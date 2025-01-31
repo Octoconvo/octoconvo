@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { inter } from "@/fonts";
 
 export const metadata: Metadata = {
   title: "Octoconvo",
@@ -13,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body className={`${inter.variable} font-sans`}>{children}</body>
     </html>
   );
 }
