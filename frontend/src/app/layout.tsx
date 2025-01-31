@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "./global.css";
 import { inter } from "@/fonts";
 
 export const metadata: Metadata = {
@@ -13,8 +13,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} font-sans`}>{children}</body>
+    <html lang="en" className="h-full">
+      <body className={`${inter.variable} font-sans flex h-full`}>
+        {children}
+      </body>
     </html>
   );
 }
