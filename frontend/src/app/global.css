@@ -13,8 +13,19 @@
 :root {
   --brand-1: #440099;
   --brand-2: #1d0041;
+  --brand-3: #80fffb;
+  --brand-4: #80ffa4;
+
   --white-100: #ede6f5;
-  --black-100: #100024;
+  --white-200: #d5cfdd;
+
+  --grey-100: #27242a;
+  --grey-200: #514d56;
+
+  --black-100: #06000e;
+  --black-200: #080012;
+  --black-300: #100024;
+  --black-400: #0f0c12;
 
   --s: 0.75rem;
   --p: 1rem;
@@ -28,5 +39,5 @@
 
 body {
   color: var(--white-100);
-  background: var(--black-100);
+  background: var(--black-300);
 }

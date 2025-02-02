@@ -15,12 +15,22 @@ export default {
         brand: {
           1: "var(--brand-1)",
           2: "var(--brand-2)",
+          3: "var(--brand-3)",
+          4: "var(--brand-4)",
         },
         white: {
           100: "var(--white-100)",
+          200: "var(--white-200)",
+        },
+        grey: {
+          100: "var(--grey-100)",
+          200: "var(--grey-200)",
         },
         black: {
           100: "var(--black-100)",
+          200: "var(--black-200)",
+          300: "var(--black-300)",
+          400: "var(--black-400)",
         },
         background: "var(--background)",
         foreground: "var(--foreground)",
