@@ -1,4 +1,4 @@
-const index = require("../routes/index");
+import index from "../routes/index";
 import request from "supertest";
 import express from "express";
 

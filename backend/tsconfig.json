@@ -7,7 +7,15 @@
     "strict": true /* Enable all strict type-checking options. */,
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "outDir": "./dist",
-    "types": ["node", "jest", "supertest"]
+    "types": [
+      "node",
+      "jest",
+      "supertest",
+      "cookie-parser",
+      "debug",
+      "http-errors",
+      "morgan"
+    ]
   },
   "exclude": ["./node_modules"]
 }
