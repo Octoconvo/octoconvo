@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="min-h-[100dvh]">
       <body className={`${inter.variable} font-sans flex h-full`}>
         {children}
       </body>
