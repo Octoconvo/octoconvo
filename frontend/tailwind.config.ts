@@ -45,6 +45,11 @@ export default {
         h2: ["var(--h2)", { lineHeight: "1.25" }],
         h1: ["var(--h1)", { lineHeight: "1.25" }],
       },
+      backgroundImage: {
+        "gr-1-t": "var(--gradient-1-t)",
+        "gr-1-d45": "var(--gradient-1-d45)",
+        "gr-bg-d": "var(--gradient-bg-d)",
+      },
     },
   },
   plugins: [],
