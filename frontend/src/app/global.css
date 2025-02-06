@@ -8,6 +8,12 @@
     src: url("/fonts/inter/inter-v.woff") format("woff"),
       url("/fonts/inter/inter-v.woff2") format("woff2");
   }
+
+  @font-face {
+    font-family: "ibm-plex-mono";
+    src: url("/fonts/ibm-plex-mono/ibmplexmono-medium.woff") format("woff"),
+      url("/fonts/ibm-plex-mono/ibmplexmono-medium.woff2") format("woff2");
+  }
 }
 
 :root {
