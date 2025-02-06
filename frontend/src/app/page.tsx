@@ -8,7 +8,7 @@ export default function Home() {
       <header className="flex p-8 w-full justify-between items-center">
         <Link href="/" className="flex gap-4 items-center">
           <Image
-            src="/octoconvo.svg"
+            src="/images/octoconvo.svg"
             width={38}
             height={38}
             alt="Octoconvo logo"
@@ -29,7 +29,7 @@ export default function Home() {
         </div>
         <div className="w-[min(calc(250px+20vw),1080px)] rounded-[16px] shadow-[-2rem_-2rem_0px_0px_var(--brand-1)]">
           <Image
-            src="/octoconvo.svg"
+            src="/images/octoconvo.svg"
             height={640}
             width={640}
             alt="Octoconvo features screenshot"
