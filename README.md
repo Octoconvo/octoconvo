@@ -21,3 +21,16 @@ chatting application to make friends, chat, and more.
 - Community profile page that allows the community creator to customize community name, community avatar, banner, and
   bio.
 - Infinite scrolling functionality to load messages.
+
+## Database Schema design
+
+### Entity-Relationship Diagram (ERD)
+
+![Database Table Relations](./assets/db-structure.png)
+
+### key points
+
+- Friend requests.
+- unilateral deletion of messages on direct message or direct message box without affecting the other user.
+- read indicator for users to see if messages has been read on direct message box.
+- activity indicator to show wether a user is currently online.
