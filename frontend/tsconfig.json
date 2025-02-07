@@ -22,7 +22,8 @@
       "@/*": ["./src/*"],
       "@/fonts": ["./src/styles/fonts.ts"],
       "@/components": ["./src/components/*"]
-    }
+    },
+    "types": ["jest"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
