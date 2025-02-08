@@ -32,8 +32,8 @@ chatting application to make friends, chat, and more.
 
 - Friend requests.
 - unilateral deletion of messages on direct message or direct message box without affecting the other user.
-- read indicator for users to see if messages has been read on direct message box.
-- activity indicator to show wether a user is currently online.
+- read indicator for users to see if messages have been read on direct message box.
+- activity indicator to show whether a user is currently online.
 
 ### Key point approach
 
