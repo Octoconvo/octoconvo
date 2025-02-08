@@ -102,20 +102,21 @@ enum ParticipantStatus {
 }
 
 model Message {
-  id                  String    @id @default(uuid())
-  inbox               Inbox     @relation(fields: [inboxId], references: [id])
+  id                  String       @id @default(uuid())
+  inbox               Inbox        @relation(fields: [inboxId], references: [id])
   inboxId             String
-  author              User      @relation(fields: [authorId], references: [id])
+  author              User         @relation(fields: [authorId], references: [id])
   authorId            String
-  content             String    @db.VarChar(2560)
-  created_at          DateTime  @default(now()) @db.Timestamptz(3)
-  updated_at          DateTime  @default(now()) @db.Timestamptz(3)
-  isDeleted           Boolean   @default(false)
-  isRead              Boolean   @default(false)
-  hiddenFromAuthor    Boolean   @default(false)
-  hiddenFromRecipient Boolean   @default(false)
-  replyTo             Replies[] @relation("replyBy")
-  replyBy             Replies[] @relation("replyTo")
+  content             String       @db.VarChar(2560)
+  created_at          DateTime     @default(now()) @db.Timestamptz(3)
+  updated_at          DateTime     @default(now()) @db.Timestamptz(3)
+  isDeleted           Boolean      @default(false)
+  isRead              Boolean      @default(false)
+  hiddenFromAuthor    Boolean      @default(false)
+  hiddenFromRecipient Boolean      @default(false)
+  replyTo             Replies[]    @relation("replyBy")
+  replyBy             Replies[]    @relation("replyTo")
+  attachments         Attachment[]
 }
 
 model Replies {
@@ -125,4 +126,26 @@ model Replies {
   replyToId String
 
   @@id([replyById, replyToId])
+}
+
+model Attachment {
+  id        String            @id @default(uuid())
+  message   Message?          @relation(fields: [messageId], references: [id])
+  messageId String?
+  type      AttachmentType
+  subtype   AttachmentSubtype
+  height    Int?
+  width     Int?
+  size      Int?
+  url       String            @db.Text
+}
+
+enum AttachmentType {
+  IMAGE
+}
+
+enum AttachmentSubtype {
+  JPEG
+  PNG
+  GIF
 }
