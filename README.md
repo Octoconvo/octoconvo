@@ -47,7 +47,7 @@ Use see_message_from to hide messages before the specified timestamp.
 
 **Direct message read indicator**
 
-Use is_read field to check message read status to update if the other participant request HTTP GET to the message.
+Use is_read field to check message read status to update if the other participant requested HTTP GET to the message.
 
 **Online activity indicator**
 
