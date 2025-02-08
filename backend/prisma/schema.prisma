@@ -39,3 +39,14 @@ enum FriendsStatus {
   PENDING
   ACTIVE
 }
+
+model Community {
+  id        String   @id @default(uuid())
+  name      String   @db.VarChar(128)
+  bio       String   @db.VarChar(255)
+  avatar    String   @db.Text
+  banner    String   @db.Text
+  isDeleted Boolean
+  createdAt DateTime @default(now()) @db.Timestamptz()
+  updatedAt DateTime @default(now()) @db.Timestamptz()
+}
