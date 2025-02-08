@@ -49,4 +49,17 @@ model Community {
   isDeleted Boolean
   createdAt DateTime @default(now()) @db.Timestamptz()
   updatedAt DateTime @default(now()) @db.Timestamptz()
+  inbox     Inbox?
+}
+
+model Inbox {
+  id          String    @id @default(uuid())
+  inboxType   InboxType
+  community   Community @relation(fields: [communityId], references: [id])
+  communityId String    @unique
+}
+
+enum InboxType {
+  DM
+  COMMUNITY
 }
