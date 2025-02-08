@@ -34,3 +34,21 @@ chatting application to make friends, chat, and more.
 - unilateral deletion of messages on direct message or direct message box without affecting the other user.
 - read indicator for users to see if messages has been read on direct message box.
 - activity indicator to show wether a user is currently online.
+
+### Key point approach
+
+**Friend request**
+
+Use status fields to check for pending friends table with the user id.
+
+**Unilateral deletion**
+
+Use see_message_from to hide messages before the specified timestamp.
+
+**Direct message read indicator**
+
+Use is_read field to check message read status to update if the other participant request HTTP GET to the message.
+
+**Online activity indicator**
+
+Use last_seen to check for users last activity date. If user last activity date is less than five minutes mark user as active.
