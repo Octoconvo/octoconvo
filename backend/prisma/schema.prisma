@@ -52,11 +52,18 @@ model Community {
   inbox     Inbox?
 }
 
+model DirectMessage {
+  id    String @id @default(uuid())
+  inbox Inbox?
+}
+
 model Inbox {
-  id          String    @id @default(uuid())
-  inboxType   InboxType
-  community   Community @relation(fields: [communityId], references: [id])
-  communityId String    @unique
+  id              String        @id @default(uuid())
+  inboxType       InboxType
+  community       Community     @relation(fields: [communityId], references: [id])
+  communityId     String        @unique
+  directMessage   DirectMessage @relation(fields: [directMessageId], references: [id])
+  directMessageId String        @unique
 }
 
 enum InboxType {
