@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Community" ALTER COLUMN "bio" DROP NOT NULL,
+ALTER COLUMN "avatar" DROP NOT NULL,
+ALTER COLUMN "banner" DROP NOT NULL;

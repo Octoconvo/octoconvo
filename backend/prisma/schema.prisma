@@ -45,9 +45,9 @@ enum FriendsStatus {
 model Community {
   id           String        @id @default(uuid())
   name         String        @db.VarChar(128)
-  bio          String        @db.VarChar(255)
-  avatar       String        @db.Text
-  banner       String        @db.Text
+  bio          String?       @db.VarChar(255)
+  avatar       String?       @db.Text
+  banner       String?       @db.Text
   isDeleted    Boolean       @default(false)
   createdAt    DateTime      @default(now()) @db.Timestamptz(3)
   updatedAt    DateTime      @default(now()) @db.Timestamptz(3)
