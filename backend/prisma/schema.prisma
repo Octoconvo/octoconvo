@@ -16,9 +16,9 @@ model User {
   banner         String?       @db.Text
   bio            String?       @db.VarChar(255)
   isDeleted      Boolean
-  lastSeen       DateTime      @default(now()) @db.Timestamptz()
-  createdAt      DateTime      @default(now()) @db.Timestamptz()
-  updatedAt      DateTime      @default(now()) @db.Timestamptz()
+  lastSeen       DateTime      @default(now()) @db.Timestamptz(3)
+  createdAt      DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime      @default(now()) @db.Timestamptz(3)
   friends        Friends[]     @relation("friendOf")
   friendsOf      Friends[]     @relation("friend")
   participations Participant[]
@@ -29,8 +29,8 @@ model Friends {
   friendOfId String
   friend     User          @relation("friend", fields: [friendId], references: [id])
   friendId   String
-  createdAt  DateTime      @default(now()) @db.Timestamptz()
-  updatedAt  DateTime      @default(now()) @db.Timestamptz()
+  createdAt  DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime      @default(now()) @db.Timestamptz(3)
   status     FriendsStatus
 
   @@id([friendOfId, friendId])
@@ -48,8 +48,8 @@ model Community {
   avatar       String        @db.Text
   banner       String        @db.Text
   isDeleted    Boolean
-  createdAt    DateTime      @default(now()) @db.Timestamptz()
-  updatedAt    DateTime      @default(now()) @db.Timestamptz()
+  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime      @default(now()) @db.Timestamptz(3)
   inbox        Inbox?
   participants Participant[]
 }
