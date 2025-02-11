@@ -7,6 +7,7 @@ import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient } from "@prisma/client";
 import passportConfig from "./config/passportConfig";
+import { exprErrorHandler } from "./utils/error";
 
 const app = express();
 app.use(logger("dev"));
@@ -34,5 +35,7 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/users", userRouter);
+
+app.use(exprErrorHandler);
 
 export default app;
