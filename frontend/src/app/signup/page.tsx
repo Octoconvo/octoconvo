@@ -37,7 +37,7 @@ export default function page() {
           ></input>
         </InputWrapper>
 
-        <button className="text-h6 bg-brand-1 rounded-[8px] box-border py-1 px-2">
+        <button className="text-h6 bg-brand-1 rounded-[8px] box-border py-1 px-2 hover:bg-gr-1-d45 transition-all">
           Sign up
         </button>
         <div className="flex justify-center items-end gap-4 text-h6">
