@@ -24,4 +24,24 @@ const getUserById = async (id: string) => {
   return user;
 };
 
-export { getUserByUsername, getUserById };
+const createUser = async ({
+  username,
+  displayName,
+  password,
+}: {
+  username: string;
+  displayName: string;
+  password: string;
+}) => {
+  const user = prisma.user.create({
+    data: {
+      username,
+      displayName,
+      password,
+    },
+  });
+
+  return user;
+};
+
+export { getUserByUsername, getUserById, createUser };
