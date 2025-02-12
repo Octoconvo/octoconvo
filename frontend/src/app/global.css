@@ -35,6 +35,19 @@
   .image-bg-404 {
     background: center / 100% auto no-repeat url("/images/404-bg.svg");
   }
+
+  .forward-icon {
+    width: 1em;
+    height: 1em;
+  }
+
+  .forward-icon::after {
+    display: block;
+    content: "";
+    height: 1em;
+    width: 1em;
+    background: center / 1em 1em no-repeat url("/images/arrow-forward-icon.svg");
+  }
 }
 
 :root {
