@@ -15,7 +15,7 @@ const getUserByUsername = async (username: string) => {
 };
 
 const getUserById = async (id: string) => {
-  const user = prisma.user.findFirst({
+  const user = await prisma.user.findFirst({
     where: {
       id: id,
     },
@@ -33,7 +33,7 @@ const createUser = async ({
   displayName: string;
   password: string;
 }) => {
-  const user = prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       username,
       displayName,
