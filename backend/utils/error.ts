@@ -1,4 +1,5 @@
 import { ErrorRequestHandler } from "express";
+import { Result } from "express-validator";
 
 // eslint-disable-next-line
 const exprErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
@@ -17,4 +18,19 @@ const exprErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
   });
 };
 
-export { exprErrorHandler };
+const createValidationErrObj = (err: Result, message: string) => {
+  const errorList = err
+    .array()
+    .map((err: { path: string; value: string; msg: string }) => {
+      return { field: err.path, value: err.value, msg: err.msg };
+    });
+
+  return {
+    message,
+    error: {
+      validationError: errorList,
+    },
+  };
+};
+
+export { exprErrorHandler, createValidationErrObj };
