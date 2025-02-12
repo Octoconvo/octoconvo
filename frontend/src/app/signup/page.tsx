@@ -44,7 +44,7 @@ export default function page() {
           <p>Already have an account?</p>
           <Link
             href={"/login"}
-            className=" flex items-center gap-4 border-b-[1px] py-1 px-2 border-b-white-100 font-medium"
+            className=" flex items-center gap-4 border-b-[1px] py-1 px-2 border-b-white-100 font-medium hover:text-brand-4 hover:gap-6 transition-all"
           >
             Log in <span className="forward-icon"></span>
           </Link>
