@@ -5,8 +5,7 @@
 @layer base {
   @font-face {
     font-family: "inter";
-    src: url("/fonts/inter/inter-v.woff") format("woff"),
-      url("/fonts/inter/inter-v.woff2") format("woff2");
+    src: url("/fonts/inter/inter-v.woff2") format("woff2");
   }
 
   @font-face {
@@ -84,4 +83,5 @@
 body {
   color: var(--white-100);
   background: var(--black-300);
+  line-height: 1;
 }
