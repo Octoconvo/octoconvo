@@ -22,7 +22,7 @@ const userValidation = {
       }
     })
     .escape()
-    .custom(async val => {
+    .custom(async (val: string) => {
       const user = await getUserByUsername(val);
 
       if (user) {
@@ -30,9 +30,20 @@ const userValidation = {
       }
     }),
   password: body("password", "Password is required")
-    .trim()
     .isLength({ min: 8 })
     .withMessage("Password must contain at least 8 characters")
+    .custom(async (val: string) => {
+      const regex = new RegExp(
+        "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\\W_]).{8,}",
+      );
+      const match = regex.test(val);
+      if (!match) {
+        throw new Error(
+          "Password must contain at least one digit, one lowercase letter, one uppercase letter," +
+            "and one special character",
+        );
+      }
+    })
     .escape(),
 };
 
