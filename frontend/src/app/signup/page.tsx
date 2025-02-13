@@ -1,5 +1,5 @@
+import SignupForm from "@/components/SignupForm";
 import Link from "next/link";
-import InputWrapper from "@/components/InputWrapper";
 
 export default function page() {
   return (
@@ -12,44 +12,16 @@ export default function page() {
           Create an account to start your journey
         </p>
       </div>
-
-      <form className="flex flex-col gap-8">
-        <InputWrapper>
-          {" "}
-          <label htmlFor="username">Username</label>
-          <input
-            data-testid="username"
-            name="username"
-            id="username"
-            required
-            className="rounded-[8px] box-border py-1 px-2 text-black-300"
-          ></input>
-        </InputWrapper>
-        <InputWrapper>
-          {" "}
-          <label htmlFor="password">Password</label>
-          <input
-            data-testid="password"
-            name="password"
-            id="password"
-            required
-            className="rounded-[8px] box-border py-1 px-2 text-black-300"
-          ></input>
-        </InputWrapper>
-
-        <button className="text-h6 bg-brand-1 rounded-[8px] box-border py-1 px-2 hover:bg-gr-1-d45 transition-all">
-          Sign up
-        </button>
-        <div className="flex justify-center items-end gap-4 text-h6">
-          <p>Already have an account?</p>
-          <Link
-            href={"/login"}
-            className=" flex items-center gap-4 border-b-[1px] py-1 px-2 border-b-white-100 font-medium hover:text-brand-4 hover:gap-6 transition-all"
-          >
-            Log in <span className="forward-icon"></span>
-          </Link>
-        </div>
-      </form>
+      <SignupForm />
+      <div className="flex justify-center items-end gap-4 text-h6">
+        <p>Already have an account?</p>
+        <Link
+          href={"/login"}
+          className=" flex items-center gap-4 border-b-[1px] py-1 px-2 border-b-white-100 font-medium hover:text-brand-4 hover:gap-6 transition-all"
+        >
+          Log in <span className="forward-icon"></span>
+        </Link>
+      </div>
     </div>
   );
 }
