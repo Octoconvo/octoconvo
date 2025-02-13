@@ -6,6 +6,7 @@ import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient } from "@prisma/client";
 import passportConfig from "./config/passportConfig";
 import { exprErrorHandler } from "./utils/error";
+import cors from "cors";
 
 import indexRouter from "./routes/index";
 import userRouter from "./routes/user";
@@ -13,6 +14,7 @@ import accountRouter from "./routes/account";
 
 const app = express();
 app.use(logger("dev"));
+app.use(cors());
 app.use(
   session({
     cookie: {
