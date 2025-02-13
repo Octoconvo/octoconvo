@@ -32,6 +32,7 @@ export default {
           300: "var(--black-300)",
           400: "var(--black-400)",
         },
+        invalid: "var(--invalid)",
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
