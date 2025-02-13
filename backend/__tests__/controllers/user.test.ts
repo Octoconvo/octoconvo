@@ -31,13 +31,13 @@ describe("Test user signup using local strategy", () => {
     await deleteUserByUsername("test_user_1");
   });
 
-  test("Successfully create an account if all field is correct", done => {
+  test("Successfully create an account if all fields passed the validation", done => {
     request(app)
       .post("/account/signup")
       .type("form")
       .send({
         username: "test_user_1",
-        password: "test_password_1",
+        password: "test_A1_",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
