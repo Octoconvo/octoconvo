@@ -38,4 +38,4 @@ app.use("/users", userRouter);
 
 app.use(exprErrorHandler);
 
-export default app;
+module.exports = app;
