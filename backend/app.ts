@@ -1,17 +1,18 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import indexRouter from "./routes/index";
-import userRouter from "./routes/user";
 import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient } from "@prisma/client";
 import passportConfig from "./config/passportConfig";
 import { exprErrorHandler } from "./utils/error";
 
+import indexRouter from "./routes/index";
+import userRouter from "./routes/user";
+import accountRouter from "./routes/account";
+
 const app = express();
 app.use(logger("dev"));
-
 app.use(
   session({
     cookie: {
@@ -35,6 +36,7 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/users", userRouter);
+app.use("/account", accountRouter);
 
 app.use(exprErrorHandler);
 
