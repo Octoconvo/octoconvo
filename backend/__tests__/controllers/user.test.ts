@@ -131,6 +131,31 @@ describe("Test user signup using local strategy", () => {
       })
       .expect(422, done);
   });
+
+  test(
+    "Failed to create an account if password doesn't contain at least one digit, one lowercase letter," +
+      "one uppercase letter, and one special character",
+    done => {
+      request(app)
+        .post("/account/signup")
+        .type("form")
+        .send({
+          username: "test_user_2",
+          password: "Test_user",
+        })
+        .expect("Content-Type", /json/)
+        .expect(res => {
+          const message = res.body.message;
+          const error = res.body.error;
+          expect(message).toEqual("Failed to create a new account");
+          expect(error.validationError[0].msg).toEqual(
+            "Password must contain at least one digit, one lowercase letter, one uppercase letter," +
+              "and one special character",
+          );
+        })
+        .expect(422, done);
+    },
+  );
 });
 
 export default app;
