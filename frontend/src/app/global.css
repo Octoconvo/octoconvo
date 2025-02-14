@@ -47,6 +47,36 @@
     width: 1em;
     background: center / 1em 1em no-repeat url("/images/arrow-forward-icon.svg");
   }
+
+  .visibility-on-icon {
+    position: absolute;
+    width: 1.25em;
+    height: 1.25em;
+  }
+
+  .visibility-on-icon::after {
+    display: block;
+    content: "";
+    width: 1.25em;
+    height: 1.25em;
+    background: center / 1.25em 1.25em no-repeat
+      url("/images/visibility-on-icon.svg");
+  }
+
+  .visibility-off-icon {
+    position: absolute;
+    height: 1.25em;
+    width: 1.25em;
+  }
+
+  .visibility-off-icon::after {
+    display: block;
+    content: "";
+    width: 1.25em;
+    height: 1.25em;
+    background: center / 1.25em 1.25em no-repeat
+      url("/images/visibility-off-icon.svg");
+  }
 }
 
 :root {
