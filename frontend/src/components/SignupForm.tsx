@@ -70,7 +70,7 @@ const SignupForm = ({ onSubmit }: { onSubmit: SubmitHandler<SignupForm> }) => {
               data-testid="password"
               id="password"
               type="password"
-              autoComplete="password"
+              autoComplete="password-new"
               {...register("password", passwordValidation)}
               className="rounded-[8px] box-border py-1 px-2 text-black-300 w-full"
             ></input>
