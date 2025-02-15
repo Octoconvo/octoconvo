@@ -4,6 +4,7 @@ import { body, validationResult } from "express-validator";
 import { createUser, getUserByUsername } from "../database/prisma/userQueries";
 import { NextFunction, Request, Response } from "express";
 import { createValidationErrObj } from "../utils/error";
+import passport, { AuthenticateCallback } from "passport";
 
 const userValidation = {
   username_signup: body("username", "username is required")
@@ -41,6 +42,22 @@ const userValidation = {
         throw new Error(
           "Password must contain at least one digit, one lowercase letter, one uppercase letter," +
             "and one special character",
+        );
+      }
+    })
+    .escape(),
+  username_login: body("username", "username is required")
+    .trim()
+    .isLength({ min: 1 })
+    .bail()
+    .isLength({ max: 32 })
+    .withMessage("Username must not exceed 32 characters")
+    .custom(async val => {
+      const regex = new RegExp("^[a-zA-Z0-9_]+$");
+      const match = regex.test(val);
+      if (!match) {
+        throw new Error(
+          "Username must only contain alphanumeric characters and underscores",
         );
       }
     })
@@ -87,4 +104,49 @@ const user_sign_up_post = [
   }),
 ];
 
-export { user_sign_up_post };
+const user_log_in_post = [
+  userValidation.username_login,
+  userValidation.password,
+  asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(errors, "Failed to log in");
+
+      res.status(422).json(obj);
+      return;
+    }
+
+    const verifyCallBack: AuthenticateCallback = (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+
+      const messageObj = info as { message: string };
+
+      if (!user) {
+        return res.status(401).json({
+          message: "Failed to log in",
+          error: {
+            message: messageObj.message,
+          },
+        });
+      } else {
+        const userData = user as Express.User;
+        req.login(user, () => {
+          res.json({
+            message: "Successfully logged in",
+            user: {
+              id: userData.id,
+            },
+          });
+        });
+      }
+    };
+
+    // Authenticate with Passport
+    passport.authenticate("local", verifyCallBack)(req, res, next);
+  }),
+];
+
+export { user_sign_up_post, user_log_in_post };
