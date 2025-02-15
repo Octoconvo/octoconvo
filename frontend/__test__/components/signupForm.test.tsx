@@ -14,7 +14,7 @@ const onSubmit = jest.fn();
 describe("Render signup page", () => {
   const user = userEvent.setup();
   beforeEach(() => {
-    render(<SignupForm onSubmit={onSubmit} />);
+    render(<SignupForm onSubmit={onSubmit} validationError={[]} />);
   });
 
   it("Check whether username input is rendered", async () => {

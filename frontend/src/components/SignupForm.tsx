@@ -1,11 +1,21 @@
 "use client";
 import InputWrapper from "./InputWrapper";
-import type { SignupForm } from "../../@types/form";
+import ValidationError from "./ValidationError";
+import type {
+  SignupForm,
+  ValidationError as ValidationErrorType,
+} from "../../@types/form";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import VisibilityButton from "./VisibilityButton";
 import { useState } from "react";
 
-const SignupForm = ({ onSubmit }: { onSubmit: SubmitHandler<SignupForm> }) => {
+const SignupForm = ({
+  onSubmit,
+  validationError,
+}: {
+  onSubmit: SubmitHandler<SignupForm>;
+  validationError: ValidationErrorType[];
+}) => {
   const methods = useForm<SignupForm>();
   const {
     handleSubmit,
@@ -49,6 +59,12 @@ const SignupForm = ({ onSubmit }: { onSubmit: SubmitHandler<SignupForm> }) => {
             <div data-testid="rfh-username-err" className="text-invalid">
               {errors.username?.message}
             </div>
+          )}
+          {validationError && (
+            <ValidationError
+              validationError={validationError}
+              field="username"
+            />
           )}
           <input
             data-testid="username"

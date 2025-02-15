@@ -1,11 +1,12 @@
 import { SubmitHandler } from "react-hook-form";
 import SignupForm from "@/components/SignupForm";
+import { ValidationError } from "../../@types/form";
 
 const createSignupOnSubmit = ({
   errorHandler,
   successHandler,
 }: {
-  errorHandler: () => void;
+  errorHandler: (error: ValidationError[]) => void;
   successHandler: () => void;
 }): SubmitHandler<SignupForm> => {
   return async (data) => {
@@ -29,7 +30,11 @@ const createSignupOnSubmit = ({
       // Handle errors
       if (login.status >= 400) {
         console.log(loginData.message);
-        errorHandler();
+
+        // Handle 422 error response
+        if (login.status === 422) {
+          errorHandler(loginData.error.validationError);
+        }
       } else {
         successHandler();
       }
