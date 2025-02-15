@@ -14,6 +14,7 @@ const VisibilityButton = ({
       data-testid="visibility-button"
       type="button"
       onClick={onClick}
+      aria-label={isVisible ? "Hide password" : "Show password"}
       className="absolute flex items-center justify-center right-4 w-[1em] h-[1em] p-4"
     >
       <span
