@@ -3,4 +3,10 @@ type SignupForm = {
   password: string;
 };
 
-export type { SignupForm };
+type ValidationError = {
+  field: string;
+  value: string;
+  msg: string;
+};
+
+export type { SignupForm, ValidationError };
