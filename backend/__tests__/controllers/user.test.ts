@@ -25,6 +25,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use("/account/signup", userController.user_sign_up_post);
+app.use("/account/login", userController.user_log_in_post);
 
 describe("Test user signup using local strategy", () => {
   afterAll(async () => {
@@ -158,4 +159,62 @@ describe("Test user signup using local strategy", () => {
   );
 });
 
+describe("Test user login using local strategy", () => {
+  test("Failed to login if username is invalid", done => {
+    request(app)
+      .post("/account/login")
+      .type("form")
+      .send({
+        username: "This_user_doesn_t_exist",
+        password: "Test_password_123",
+      })
+      .expect("Content-Type", /json/)
+      .expect(res => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toEqual("Failed to log in");
+        expect(error.message).toEqual("Incorrect username or password");
+      })
+      .expect(401, done);
+  });
+
+  test("Failed to login if password is invalid", done => {
+    request(app)
+      .post("/account/login")
+      .type("form")
+      .send({
+        username: "client_user_1",
+        password: "Test_password_1",
+      })
+      .expect("Content-Type", /json/)
+      .expect(res => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toEqual("Failed to log in");
+        expect(error.message).toEqual("Incorrect username or password");
+      })
+      .expect(401, done);
+  });
+
+  test("Successfully login if all fields are valid", done => {
+    request(app)
+      .post("/account/login")
+      .type("form")
+      .send({
+        username: "client_user_1",
+        password: "Client_password_1",
+      })
+      .expect("Content-Type", /json/)
+      .expect(res => {
+        const message = res.body.message;
+        const user = res.body.user;
+
+        expect(message).toEqual("Successfully logged in");
+        expect(user.id).toBeDefined();
+      })
+      .expect(200, done);
+  });
+});
 export default app;
