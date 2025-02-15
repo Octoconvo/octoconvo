@@ -8,7 +8,7 @@ export default function page() {
         <h1 className="text-h3 text-white-100 font-bold">
           Welcome to Octoconvo
         </h1>
-        <p className="text-h5 text-white-100 font-medium">
+        <p className="text-h5 text-white-200 font-medium">
           Create an account to start your journey
         </p>
       </div>
@@ -17,7 +17,7 @@ export default function page() {
         <p>Already have an account?</p>
         <Link
           href={"/login"}
-          className=" flex items-center gap-4 border-b-[1px] py-1 px-2 border-b-white-100 font-medium hover:text-brand-4 hover:gap-6 transition-all"
+          className=" flex text-white-200 items-center gap-4 border-b-[1px] py-1 px-2 border-b-white-100 font-medium hover:text-brand-4 hover:gap-6 transition-all"
         >
           Log in <span className="forward-icon"></span>
         </Link>
