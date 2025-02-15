@@ -5,7 +5,7 @@ import passport from "passport";
 import passportLocal from "passport-local";
 
 const strategy: VerifyFunction = async (username, password, done) => {
-  const message = "Incorrect username or password.";
+  const message = "Incorrect username or password";
 
   try {
     const user = await getUserByUsername(username);
