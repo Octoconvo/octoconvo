@@ -71,7 +71,7 @@ const SignupForm = ({
             id="username"
             autoComplete="username"
             {...register("username", usernameValidation)}
-            className="rounded-[8px] box-border py-1 px-2 text-black-300"
+            className="rounded-[8px] box-border py-1 px-2 text-black-300 bg-white-100"
           ></input>
         </InputWrapper>
         <InputWrapper>
@@ -88,7 +88,7 @@ const SignupForm = ({
               type={isPasswordVisible ? "text" : "password"}
               autoComplete="password-new"
               {...register("password", passwordValidation)}
-              className="rounded-[8px] box-border py-1 px-2 text-black-300 w-full"
+              className="rounded-[8px] box-border py-1 px-2 text-black-300 w-full bg-white-100"
             ></input>
             <VisibilityButton
               setIsVisible={setIsPasswordVisible}
