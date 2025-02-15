@@ -115,4 +115,15 @@ describe("Render signup page", () => {
     const errorPassword = screen.queryByTestId("rfh-password-err");
     expect(errorPassword).toBeNull();
   });
+
+  it("Check if password input type change correctly when clicking VisibilityButton", async () => {
+    const password = screen.getByTestId("password") as HTMLInputElement;
+
+    expect(password.type).toBe("password");
+
+    const button = screen.getByTestId("visibility-button");
+
+    await user.click(button);
+    expect(password.type).toBe("text");
+  });
 });
