@@ -65,7 +65,7 @@ const SignupForm = ({ onSubmit }: { onSubmit: SubmitHandler<SignupForm> }) => {
               {errors.password?.message}
             </div>
           )}
-          <div className="relative flex flex-auto">
+          <div className="relative flex flex-auto items-center">
             <input
               data-testid="password"
               id="password"
