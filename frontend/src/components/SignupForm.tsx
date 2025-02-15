@@ -2,46 +2,17 @@
 import InputWrapper from "./InputWrapper";
 import type { SignupForm } from "../../@types/form";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import VisibilityButton from "./VisibilityButton";
+import { useState } from "react";
 
-const SignupForm = () => {
+const SignupForm = ({ onSubmit }: { onSubmit: SubmitHandler<SignupForm> }) => {
   const methods = useForm<SignupForm>();
-  const router = useRouter();
   const {
     handleSubmit,
     register,
     formState: { errors },
   } = methods;
-
-  const onSubmit: SubmitHandler<SignupForm> = async (data) => {
-    const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
-
-    const formData = new URLSearchParams();
-    formData.append("username", data.username);
-    formData.append("password", data.password);
-
-    try {
-      const login = await fetch(`${domainURL}/account/signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData,
-      });
-
-      const loginData = await login.json();
-
-      // Handle errors
-      if (login.status >= 400) {
-        console.error(loginData.message);
-      } else {
-        router.push("/login");
-      }
-    } catch (err) {
-      console.log("Something went wrong, failed to sign up");
-      if (err instanceof TypeError) console.log(err.message);
-    }
-  };
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const usernameValidation = {
     required: "username is required",
@@ -59,13 +30,13 @@ const SignupForm = () => {
     required: "Password is required",
     minLength: {
       value: 8,
-      message: "Password must be atleast 8 characters long",
+      message: "Password must contain at least 8 characters",
     },
     pattern: {
       value: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}/,
       message:
-        "Password must be contain at least one digit," +
-        "one lowercase letter, one uppercase letter, and one special character",
+        "Password must contain at least one digit" +
+        ", one lowercase letter, one uppercase letter, and one special character",
     },
   };
 
@@ -75,7 +46,9 @@ const SignupForm = () => {
         <InputWrapper>
           <label htmlFor="username">Username</label>
           {errors.username && (
-            <div className="text-invalid">{errors.username?.message}</div>
+            <div data-testid="rfh-username-err" className="text-invalid">
+              {errors.username?.message}
+            </div>
           )}
           <input
             data-testid="username"
@@ -87,15 +60,23 @@ const SignupForm = () => {
         <InputWrapper>
           <label htmlFor="password">Password</label>
           {errors.password && (
-            <div className="text-invalid">{errors.password?.message}</div>
+            <div data-testid="rfh-password-err" className="text-invalid">
+              {errors.password?.message}
+            </div>
           )}
-          <input
-            data-testid="password"
-            id="password"
-            type="password"
-            {...register("password", passwordValidation)}
-            className="rounded-[8px] box-border py-1 px-2 text-black-300"
-          ></input>
+          <div className="relative flex flex-auto">
+            <input
+              data-testid="password"
+              id="password"
+              type="password"
+              {...register("password", passwordValidation)}
+              className="rounded-[8px] box-border py-1 px-2 text-black-300 w-full"
+            ></input>
+            <VisibilityButton
+              setIsVisible={setIsPasswordVisible}
+              isVisible={isPasswordVisible}
+            />
+          </div>
         </InputWrapper>
 
         <button

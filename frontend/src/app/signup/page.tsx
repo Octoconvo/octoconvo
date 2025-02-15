@@ -1,4 +1,4 @@
-import SignupForm from "@/components/SignupForm";
+import SignupFormWrapper from "@/components/SignupFormWrapper";
 import Link from "next/link";
 
 export default function page() {
@@ -12,7 +12,7 @@ export default function page() {
           Create an account to start your journey
         </p>
       </div>
-      <SignupForm />
+      <SignupFormWrapper />
       <div className="flex justify-center items-end gap-4 text-h6">
         <p>Already have an account?</p>
         <Link
