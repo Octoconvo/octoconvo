@@ -2,6 +2,32 @@ import { SubmitHandler } from "react-hook-form";
 import SignupForm from "@/components/SignupForm";
 import { ValidationError } from "../../@types/form";
 
+const usernameValidation = {
+  required: "username is required",
+  maxLength: {
+    value: 32,
+    message: "Username cannot exceed 32 characters",
+  },
+  pattern: {
+    value: /^[a-zA-Z0-9_]+$/,
+    message: "Username must only contain alphanumerics and underscores",
+  },
+};
+
+const passwordValidation = {
+  required: "Password is required",
+  minLength: {
+    value: 8,
+    message: "Password must contain at least 8 characters",
+  },
+  pattern: {
+    value: /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).{8,}/,
+    message:
+      "Password must contain at least one digit" +
+      ", one lowercase letter, one uppercase letter, and one special character",
+  },
+};
+
 const createSignupOnSubmit = ({
   errorHandler,
   successHandler,
@@ -45,4 +71,4 @@ const createSignupOnSubmit = ({
   };
 };
 
-export { createSignupOnSubmit };
+export { usernameValidation, passwordValidation, createSignupOnSubmit };
