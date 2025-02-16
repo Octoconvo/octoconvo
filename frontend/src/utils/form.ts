@@ -52,7 +52,6 @@ const createSignupOnSubmit = ({
       });
 
       const loginData = await login.json();
-
       // Handle errors
       if (login.status >= 400) {
         console.log(loginData.message);
@@ -66,7 +65,10 @@ const createSignupOnSubmit = ({
       }
     } catch (err) {
       console.log("Something went wrong, failed to sign up");
-      if (err instanceof TypeError) console.log(err.message);
+
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
     }
   };
 };
