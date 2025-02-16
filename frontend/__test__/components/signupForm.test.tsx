@@ -23,7 +23,7 @@ describe("Render signup page", () => {
   });
 
   it("Check whether password input is rendered", async () => {
-    const input = screen.getByTestId("username");
+    const input = screen.getByTestId("password");
     expect(input).toBeInTheDocument();
   });
 
