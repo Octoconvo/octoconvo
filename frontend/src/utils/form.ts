@@ -73,4 +73,53 @@ const createSignupOnSubmit = ({
   };
 };
 
-export { usernameValidation, passwordValidation, createSignupOnSubmit };
+const createOnSubmit =
+  <T extends object>({
+    errorHandler,
+    successHandler,
+    path,
+    getFormData,
+    config,
+  }: {
+    errorHandler: (error: ValidationError[]) => void;
+    successHandler: <Data>(successData: Data) => void;
+    path: string;
+    getFormData: <T extends object>(data: T) => BodyInit;
+    config: RequestInit;
+  }): SubmitHandler<T> =>
+  async (data: T) => {
+    const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
+
+    const formData = getFormData(data);
+
+    try {
+      const response = await fetch(`${domainURL}/${path}`, {
+        ...config,
+        body: formData,
+      });
+
+      const responseData = await response.json();
+
+      // Handle errors
+      console.log({ responseData });
+      if (response.status >= 400) {
+        // Handle 422 error response
+        if (response.status === 422) {
+          errorHandler(responseData.error.validationError);
+        }
+      } else {
+        successHandler(responseData);
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
+  };
+
+export {
+  usernameValidation,
+  passwordValidation,
+  createSignupOnSubmit,
+  createOnSubmit,
+};
