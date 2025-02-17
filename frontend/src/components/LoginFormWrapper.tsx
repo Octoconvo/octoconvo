@@ -27,7 +27,7 @@ const LoginFormWrapper = () => {
   const onSubmit = createOnSubmit<LoginFormType>({
     errorHandler,
     successHandler,
-    path: "account/signup",
+    path: "account/login",
     getFormData,
     config: {
       method: "POST",
