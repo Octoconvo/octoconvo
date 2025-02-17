@@ -43,7 +43,7 @@ const createSignupOnSubmit = ({
     formData.append("password", data.password);
 
     try {
-      const login = await fetch(`${domainURL}/account/signup`, {
+      const signup = await fetch(`${domainURL}/account/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
@@ -51,14 +51,14 @@ const createSignupOnSubmit = ({
         body: formData,
       });
 
-      const loginData = await login.json();
+      const signupData = await signup.json();
       // Handle errors
-      if (login.status >= 400) {
-        console.log(loginData.message);
+      if (signup.status >= 400) {
+        console.log(signupData.message);
 
         // Handle 422 error response
-        if (login.status === 422) {
-          errorHandler(loginData.error.validationError);
+        if (signup.status === 422) {
+          errorHandler(signupData.error.validationError);
         }
       } else {
         successHandler();
