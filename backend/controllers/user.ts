@@ -5,6 +5,7 @@ import { createUser, getUserByUsername } from "../database/prisma/userQueries";
 import { NextFunction, Request, Response } from "express";
 import { createValidationErrObj } from "../utils/error";
 import passport, { AuthenticateCallback } from "passport";
+import AuthenticationEmitter from "../events/authentication";
 
 const userValidation = {
   username_signup: body("username", "username is required")
@@ -133,7 +134,8 @@ const user_log_in_post = [
         });
       } else {
         const userData = user as Express.User;
-        req.login(user, () => {
+        return req.login(user, () => {
+          AuthenticationEmitter.login({ user, date: new Date(Date.now()) });
           res.json({
             message: "Successfully logged in",
             user: {
