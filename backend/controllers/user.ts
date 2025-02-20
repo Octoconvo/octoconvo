@@ -161,8 +161,21 @@ const user_log_in_post = [
   }),
 ];
 
-// const user_put = [
+const user_log_out_post = (req: Request, res: Response, next: NextFunction) => {
+  req.logout((err: Error) => {
+    if (err) {
+      return next(err);
+    }
 
-// ]
+    res.json({
+      message: "Successfully logged out",
+    });
+  });
+};
 
-export { user_sign_up_post, user_log_in_post, user_log_in_get };
+export {
+  user_sign_up_post,
+  user_log_in_post,
+  user_log_in_get,
+  user_log_out_post,
+};
