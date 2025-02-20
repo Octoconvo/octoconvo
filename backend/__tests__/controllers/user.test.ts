@@ -226,6 +226,27 @@ describe("Test user login get", () => {
 });
 
 describe("Test user login using local strategy", () => {
+  test("Failed to login if input validation failed", done => {
+    request(app)
+      .post("/account/login")
+      .type("form")
+      .send({
+        username: "failed.",
+        password: "Test_password_123",
+      })
+      .expect("Content-Type", /json/)
+      .expect(res => {
+        const message = res.body.message;
+        const error = res.body.error.validationError;
+
+        console.log(error);
+        expect(message).toEqual("Failed to log in");
+        expect(error[0].msg).toEqual(
+          "Username must only contain alphanumeric characters and underscores",
+        );
+      })
+      .expect(422, done);
+  });
   test("Failed to login if username is invalid", done => {
     request(app)
       .post("/account/login")
