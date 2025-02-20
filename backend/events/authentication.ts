@@ -13,6 +13,7 @@ class emitter extends EventEmitter {
 }
 
 const AuthenticationEmitter = new emitter();
+
 AuthenticationEmitter.on(
   "login",
   ({ user, date }: { user: Express.User; date: Date }) => {

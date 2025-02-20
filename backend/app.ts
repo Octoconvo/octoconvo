@@ -14,7 +14,12 @@ import accountRouter from "./routes/account";
 
 const app = express();
 app.use(logger("dev"));
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.ORIGIN,
+    credentials: true,
+  }),
+);
 app.use(
   session({
     cookie: {
