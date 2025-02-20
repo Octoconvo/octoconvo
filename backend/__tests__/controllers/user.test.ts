@@ -25,7 +25,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use("/account/signup", userController.user_sign_up_post);
-app.use("/account/login", userController.user_log_in_post);
+app.get("/account/login", userController.user_log_in_get);
+app.post("/account/login", userController.user_log_in_post);
 
 describe("Test user signup using local strategy", () => {
   afterAll(async () => {
@@ -159,6 +160,62 @@ describe("Test user signup using local strategy", () => {
   );
 });
 
+describe("Test user login get", () => {
+  test(
+    "Return json object with user equal to false if user is not" +
+      "authenticated",
+    done => {
+      request(app)
+        .get("/account/login")
+        .expect("Content-Type", /json/)
+        .expect(res => {
+          const message = res.body.message;
+
+          expect(message).toEqual("You are not authenticated");
+        })
+        .expect(200, done);
+    },
+  );
+
+  const agent = request.agent(app);
+
+  test("Successfully log in as client_user_1", done => {
+    agent
+      .post("/account/login")
+      .type("form")
+      .send({
+        username: "client_user_1",
+        password: "Client_password_1",
+      })
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect(res => {
+        const message = res.body.message;
+        const user = res.body.user;
+
+        expect(message).toEqual("Successfully logged in");
+        expect(user.id).toBeDefined();
+      })
+      .expect("set-cookie", /^connect.sid=/)
+      .end(done);
+  });
+
+  test("Return json object with user id if user is authenticated", done => {
+    agent
+      .get("/account/login")
+      .expect("Content-Type", /json/)
+      .expect(res => {
+        const message = res.body.message;
+        const user = res.body.user;
+
+        expect(message).toEqual("You are authenticated");
+        expect(user.id).toBeDefined();
+      })
+      .expect(200)
+      .end(done);
+  });
+});
+
 describe("Test user login using local strategy", () => {
   test("Failed to login if username is invalid", done => {
     request(app)
@@ -217,4 +274,5 @@ describe("Test user login using local strategy", () => {
       .expect(200, done);
   });
 });
+
 export default app;
