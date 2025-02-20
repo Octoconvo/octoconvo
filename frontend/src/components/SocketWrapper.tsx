@@ -24,7 +24,7 @@ const SocketWrapper = ({ children }: { children: React.ReactNode }) => {
     };
   }, [isConnected]);
 
-  return <div>{children}</div>;
+  return <div className="flex flex-auto min-h-[100dvh]">{children}</div>;
 };
 
 export default SocketWrapper;
