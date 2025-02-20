@@ -105,6 +105,16 @@ const user_sign_up_post = [
   }),
 ];
 
+const user_log_in_get = (req: Request, res: Response) => {
+  const user = req.user;
+  const message = user ? "You are authenticated" : "You are not authenticated";
+
+  res.json({
+    user: user ? { id: user.id } : false,
+    message,
+  });
+};
+
 const user_log_in_post = [
   userValidation.username_login,
   userValidation.password,
@@ -134,7 +144,7 @@ const user_log_in_post = [
         });
       } else {
         const userData = user as Express.User;
-        return req.login(user, () => {
+        return req.logIn(user, () => {
           AuthenticationEmitter.login({ user, date: new Date(Date.now()) });
           res.json({
             message: "Successfully logged in",
@@ -155,4 +165,4 @@ const user_log_in_post = [
 
 // ]
 
-export { user_sign_up_post, user_log_in_post };
+export { user_sign_up_post, user_log_in_post, user_log_in_get };
