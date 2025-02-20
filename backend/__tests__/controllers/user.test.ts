@@ -5,6 +5,9 @@ import passportConfig from "../../config/passportConfig";
 import * as userController from "../../controllers/user";
 import request from "supertest";
 import { deleteUserByUsername } from "../../database/prisma/userQueries";
+import TestAgent from "supertest/lib/agent";
+import { exprErrorHandler } from "../../utils/error";
+import { Request, Response, NextFunction } from "express";
 
 const app = express();
 
@@ -27,6 +30,31 @@ app.use(cookieParser());
 app.use("/account/signup", userController.user_sign_up_post);
 app.get("/account/login", userController.user_log_in_get);
 app.post("/account/login", userController.user_log_in_post);
+app.post("/account/logout", userController.user_log_out_post);
+
+app.use(exprErrorHandler);
+
+const login = (agent: TestAgent) =>
+  test("Successfully log in as client_user_1", done => {
+    agent
+      .post("/account/login")
+      .type("form")
+      .send({
+        username: "client_user_1",
+        password: "Client_password_1",
+      })
+      .expect("Content-Type", /json/)
+      .expect(200)
+      .expect(res => {
+        const message = res.body.message;
+        const user = res.body.user;
+
+        expect(message).toEqual("Successfully logged in");
+        expect(user.id).toBeDefined();
+      })
+      .expect("set-cookie", /^connect.sid=/)
+      .end(done);
+  });
 
 describe("Test user signup using local strategy", () => {
   afterAll(async () => {
@@ -177,28 +205,9 @@ describe("Test user login get", () => {
     },
   );
 
-  const agent = request.agent(app);
+  const agent: TestAgent = request.agent(app);
 
-  test("Successfully log in as client_user_1", done => {
-    agent
-      .post("/account/login")
-      .type("form")
-      .send({
-        username: "client_user_1",
-        password: "Client_password_1",
-      })
-      .expect("Content-Type", /json/)
-      .expect(200)
-      .expect(res => {
-        const message = res.body.message;
-        const user = res.body.user;
-
-        expect(message).toEqual("Successfully logged in");
-        expect(user.id).toBeDefined();
-      })
-      .expect("set-cookie", /^connect.sid=/)
-      .end(done);
-  });
+  login(agent);
 
   test("Return json object with user id if user is authenticated", done => {
     agent
@@ -272,6 +281,50 @@ describe("Test user login using local strategy", () => {
         expect(user.id).toBeDefined();
       })
       .expect(200, done);
+  });
+});
+
+describe("Test logout get controller", () => {
+  const agent = request.agent(app);
+
+  login(agent);
+
+  test("Successfully logged out if user is authenticated", done => {
+    agent
+      .post("/account/logout")
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Successfully logged out",
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("User object is undefined after logging out", done => {
+    request(app)
+      .get("/account/login")
+      .expect("Content-Type", /json/)
+      .expect(res => {
+        const message = res.body.message;
+
+        expect(message).toEqual("You are not authenticated");
+      })
+      .expect(200, done);
+  });
+
+  test("Call next if an error occured when trying to log out", () => {
+    const error = new Error("Network Error");
+    const req: Request = {
+      logout: jest.fn(callback => {
+        callback(error);
+      }),
+    } as unknown as Request;
+    const res: Response = { json: jest.fn(() => {}) } as unknown as Response;
+    const next: NextFunction = jest.fn(() => {});
+
+    userController.user_log_out_post(req, res, next);
+    expect(req.logout).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(error);
   });
 });
 
