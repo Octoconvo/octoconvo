@@ -9,7 +9,13 @@ describe("Render login page", () => {
   const user = userEvent.setup();
 
   beforeEach(() => {
-    render(<LoginForm onSubmit={onSubmit} validationError={[]} />);
+    render(
+      <LoginForm
+        onSubmit={onSubmit}
+        validationError={[]}
+        isSubmitting={false}
+      />
+    );
   });
 
   it("Check whether username input is rendered", async () => {
