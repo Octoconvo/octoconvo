@@ -74,7 +74,7 @@ const createSignupOnSubmit = ({
 };
 
 const createOnSubmit =
-  <T extends object>({
+  <FormType extends object, Data>({
     initialHandler,
     doneHandler,
     errorHandler,
@@ -86,12 +86,12 @@ const createOnSubmit =
     initialHandler: () => void;
     doneHandler: () => void;
     errorHandler: (error: ValidationError[]) => void;
-    successHandler: <Data>(successData: Data) => void;
+    successHandler: (data: Data) => void;
     path: string;
-    getFormData: <T extends object>(data: T) => BodyInit;
+    getFormData: (data: FormType) => BodyInit;
     config: RequestInit;
-  }): SubmitHandler<T> =>
-  async (data: T) => {
+  }): SubmitHandler<FormType> =>
+  async (data: FormType) => {
     const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
     const formData = getFormData(data);
@@ -107,14 +107,13 @@ const createOnSubmit =
       const responseData = await response.json();
 
       // Handle errors
-      console.log({ responseData });
       if (response.status >= 400) {
         // Handle 422 error response
         if (response.status === 422) {
           errorHandler(responseData.error.validationError);
         }
       } else {
-        successHandler(responseData);
+        successHandler(responseData.user);
       }
     } catch (err) {
       if (err instanceof Error) {

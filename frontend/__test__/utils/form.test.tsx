@@ -1,6 +1,7 @@
 import { createSignupOnSubmit, createOnSubmit } from "@/utils/form";
 import { SignupForm as SignupFormType } from "../../@types/form";
 import SignupForm from "@/components/SignupForm";
+import { User } from "../../@types/user";
 
 const errorObj = {
   message: "Failed to sign up",
@@ -134,7 +135,7 @@ describe("Test createOnSubmit function", () => {
   });
 
   it("Run errorHandler when response status >= 400", async () => {
-    const onSubmit = createOnSubmit<SignupForm>({
+    const onSubmit = createOnSubmit<SignupForm, User>({
       initialHandler,
       doneHandler,
       errorHandler,
@@ -153,7 +154,7 @@ describe("Test createOnSubmit function", () => {
   });
 
   it("Run successHandler when response status < 400", async () => {
-    const onSubmit = createOnSubmit<SignupForm>({
+    const onSubmit = createOnSubmit<SignupForm, User>({
       initialHandler,
       doneHandler,
       errorHandler,
@@ -173,7 +174,7 @@ describe("Test createOnSubmit function", () => {
 
   describe("Test createSignupOnSubmit function", () => {
     it("Run errorHandler when response status >= 400", async () => {
-      const onSubmit = createOnSubmit<SignupFormType>({
+      const onSubmit = createOnSubmit<SignupFormType, User>({
         initialHandler,
         doneHandler,
         errorHandler,
@@ -192,7 +193,7 @@ describe("Test createOnSubmit function", () => {
     });
 
     it("Catch err if fetch throw an error", async () => {
-      const onSubmit = createOnSubmit<SignupFormType>({
+      const onSubmit = createOnSubmit<SignupFormType, User>({
         initialHandler,
         doneHandler,
         errorHandler,
