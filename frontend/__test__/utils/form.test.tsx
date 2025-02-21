@@ -116,23 +116,27 @@ describe("Test createOnSubmit function", () => {
     return formData;
   });
 
+  const errorHandler = jest.fn(() => {});
+  const successHandler = jest.fn();
+  const initialHandler = jest.fn();
+  const doneHandler = jest.fn();
+  const getFormData = getFormDataMock;
+  const config = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  };
+  const path = "test";
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("Run errorHandler when response status >= 400", async () => {
-    const errorHandler = jest.fn(() => {});
-    const successHandler = jest.fn();
-    const getFormData = getFormDataMock;
-    const config = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    };
-    const path = "test";
-
     const onSubmit = createOnSubmit<SignupForm>({
+      initialHandler,
+      doneHandler,
       errorHandler,
       successHandler,
       getFormData,
@@ -149,18 +153,9 @@ describe("Test createOnSubmit function", () => {
   });
 
   it("Run successHandler when response status < 400", async () => {
-    const errorHandler = jest.fn(() => {});
-    const successHandler = jest.fn();
-    const getFormData = getFormDataMock;
-    const config = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    };
-    const path = "test";
-
     const onSubmit = createOnSubmit<SignupForm>({
+      initialHandler,
+      doneHandler,
       errorHandler,
       successHandler,
       getFormData,
@@ -178,18 +173,9 @@ describe("Test createOnSubmit function", () => {
 
   describe("Test createSignupOnSubmit function", () => {
     it("Run errorHandler when response status >= 400", async () => {
-      const errorHandler = jest.fn(() => {});
-      const successHandler = jest.fn();
-      const getFormData = getFormDataMock;
-      const config = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      };
-      const path = "test";
-
       const onSubmit = createOnSubmit<SignupFormType>({
+        initialHandler,
+        doneHandler,
         errorHandler,
         successHandler,
         getFormData,
@@ -206,18 +192,9 @@ describe("Test createOnSubmit function", () => {
     });
 
     it("Catch err if fetch throw an error", async () => {
-      const errorHandler = jest.fn(() => {});
-      const successHandler = jest.fn();
-      const getFormData = getFormDataMock;
-      const config = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      };
-      const path = "test";
-
       const onSubmit = createOnSubmit<SignupFormType>({
+        initialHandler,
+        doneHandler,
         errorHandler,
         successHandler,
         getFormData,

@@ -75,12 +75,16 @@ const createSignupOnSubmit = ({
 
 const createOnSubmit =
   <T extends object>({
+    initialHandler,
+    doneHandler,
     errorHandler,
     successHandler,
     path,
     getFormData,
     config,
   }: {
+    initialHandler: () => void;
+    doneHandler: () => void;
     errorHandler: (error: ValidationError[]) => void;
     successHandler: <Data>(successData: Data) => void;
     path: string;
@@ -93,6 +97,8 @@ const createOnSubmit =
     const formData = getFormData(data);
 
     try {
+      initialHandler();
+
       const response = await fetch(`${domainURL}/${path}`, {
         ...config,
         body: formData,
@@ -114,6 +120,8 @@ const createOnSubmit =
       if (err instanceof Error) {
         console.log(err.message);
       }
+    } finally {
+      doneHandler();
     }
   };
 
