@@ -39,6 +39,8 @@ const io = new Server(server, {
   },
 });
 
+app.set("io", io);
+
 // Event listener for HTTP server "error" event.
 const onError = error => {
   if (error.syscall !== "listen") {
