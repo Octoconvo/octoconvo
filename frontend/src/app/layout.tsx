@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./global.css";
 import { inter } from "@/fonts";
+import SocketWrapper from "@/components/SocketWrapper";
+import UserProvider from "@/components/UserProvider";
 
 export const metadata: Metadata = {
   title: "Octoconvo",
@@ -15,7 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="min-h-[100dvh]">
       <body className={`${inter.variable} font-sans flex h-full`}>
-        {children}
+        <SocketWrapper>
+          <UserProvider>{children}</UserProvider>
+        </SocketWrapper>
       </body>
     </html>
   );

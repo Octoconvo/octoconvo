@@ -13,9 +13,11 @@ import { usernameValidation, passwordValidation } from "@/utils/form";
 const LoginForm = ({
   onSubmit,
   validationError,
+  isSubmitting,
 }: {
   onSubmit: SubmitHandler<LoginForm>;
   validationError: ValidationErrorType[];
+  isSubmitting: boolean;
 }) => {
   const methods = useForm<LoginForm>();
   const {
@@ -78,7 +80,7 @@ const LoginForm = ({
             "hover:bg-gr-1-d45 transition-all"
           }
         >
-          Log in
+          {isSubmitting ? "submitting..." : "Log in"}
         </button>
       </form>
     </FormProvider>
