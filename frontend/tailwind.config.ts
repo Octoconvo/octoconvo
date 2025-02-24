@@ -49,6 +49,7 @@ export default {
       backgroundImage: {
         "gr-1-t": "var(--gradient-1-t)",
         "gr-1-d45": "var(--gradient-1-d45)",
+        "gr-2-t": "var(--gradient-2-t)",
         "gr-bg-d": "var(--gradient-bg-d)",
       },
     },

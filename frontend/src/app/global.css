@@ -90,6 +90,20 @@
     background: center / 1.25em 1.25em no-repeat
       url("/images/visibility-off-icon.svg");
   }
+
+  .lobby-nav-icon {
+    position: absolute;
+    width: 3rem;
+    height: 3em;
+  }
+
+  .lobby-nav-icon::after {
+    display: block;
+    content: "";
+    width: 3em;
+    height: 3em;
+    background: center / 3em 3em no-repeat;
+  }
 }
 
 :root {
@@ -122,6 +136,7 @@
 
   --gradient-1-t: linear-gradient(to top, var(--brand-3), var(--brand-1));
   --gradient-1-d45: linear-gradient(45deg, var(--brand-3), var(--brand-1));
+  --gradient-2-t: linear-gradient(to top, var(--brand-4), var(--brand-1));
   --gradient-bg-d: linear-gradient(to top, var(--brand-1), var(--black-300));
 }
 
