@@ -1,38 +1,9 @@
-import express from "express";
-import cookieParser from "cookie-parser";
-import session from "express-session";
-import passportConfig from "../../config/passportConfig";
 import * as userController from "../../controllers/user";
 import request from "supertest";
 import { deleteUserByUsername } from "../../database/prisma/userQueries";
 import TestAgent from "supertest/lib/agent";
-import { exprErrorHandler } from "../../utils/error";
 import { Request, Response, NextFunction } from "express";
-
-const app = express();
-
-app.use(
-  session({
-    cookie: {
-      secure: false,
-    },
-    secret: "test",
-    resave: false,
-    saveUninitialized: true,
-  }),
-);
-app.use(passportConfig.session());
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-
-app.use("/account/signup", userController.user_sign_up_post);
-app.get("/account/login", userController.user_log_in_get);
-app.post("/account/login", userController.user_log_in_post);
-app.post("/account/logout", userController.user_log_out_post);
-
-app.use(exprErrorHandler);
+import app from "../../config/testConfig";
 
 const login = (agent: TestAgent) =>
   test("Successfully log in as client_user_1", done => {
@@ -350,3 +321,4 @@ describe("Test logout get controller", () => {
 });
 
 export default app;
+export { login };
