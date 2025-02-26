@@ -4,7 +4,7 @@ import session from "express-session";
 import passportConfig from "../config/passportConfig";
 import * as userController from "../controllers/user";
 import * as profileController from "../controllers/profile";
-import { exprErrorHandler } from "../utils/error";
+import { expr404ErrorHandler, exprErrorHandler } from "../utils/error";
 
 const app = express();
 
@@ -31,6 +31,7 @@ app.post("/account/logout", userController.user_log_out_post);
 
 app.get("/profile/:id", profileController.user_profile_get);
 
+app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
 
 export default app;
