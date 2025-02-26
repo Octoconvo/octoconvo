@@ -11,6 +11,7 @@ import cors from "cors";
 import indexRouter from "./routes/index";
 import userRouter from "./routes/user";
 import accountRouter from "./routes/account";
+import profileRouter from "./routes/profile";
 
 const app = express();
 app.use(logger("dev"));
@@ -45,6 +46,7 @@ app.use(cookieParser());
 app.use("/", indexRouter);
 app.use("/users", userRouter);
 app.use("/account", accountRouter);
+app.use("/profile", profileRouter);
 
 app.use(exprErrorHandler);
 
