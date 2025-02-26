@@ -5,15 +5,15 @@ import TestAgent from "supertest/lib/agent";
 import { Request, Response, NextFunction } from "express";
 import app from "../../config/testConfig";
 
-const login = (agent: TestAgent) =>
+const login = (
+  agent: TestAgent,
+  { username, password }: { username: string; password: string },
+) =>
   test("Successfully log in as client_user_1", done => {
     agent
       .post("/account/login")
       .type("form")
-      .send({
-        username: "client_user_1",
-        password: "Client_password_1",
-      })
+      .send({ username, password })
       .expect("Content-Type", /json/)
       .expect(200)
       .expect(res => {
@@ -178,7 +178,10 @@ describe("Test user login get", () => {
 
   const agent: TestAgent = request.agent(app);
 
-  login(agent);
+  login(agent, {
+    username: "client_user_1",
+    password: "Client_password_1",
+  });
 
   test("Return json object with user id if user is authenticated", done => {
     agent
@@ -279,7 +282,10 @@ describe("Test user login using local strategy", () => {
 describe("Test logout get controller", () => {
   const agent = request.agent(app);
 
-  login(agent);
+  login(agent, {
+    username: "client_user_1",
+    password: "Client_password_1",
+  });
 
   test("Successfully logged out if user is authenticated", done => {
     agent
