@@ -1,5 +1,6 @@
-import { ErrorRequestHandler } from "express";
+import { ErrorRequestHandler, Request, Response, NextFunction } from "express";
 import { Result } from "express-validator";
+import createHttpError from "http-errors";
 
 // eslint-disable-next-line
 const exprErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
@@ -33,4 +34,14 @@ const createValidationErrObj = (err: Result, message: string) => {
   };
 };
 
-export { exprErrorHandler, createValidationErrObj };
+const expr404ErrorHandler = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void => {
+  const err = createHttpError(404);
+
+  next(err);
+};
+
+export { exprErrorHandler, createValidationErrObj, expr404ErrorHandler };

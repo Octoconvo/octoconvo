@@ -5,7 +5,7 @@ import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import { PrismaClient } from "@prisma/client";
 import passportConfig from "./config/passportConfig";
-import { exprErrorHandler } from "./utils/error";
+import { expr404ErrorHandler, exprErrorHandler } from "./utils/error";
 import cors from "cors";
 
 import indexRouter from "./routes/index";
@@ -48,6 +48,7 @@ app.use("/users", userRouter);
 app.use("/account", accountRouter);
 app.use("/profile", profileRouter);
 
+app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
 
 module.exports = app;
