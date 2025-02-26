@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import express from "express";
-import { exprErrorHandler } from "../utils/error";
+import { exprErrorHandler, expr404ErrorHandler } from "../utils/error";
 import request from "supertest";
 import createHttpError from "http-errors";
 
@@ -11,11 +11,12 @@ app.use("/no-msg", (req: Request, res: Response, next: NextFunction) => {
   next(error);
 });
 // pass error with status
-app.use("/:status", (req: Request, res: Response, next: NextFunction) => {
+app.use("/error/:status", (req: Request, res: Response, next: NextFunction) => {
   const status = Number(req.params.status);
   const error = createHttpError(status);
   next(error);
 });
+app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
 
 describe("Test exprErrorHandler middleware", () => {
@@ -28,7 +29,7 @@ describe("Test exprErrorHandler middleware", () => {
 
   test("Check json response 404 error on development", done => {
     request(app)
-      .get("/404")
+      .get("/error/404")
       .expect("Content-Type", /json/)
       .expect({
         error: {
@@ -40,7 +41,7 @@ describe("Test exprErrorHandler middleware", () => {
 
   test("Check json response 500 error on development", done => {
     request(app)
-      .get("/500")
+      .get("/error/500")
       .expect("Content-Type", /json/)
       .expect({
         error: {
@@ -65,7 +66,7 @@ describe("Test exprErrorHandler middleware", () => {
   test("Check json response 404 error on production", done => {
     setProcessEnv("production");
     request(app)
-      .get("/404")
+      .get("/error/404")
       .expect("Content-Type", /json/)
       .expect({
         error: {
@@ -78,7 +79,7 @@ describe("Test exprErrorHandler middleware", () => {
   test("Check json response 500 error on production", done => {
     setProcessEnv("production");
     request(app)
-      .get("/500")
+      .get("/error/500")
       .expect("Content-Type", /json/)
       .expect({
         error: {
@@ -86,5 +87,19 @@ describe("Test exprErrorHandler middleware", () => {
         },
       })
       .expect(500, done);
+  });
+});
+
+describe("Test 404 error", () => {
+  test("Return json object with 404 status when accessing not found path", done => {
+    request(app)
+      .get("/abc404cba")
+      .expect("Content-Type", /json/)
+      .expect({
+        error: {
+          message: "Not Found",
+        },
+      })
+      .expect(404, done);
   });
 });
