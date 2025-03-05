@@ -4,7 +4,7 @@ import { deleteUserByUsername } from "../../database/prisma/userQueries";
 import TestAgent from "supertest/lib/agent";
 import { Request, Response, NextFunction } from "express";
 import app from "../../config/testConfig";
-import { login } from "../../utils/test";
+import { login } from "../../utils/testUtils";
 
 describe("Test user signup using local strategy", () => {
   afterAll(async () => {
