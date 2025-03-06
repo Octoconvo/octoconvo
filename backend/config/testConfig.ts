@@ -30,6 +30,7 @@ app.post("/account/login", userController.user_log_in_post);
 app.post("/account/logout", userController.user_log_out_post);
 
 app.get("/profile/:id", profileController.user_profile_get);
+app.post("/profile/:id", profileController.user_profile_post);
 
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
