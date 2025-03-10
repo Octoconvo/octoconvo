@@ -81,7 +81,7 @@ const user_profile_get = asyncHandler(async (req: Request, res: Response) => {
   }
 
   res.json({
-    message: "Succesfully retrieved user profile",
+    message: "Successfully retrieved user profile",
     userProfile,
   });
 });
