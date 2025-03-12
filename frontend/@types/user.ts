@@ -10,9 +10,9 @@ type UserProfile = {
   banner: string | null;
   bio: string | null;
   isDeleted: boolean;
-  lastSeen: Date;
-  createdAt: Date;
-  updatedAt: Date;
+  lastSeen: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type { User, UserProfile };
