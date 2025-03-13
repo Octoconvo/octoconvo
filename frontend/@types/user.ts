@@ -9,7 +9,6 @@ type UserProfile = {
   avatar: string | null;
   banner: string | null;
   bio: string | null;
-  isDeleted: boolean;
   lastSeen: string;
   createdAt: string;
   updatedAt: string;
