@@ -39,7 +39,17 @@ jest.mock("../../database/supabase/supabaseQueries", () => ({
     path: string;
     bucketName: string;
   }) => {
-    return { publicUrl: `test/${bucketName}/${path}` };
+    path =
+      bucketName === "banner"
+        ? "513c920c-3921-48b2-88d7-5b8156b9e6b8/" +
+          "image-887cc252-e94c-455f-bc99-4d5c7a0d8b47.png"
+        : "513c920c-3921-48b2-88d7-5b8156b9e6b8/" +
+          "image-7ee20129-ce65-43ce-b324-6c8cb514c1cd.png";
+    return {
+      publicUrl:
+        "https://mqzsctdttuxrgvlpthvy.supabase.co/storage/v1/object/public/" +
+        `${bucketName}/${path}`,
+    };
   },
 }));
 
@@ -167,9 +177,11 @@ describe("Test user profile post controller", () => {
         expect(message).toEqual("Successfully updated user profile");
         expect(userProfile).toBeDefined();
         expect(avatar).toBeDefined();
-        const avatarArr = avatar.split("/");
-        expect(avatarArr[avatarArr.length - 1]).toContain("image-");
-        expect(avatarArr[avatarArr.length - 1]).toContain(".jpg");
+        expect(avatar).toBe(
+          "https://mqzsctdttuxrgvlpthvy.supabase.co/storage/v1/object/public/" +
+            "avatar/513c920c-3921-48b2-88d7-5b8156b9e6b8/" +
+            "image-7ee20129-ce65-43ce-b324-6c8cb514c1cd.png",
+        );
       })
       .expect(200)
       .end(done);
@@ -188,9 +200,11 @@ describe("Test user profile post controller", () => {
         expect(message).toEqual("Successfully updated user profile");
         expect(userProfile).toBeDefined();
         expect(banner).toBeDefined();
-        const bannerArr = banner.split("/");
-        expect(bannerArr[bannerArr.length - 1]).toContain("image-");
-        expect(bannerArr[bannerArr.length - 1]).toContain(".jpg");
+        expect(banner).toBe(
+          "https://mqzsctdttuxrgvlpthvy.supabase.co/storage/v1/object/public/" +
+            "banner/513c920c-3921-48b2-88d7-5b8156b9e6b8/" +
+            "image-887cc252-e94c-455f-bc99-4d5c7a0d8b47.png",
+        );
       })
       .expect(200)
       .end(done);
