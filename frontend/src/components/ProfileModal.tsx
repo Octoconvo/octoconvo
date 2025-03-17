@@ -5,6 +5,7 @@ import { FC, useEffect, useState } from "react";
 import { UserProfile } from "../../@types/user";
 import avatarIcon from "../../public/images/avatar_icon.svg";
 import { formatDateString } from "@/utils/date";
+import socket from "@/socket/socket";
 
 type ProfileModalProps = {
   id: string | null;
@@ -37,8 +38,23 @@ const ProfileModal: FC<ProfileModalProps> = ({ id }) => {
       }
     };
 
+    const connectToRoom = () => {
+      socket.emit("subscribe", `profile:${id}`);
+    };
+
     if (id) {
       fetchUserProfile();
+
+      socket.emit("subscribe", `profile:${id}`);
+      socket.on("profileupdate", fetchUserProfile);
+
+      socket.on("initiate", connectToRoom);
+
+      return () => {
+        socket.off("initiate");
+        socket.off("profileupdate", fetchUserProfile);
+        socket.emit("unsubscribe", `profile:${id}`);
+      };
     }
   }, [id]);
 
