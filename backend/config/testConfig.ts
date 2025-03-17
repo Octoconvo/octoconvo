@@ -5,8 +5,12 @@ import passportConfig from "../config/passportConfig";
 import * as userController from "../controllers/user";
 import * as profileController from "../controllers/profile";
 import { expr404ErrorHandler, exprErrorHandler } from "../utils/error";
+import { createServer } from "node:http";
+import { createSocketServer } from "../events/socketIO";
 
 const app = express();
+const httpServer = createServer(app);
+createSocketServer(httpServer, app);
 
 app.use(
   session({
