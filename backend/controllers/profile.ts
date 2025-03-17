@@ -208,6 +208,8 @@ const user_profile_post = [
       currentTime,
     });
 
+    req.app.get("io").to(`profile:${id}`).emit("profileupdate");
+
     res.json({
       message: "Successfully updated user profile",
       userProfile: updatedUserProfile,
