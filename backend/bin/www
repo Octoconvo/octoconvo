@@ -6,7 +6,11 @@ const appString =
 const app = require(appString);
 const debug = require("debug")("backend:server");
 const http = require("http");
-const { Server } = require("socket.io");
+const socektIOString =
+  process.env.NODE_ENV === "development"
+    ? "../events/socketIO"
+    : "../dist/events/socketIO";
+const { createSocketServer } = require(socektIOString);
 
 // Normalize a port into a number, string, or false.
 function normalizePort(val) {
@@ -31,15 +35,8 @@ app.set("port", port);
 
 //  Create HTTP server.
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: process.env.ORIGIN,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
-  },
-});
-
-app.set("io", io);
+createSocketServer(server, app);
+// createSocketServer(server, app);
 
 // Event listener for HTTP server "error" event.
 const onError = error => {
@@ -70,10 +67,6 @@ const onListening = () => {
   const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
   debug("Listening on " + bind);
 };
-
-io.on("connection", socket => {
-  console.log("A client is connected");
-});
 
 // Listen on provided port, on all network interfaces.
 server.listen(port);
