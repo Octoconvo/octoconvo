@@ -49,13 +49,13 @@ const ProfileModal: FC<ProfileModalProps> = ({ id }) => {
       socket.on("profileupdate", fetchUserProfile);
 
       socket.on("initiate", connectToRoom);
-
-      return () => {
-        socket.off("initiate");
-        socket.off("profileupdate", fetchUserProfile);
-        socket.emit("unsubscribe", `profile:${id}`);
-      };
     }
+
+    return () => {
+      socket.off("initiate");
+      socket.off("profileupdate", fetchUserProfile);
+      socket.emit("unsubscribe", `profile:${id}`);
+    };
   }, [id]);
 
   return (
