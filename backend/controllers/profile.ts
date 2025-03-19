@@ -144,7 +144,7 @@ const user_profile_post = [
       banner: Express.Multer.File[];
     };
     const displayName: null | string = req.body?.displayname
-      ? req.body.displayName
+      ? req.body.displayname
       : null;
     const bio: null | string = req.body?.bio ? req.body.bio : null;
     const avatar: null | Express.Multer.File = files?.avatar
