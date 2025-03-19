@@ -164,6 +164,25 @@ describe("Test user profile post controller", () => {
       .end(done);
   });
 
+  test("Successfully update displayname if user is authorized to edit profile", done => {
+    agent
+      .post("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
+      .send({
+        displayname: "test_user_1",
+      })
+      .expect("Content-type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const userProfile = res.body.userProfile;
+
+        expect(message).toEqual("Successfully updated user profile");
+        expect(userProfile).toBeDefined();
+        expect(userProfile.displayName).toEqual("test_user_1");
+      })
+      .expect(200)
+      .end(done);
+  });
+
   test("Successfully update avatar if image mimetype is valid", done => {
     agent
       .post("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
