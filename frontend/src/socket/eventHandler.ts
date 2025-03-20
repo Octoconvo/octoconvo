@@ -1,3 +1,5 @@
+import { Socket } from "socket.io-client";
+
 const onConnect = () => {
   console.log(
     `%cSuccessfully established a socket connection`,
@@ -5,4 +7,8 @@ const onConnect = () => {
   );
 };
 
-export { onConnect };
+const connectToRoom = (socket: Socket, room: string) => {
+  socket.emit("subscribe", room);
+};
+
+export { onConnect, connectToRoom };
