@@ -1,17 +1,34 @@
 "use client";
 
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import LobbyNav from "./LobbyNav";
 import ProfileModal from "./ProfileModal";
-import { UserContext } from "@/contexts/user";
+import { UserProfileContext } from "@/contexts/user";
+import { ProfileVisibilityContext } from "@/contexts/visibility";
+import { ActiveModalContext } from "@/contexts/modal";
 
 const LobbyNavWrapper = () => {
-  const { user } = useContext(UserContext);
+  const { userProfile } = useContext(UserProfileContext);
+  const [profileVisibility, setProfileVisibility] = useState<boolean>(false);
+  const { setCloseModal } = useContext(ActiveModalContext);
+
+  useEffect(() => {
+    if (profileVisibility) {
+      setCloseModal(() => setProfileVisibility);
+    }
+  }, [profileVisibility, setCloseModal]);
 
   return (
     <div className="relative">
-      <LobbyNav />
-      <ProfileModal id={user ? user.id : null} />
+      <ProfileVisibilityContext.Provider
+        value={{
+          profileVisibility,
+          setProfileVisibility,
+        }}
+      >
+        <LobbyNav />
+        <ProfileModal profileData={userProfile} />
+      </ProfileVisibilityContext.Provider>
     </div>
   );
 };

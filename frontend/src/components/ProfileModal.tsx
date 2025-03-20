@@ -1,18 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import { FC, useEffect, useState } from "react";
+import { FC, useContext, useEffect, useRef, useState } from "react";
 import { UserProfile } from "../../@types/user";
 import avatarIcon from "../../public/images/avatar_icon.svg";
 import { formatDateString } from "@/utils/date";
 import socket from "@/socket/socket";
+import { UserContext } from "@/contexts/user";
+import { ProfileVisibilityContext } from "@/contexts/visibility";
+import { ActiveModalContext } from "@/contexts/modal";
+import { connectToRoom } from "@/socket/eventHandler";
 
 type ProfileModalProps = {
-  id: string | null;
+  id?: string;
+  profileData?: null | UserProfile;
 };
 
-const ProfileModal: FC<ProfileModalProps> = ({ id }) => {
+const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
+  const { user } = useContext(UserContext);
   const [userProfile, setUserProfile] = useState<null | UserProfile>(null);
+  const modalRef = useRef<null | HTMLDivElement>(null);
+  const { profileVisibility } = useContext(ProfileVisibilityContext);
+  const { setActiveModal } = useContext(ActiveModalContext);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -38,33 +47,40 @@ const ProfileModal: FC<ProfileModalProps> = ({ id }) => {
       }
     };
 
-    const connectToRoom = () => {
-      socket.emit("subscribe", `profile:${id}`);
-    };
-
     if (id) {
       fetchUserProfile();
 
       socket.emit("subscribe", `profile:${id}`);
       socket.on("profileupdate", fetchUserProfile);
 
-      socket.on("initiate", connectToRoom);
+      socket.on("initiate", connectToRoom.bind(this, socket, `profile:${id}`));
+    }
+
+    if (profileData) {
+      setUserProfile(profileData);
+    }
+
+    if (profileVisibility) {
+      setActiveModal(modalRef);
     }
 
     return () => {
-      socket.off("initiate");
-      socket.off("profileupdate", fetchUserProfile);
-      socket.emit("unsubscribe", `profile:${id}`);
+      if (id) {
+        socket.off("initiate");
+        socket.off("profileupdate", fetchUserProfile);
+        socket.emit("unsubscribe", `profile:${id}`);
+      }
     };
-  }, [id]);
+  }, [user, id, profileData, profileVisibility, setActiveModal]);
 
   return (
-    <dialog
+    <div
+      data-testid="profile-modal"
+      ref={modalRef}
       className={
         "absolute left-[calc(100%+1rem)] bottom-[1rem] bg-black-200 " +
-        "rounded-[8px]"
+        `rounded-[8px] ${profileVisibility ? "" : "hidden"}`
       }
-      open
     >
       <div
         className={
@@ -152,7 +168,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id }) => {
           </div>
         </div>
       </div>
-    </dialog>
+    </div>
   );
 };
 

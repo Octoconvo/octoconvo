@@ -1,10 +1,18 @@
 "use client";
 
+import { UserProfileContext } from "@/contexts/user";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useContext } from "react";
+import { ProfileVisibilityContext } from "@/contexts/visibility";
 
 const LobbyNav = () => {
   const pathname = usePathname();
+  const { userProfile } = useContext(UserProfileContext);
+  const { profileVisibility, setProfileVisibility } = useContext(
+    ProfileVisibilityContext
+  );
 
   return (
     <>
@@ -91,7 +99,26 @@ const LobbyNav = () => {
           </Link>
         </div>
 
-        <button className="rounded-full h-[3rem] w-[3rem] bg-grey-200"></button>
+        <button
+          data-testid="profile-btn"
+          className="rounded-full h-[3rem] w-[3rem] bg-grey-200"
+          onClick={() => {
+            setProfileVisibility(!profileVisibility);
+          }}
+        >
+          <Image
+            data-testid="btn-avatar"
+            className="rounded-[inherit]"
+            src={
+              userProfile && userProfile?.avatar
+                ? userProfile?.avatar
+                : "images/avatar_icon.svg"
+            }
+            width={64}
+            height={64}
+            alt={`${userProfile?.username} avatar`}
+          ></Image>
+        </button>
       </nav>
     </>
   );
