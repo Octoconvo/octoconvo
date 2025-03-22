@@ -113,7 +113,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
                   src={userProfile?.avatar ? userProfile?.avatar : avatarIcon}
                   width={64}
                   height={64}
-                  className="rounded-full bg-brand-4 min-w-[64px] min-h-[64px]"
+                  className="rounded-full bg-brand-4 min-w-[64px] min-h-[64px] bg-white-200"
                   alt="User avatar"
                 ></Image>
               </figure>

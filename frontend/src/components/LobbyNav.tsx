@@ -101,7 +101,7 @@ const LobbyNav = () => {
 
         <button
           data-testid="profile-btn"
-          className="rounded-full h-[3rem] w-[3rem] bg-grey-200"
+          className="rounded-full h-[3rem] w-[3rem] bg-white-200"
           onClick={() => {
             setProfileVisibility(!profileVisibility);
           }}
