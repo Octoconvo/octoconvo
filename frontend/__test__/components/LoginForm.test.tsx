@@ -13,7 +13,9 @@ describe("Render login page", () => {
       <LoginForm
         onSubmit={onSubmit}
         validationError={[]}
+        unauthorizedError={""}
         isSubmitting={false}
+        resetError={() => {}}
       />
     );
   });

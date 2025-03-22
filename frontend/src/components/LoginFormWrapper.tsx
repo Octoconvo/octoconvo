@@ -12,17 +12,31 @@ const LoginFormWrapper = () => {
   const { user, setUser } = useContext(UserContext);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<ValidationError[]>([]);
+  const router = useRouter();
+  const [unauthorizedError, setUnauthorizedError] = useState<string>("");
+
   const initialHandler = () => {
     setIsSubmitting(true);
   };
+
   const doneHandler = () => {
     setIsSubmitting(false);
   };
-  const router = useRouter();
-  const errorHandler = (error: ValidationError[]) => {
+
+  type ErrorHandlerType = ValidationError[] | string;
+
+  const errorHandler = (status: number, error: ValidationError[] | string) => {
     console.log(error);
-    setValidationError(error);
+
+    if (status === 422) {
+      setValidationError(error as ValidationError[]);
+    }
+
+    if (status === 401) {
+      setUnauthorizedError(error as string);
+    }
   };
+
   const successHandler = (data: User) => {
     setUser(data);
     router.push("/login");
@@ -41,7 +55,7 @@ const LoginFormWrapper = () => {
     if (user !== null && user) router.push("/lobby");
   }, [user, router]);
 
-  const onSubmit = createOnSubmit<LoginFormType, User>({
+  const onSubmit = createOnSubmit<LoginFormType, User, ErrorHandlerType>({
     initialHandler,
     doneHandler,
     errorHandler,
@@ -63,7 +77,12 @@ const LoginFormWrapper = () => {
       <LoginForm
         onSubmit={onSubmit}
         validationError={validationError}
+        unauthorizedError={unauthorizedError}
         isSubmitting={isSubmitting}
+        resetError={() => {
+          setValidationError([]);
+          setUnauthorizedError("");
+        }}
       />
     </>
   );

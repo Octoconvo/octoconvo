@@ -13,11 +13,15 @@ import { usernameValidation, passwordValidation } from "@/utils/form";
 const LoginForm = ({
   onSubmit,
   validationError,
+  unauthorizedError,
   isSubmitting,
+  resetError,
 }: {
   onSubmit: SubmitHandler<LoginForm>;
   validationError: ValidationErrorType[];
+  unauthorizedError: string;
   isSubmitting: boolean;
+  resetError: () => void;
 }) => {
   const methods = useForm<LoginForm>();
   const {
@@ -32,6 +36,11 @@ const LoginForm = ({
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
         <InputWrapper>
           <label htmlFor="username">Username</label>
+          {unauthorizedError && (
+            <div data-testid="401-err" className="text-invalid">
+              {unauthorizedError}
+            </div>
+          )}
           {errors.username && (
             <div data-testid="rfh-username-err" className="text-invalid">
               {errors.username?.message}
@@ -47,6 +56,7 @@ const LoginForm = ({
             data-testid="username"
             id="username"
             autoComplete="username"
+            onInput={() => resetError()}
             {...register("username", usernameValidation)}
             className="rounded-[8px] box-border py-1 px-2 text-black-300 bg-white-100"
           ></input>
@@ -64,6 +74,7 @@ const LoginForm = ({
               id="password"
               type={isPasswordVisible ? "text" : "password"}
               autoComplete="password-current"
+              onInput={() => resetError()}
               {...register("password", passwordValidation)}
               className="rounded-[8px] box-border py-1 px-2 text-black-300 w-full bg-white-100"
             ></input>
