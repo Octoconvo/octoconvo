@@ -74,7 +74,7 @@ const createSignupOnSubmit = ({
 };
 
 const createOnSubmit =
-  <FormType extends object, Data>({
+  <FormType extends object, Data, errorHandlerType>({
     initialHandler,
     doneHandler,
     errorHandler,
@@ -85,7 +85,7 @@ const createOnSubmit =
   }: {
     initialHandler: () => void;
     doneHandler: () => void;
-    errorHandler: (error: ValidationError[]) => void;
+    errorHandler: (status: number, error: errorHandlerType) => void;
     successHandler: (data: Data) => void;
     path: string;
     getFormData: (data: FormType) => BodyInit;
@@ -108,10 +108,12 @@ const createOnSubmit =
 
       // Handle errors
       if (response.status >= 400) {
-        // Handle 422 error response
-        if (response.status === 422) {
-          errorHandler(responseData.error.validationError);
-        }
+        if (response.status === 422)
+          errorHandler(response.status, responseData.error.validationError);
+      }
+
+      if (response.status === 401) {
+        errorHandler(response.status, responseData.error.message);
       } else {
         successHandler(responseData.user);
       }
