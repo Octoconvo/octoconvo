@@ -4,8 +4,9 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext, UserProfileContext } from "@/contexts/user";
 import socket from "@/socket/socket";
 import { UserProfile } from "../../@types/user";
+import { connectToRoom } from "@/socket/eventHandler";
 
-const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
+const UserProfileProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useContext(UserContext);
   const [userProfile, setUserProfile] = useState<null | UserProfile>(null);
 
@@ -32,20 +33,19 @@ const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
     if (user) {
       fetchUserProfile(user.id);
 
-      const connectToRoom = () => {
-        socket.emit("subscribe", `profile:${user.id}`);
-      };
-
       socket.emit("subscribe", `profile:${user.id}`);
-      socket.on("profileupdate", fetchUserProfile);
+      socket.on("profileupdate", fetchUserProfile.bind(this, user.id));
 
-      socket.on("initiate", connectToRoom);
+      socket.on(
+        "initiate",
+        connectToRoom.bind(this, socket, `profile:${user.id}`)
+      );
     }
 
     return () => {
       if (user) {
         socket.off("initiate");
-        socket.off("profileupdate", fetchUserProfile);
+        socket.off("profileupdate", fetchUserProfile.bind(this, user.id));
         socket.emit("unsubscribe", `profile:${user.id}`);
       }
     };
@@ -58,4 +58,4 @@ const ProfileProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-export default ProfileProvider;
+export default UserProfileProvider;
