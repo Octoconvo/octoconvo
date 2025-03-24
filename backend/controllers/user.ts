@@ -6,6 +6,7 @@ import { NextFunction, Request, Response } from "express";
 import { createValidationErrObj } from "../utils/error";
 import passport, { AuthenticateCallback } from "passport";
 import AuthenticationEmitter from "../events/authentication";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const userValidation = {
   username_signup: body("username", "username is required")
@@ -89,18 +90,39 @@ const user_sign_up_post = [
 
       const username = req.body.username.toLowerCase();
 
-      const user = await createUser({
-        username,
-        displayName: username,
-        password: hashedPassword,
-      });
+      try {
+        const user = await createUser({
+          username,
+          displayName: username,
+          password: hashedPassword,
+        });
 
-      res.json({
-        message: `Successfully signed up as ${username}`,
-        user: {
-          id: user.id,
-        },
-      });
+        res.json({
+          message: `Successfully signed up as ${username}`,
+          user: {
+            id: user.id,
+          },
+        });
+      } catch (err) {
+        console.log(err);
+        if (err instanceof PrismaClientKnownRequestError) {
+          console.log(err.code);
+          if (err.code.toLowerCase() === "p2002") {
+            res.status(422).json({
+              message: "Failed to create a new account",
+              error: {
+                validationError: [
+                  {
+                    field: "username",
+                    value: req.body.username,
+                    msg: "Username is already taken",
+                  },
+                ],
+              },
+            });
+          }
+        }
+      }
     });
   }),
 ];
