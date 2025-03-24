@@ -14,4 +14,34 @@ const checkAuthStatus = async (): Promise<false | User> => {
   return responseData.user;
 };
 
-export { checkAuthStatus };
+const logout = async ({
+  successHandler,
+  errorHandler,
+}: {
+  successHandler: () => void;
+  errorHandler: (err: string) => void;
+}) => {
+  const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
+
+  try {
+    const response = await fetch(`${domainURL}/account/logout`, {
+      mode: "cors",
+      method: "POST",
+      credentials: "include",
+    });
+
+    const responseData = await response.json();
+
+    if (response.status >= 400) {
+      errorHandler(responseData.message);
+    } else {
+      successHandler();
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      errorHandler(err.message);
+    }
+  }
+};
+
+export { checkAuthStatus, logout };
