@@ -73,7 +73,7 @@ const LoginForm = ({
               data-testid="password"
               id="password"
               type={isPasswordVisible ? "text" : "password"}
-              autoComplete="password-current"
+              autoComplete="current-password"
               onInput={() => resetError()}
               {...register("password", passwordValidation)}
               className="rounded-[8px] box-border py-1 px-2 text-black-300 w-full bg-white-100"
