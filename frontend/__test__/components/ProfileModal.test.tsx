@@ -3,6 +3,8 @@ import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import { UserProfile } from "../../@types/user";
 import { act } from "react";
+import userEvent from "@testing-library/user-event";
+import socket from "@/socket/socket";
 
 const userProfile: UserProfile = {
   id: "513c920c-3921-48b2-88d7-5b8156b9e6b8",
@@ -32,6 +34,10 @@ global.fetch = jest.fn((_url, config: Config) => {
 }) as jest.Mock;
 
 describe("Render ProfileModal component", () => {
+  const user = userEvent.setup();
+  beforeAll(() => {
+    jest.spyOn(socket, "disconnect").mockImplementation(jest.fn());
+  });
   beforeEach(async () => {
     await act(async () =>
       render(<ProfileModal id="513c920c-3921-48b2-88d7-5b8156b9e6b8" />)
@@ -80,6 +86,13 @@ describe("Render ProfileModal component", () => {
     expect(date).toBeDefined();
     expect(date.textContent).toContain("February");
     expect(date.textContent).toContain("2025");
+  });
+
+  it("Properly logout after clicking logout button", async () => {
+    const logoutBtn = screen.getByTestId("logout");
+    expect(logoutBtn).toBeInTheDocument();
+    await user.click(logoutBtn);
+    expect(socket.disconnect).toHaveBeenCalled();
   });
 });
 
