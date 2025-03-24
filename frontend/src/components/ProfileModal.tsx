@@ -10,6 +10,7 @@ import { UserContext } from "@/contexts/user";
 import { ProfileVisibilityContext } from "@/contexts/visibility";
 import { ActiveModalContext } from "@/contexts/modal";
 import { connectToRoom } from "@/socket/eventHandler";
+import { logout } from "@/utils/authentication";
 
 type ProfileModalProps = {
   id?: string;
@@ -17,7 +18,7 @@ type ProfileModalProps = {
 };
 
 const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
-  const { user } = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const [userProfile, setUserProfile] = useState<null | UserProfile>(null);
   const modalRef = useRef<null | HTMLDivElement>(null);
   const { profileVisibility } = useContext(ProfileVisibilityContext);
@@ -72,6 +73,16 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
       }
     };
   }, [user, id, profileData, profileVisibility, setActiveModal]);
+
+  const successHandler = () => {
+    setUser(false);
+    setUserProfile(null);
+
+    if (id) {
+      socket.disconnect();
+    }
+  };
+  const errorHandler = (err: string) => console.log(err);
 
   return (
     <div
@@ -163,10 +174,12 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
         <div className="flex flex-col gap-4 p-8 rounded-[inherit]">
           <div>
             <button
+              data-testid="logout"
               className={
                 "bg-grey-100 py-2 px-4 text-white-100 rounded-[4px] " +
                 "hover:bg-grey-200"
               }
+              onClick={() => logout({ successHandler, errorHandler })}
             >
               Log Out
             </button>
