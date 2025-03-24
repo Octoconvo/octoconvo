@@ -162,7 +162,12 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
         </article>
         <div className="flex flex-col gap-4 p-8 rounded-[inherit]">
           <div>
-            <button className="bg-grey-100 py-2 px-4 text-white-100 rounded-[4px]">
+            <button
+              className={
+                "bg-grey-100 py-2 px-4 text-white-100 rounded-[4px] " +
+                "hover:bg-grey-200"
+              }
+            >
               Log Out
             </button>
           </div>
