@@ -11,12 +11,18 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const initiateUser = async () => {
-      const userVal = await checkAuthStatus();
+      try {
+        const userVal = await checkAuthStatus();
 
-      setUser(userVal);
+        setUser(userVal);
 
-      if (userVal) {
-        socket.connect();
+        if (userVal) {
+          socket.connect();
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          console.log(err.message);
+        }
       }
     };
 
