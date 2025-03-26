@@ -27,14 +27,18 @@ export default function Home() {
             engaging communities and chat with other people.
           </p>
         </div>
-        <div className="w-[min(calc(250px+20vw),1080px)] rounded-[16px] shadow-[-2rem_-2rem_0px_0px_var(--brand-1)]">
-          <Image
-            src="/images/octoconvo.svg"
-            height={640}
-            width={640}
-            alt="Octoconvo features screenshot"
-            className="bg-brand-2 w-full h-auto"
-          ></Image>
+        <div
+          className={
+            "flex items-end justify-end w-[min(calc(240px+20vw),1080px)]" +
+            " h-[min(calc(240px+20vw),1080px)] rounded-[8px] bg-gr-1-t"
+          }
+        >
+          <div
+            className={
+              "w-[min(calc(160px+20vw),1000px)] h-[min(calc(160px+20vw),1000px)]" +
+              " bg-white-200"
+            }
+          ></div>
         </div>
       </main>
     </div>
