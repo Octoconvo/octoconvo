@@ -1,5 +1,6 @@
 import ActiveModalProvider from "@/components/ActiveModalProvider";
 import LobbyNavWrapper from "@/components/LobbyNavWrapper";
+import ProtectedRouteWrapper from "@/components/ProtectedRouteWrapper";
 
 export default async function Layout({
   children,
@@ -8,10 +9,12 @@ export default async function Layout({
 }) {
   return (
     <div className="flex flex-auto bg-black-200">
-      <ActiveModalProvider>
-        <LobbyNavWrapper />
-        {children}
-      </ActiveModalProvider>
+      <ProtectedRouteWrapper route="\login">
+        <ActiveModalProvider>
+          <LobbyNavWrapper />
+          {children}
+        </ActiveModalProvider>
+      </ProtectedRouteWrapper>
     </div>
   );
 }
