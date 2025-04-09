@@ -1,4 +1,4 @@
-import type { ValidationError } from "../../@types/form";
+import type { ValidationError } from "@/types/form";
 
 const ValidationError = ({
   validationError,

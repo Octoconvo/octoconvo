@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { FC, useContext, useEffect, useRef, useState } from "react";
-import { UserProfile } from "../../@types/user";
+import { UserProfile } from "@/types/user";
 import avatarIcon from "../../public/images/avatar_icon.svg";
 import { formatDateString } from "@/utils/date";
 import socket from "@/socket/socket";
@@ -124,7 +124,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
                   src={userProfile?.avatar ? userProfile?.avatar : avatarIcon}
                   width={64}
                   height={64}
-                  className="rounded-full bg-brand-4 min-w-[64px] min-h-[64px] bg-white-200"
+                  className="rounded-full min-w-[64px] min-h-[64px] bg-white-200"
                   alt="User avatar"
                 ></Image>
               </figure>

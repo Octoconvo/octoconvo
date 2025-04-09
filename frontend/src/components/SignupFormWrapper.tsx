@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { createSignupOnSubmit } from "@/utils/form";
 import SignupForm from "./SignupForm";
 import { useState } from "react";
-import { ValidationError } from "../../@types/form";
+import { ValidationError } from "@/types/form";
 
 const SignupFormWrapper = () => {
   const [validationError, setValidationError] = useState<ValidationError[]>([]);

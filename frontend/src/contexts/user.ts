@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { User, UserProfile } from "../../@types/user";
+import { User, UserProfile } from "@/types/user";
 
 type UserContext = {
   user: null | User | false;

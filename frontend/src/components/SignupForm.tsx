@@ -4,7 +4,7 @@ import ValidationError from "./ValidationError";
 import type {
   SignupForm,
   ValidationError as ValidationErrorType,
-} from "../../@types/form";
+} from "@/types/form";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import VisibilityButton from "./VisibilityButton";
 import { useState } from "react";

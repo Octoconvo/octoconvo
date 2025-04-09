@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { User } from "../../@types/user";
+import { User } from "@/types/user";
 import { UserContext } from "@/contexts/user";
 import { checkAuthStatus } from "@/utils/authentication";
 import socket from "@/socket/socket";

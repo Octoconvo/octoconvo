@@ -1,7 +1,7 @@
 import { createSignupOnSubmit, createOnSubmit } from "@/utils/form";
-import { SignupForm as SignupFormType } from "../../@types/form";
+import { SignupForm as SignupFormType } from "@/types/form";
 import SignupForm from "@/components/SignupForm";
-import { User } from "../../@types/user";
+import { User } from "@/types/user";
 
 const errorObj = {
   message: "Failed to sign up",

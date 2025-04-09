@@ -1,5 +1,5 @@
 import LobbyNav from "@/components/LobbyNav";
-import { UserProfile } from "../../@types/user";
+import { UserProfile } from "@/types/user";
 import { UserProfileContext } from "@/contexts/user";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";

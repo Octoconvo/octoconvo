@@ -1,7 +1,7 @@
 import ProfileModal from "@/components/ProfileModal";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import { UserProfile } from "../../@types/user";
+import { UserProfile } from "@/types/user";
 import { act } from "react";
 import userEvent from "@testing-library/user-event";
 import socket from "@/socket/socket";

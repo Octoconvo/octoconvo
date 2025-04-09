@@ -1,6 +1,6 @@
 import LobbyNavWrapper from "@/components/LobbyNavWrapper";
 import { UserProfileContext } from "@/contexts/user";
-import { UserProfile } from "../../@types/user";
+import { UserProfile } from "@/types/user";
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

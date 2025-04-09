@@ -1,4 +1,4 @@
-import { User } from "../../@types/user";
+import { User } from "@/types/user";
 
 const checkAuthStatus = async (): Promise<false | User> => {
   const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;

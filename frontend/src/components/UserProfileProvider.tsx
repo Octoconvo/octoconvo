@@ -3,7 +3,7 @@
 import { useContext, useEffect, useState } from "react";
 import { UserContext, UserProfileContext } from "@/contexts/user";
 import socket from "@/socket/socket";
-import { UserProfile } from "../../@types/user";
+import { UserProfile } from "@/types/user";
 import { connectToRoom } from "@/socket/eventHandler";
 
 const UserProfileProvider = ({ children }: { children: React.ReactNode }) => {

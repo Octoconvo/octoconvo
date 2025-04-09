@@ -14,4 +14,11 @@ type ValidationError = {
   msg: string;
 };
 
-export type { SignupForm, LoginForm, ValidationError };
+type EditProfileForm = {
+  avatar: File;
+  banner: File;
+  displayname: string;
+  bio: string;
+};
+
+export type { SignupForm, LoginForm, ValidationError, EditProfileForm };

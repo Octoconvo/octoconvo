@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { createOnSubmit } from "@/utils/form";
 import LoginForm from "./LoginForm";
 import { useContext, useEffect, useState } from "react";
-import { LoginForm as LoginFormType, ValidationError } from "../../@types/form";
+import { LoginForm as LoginFormType, ValidationError } from "@/types/form";
 import { UserContext } from "@/contexts/user";
-import { User } from "../../@types/user";
+import { User } from "@/types/user";
 
 const LoginFormWrapper = () => {
   const { user, setUser } = useContext(UserContext);

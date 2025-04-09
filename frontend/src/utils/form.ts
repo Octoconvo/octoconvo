@@ -1,6 +1,6 @@
 import { SubmitHandler } from "react-hook-form";
 import SignupForm from "@/components/SignupForm";
-import { ValidationError } from "../../@types/form";
+import { ValidationError } from "@/types/form";
 
 const usernameValidation = {
   required: "username is required",
