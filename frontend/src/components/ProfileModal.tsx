@@ -1,14 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { FC, useContext, useEffect, useRef, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { UserProfile } from "@/types/user";
 import avatarIcon from "../../public/images/avatar_icon.svg";
 import { formatDateString } from "@/utils/date";
 import socket from "@/socket/socket";
 import { UserContext } from "@/contexts/user";
-import { ProfileVisibilityContext } from "@/contexts/visibility";
-import { ActiveModalContext } from "@/contexts/modal";
+import { ActiveModalsContext, UserProfileModalContext } from "@/contexts/modal";
 import { connectToRoom } from "@/socket/eventHandler";
 import { logout } from "@/utils/authentication";
 
@@ -20,9 +19,8 @@ type ProfileModalProps = {
 const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
   const { user, setUser } = useContext(UserContext);
   const [userProfile, setUserProfile] = useState<null | UserProfile>(null);
-  const modalRef = useRef<null | HTMLDivElement>(null);
-  const { profileVisibility } = useContext(ProfileVisibilityContext);
-  const { setActiveModal } = useContext(ActiveModalContext);
+  const { activeModals } = useContext(ActiveModalsContext);
+  const { userProfileModal } = useContext(UserProfileModalContext);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -61,10 +59,6 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
       setUserProfile(profileData);
     }
 
-    if (profileVisibility) {
-      setActiveModal(modalRef);
-    }
-
     return () => {
       if (id) {
         socket.off("initiate");
@@ -72,7 +66,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
         socket.emit("unsubscribe", `profile:${id}`);
       }
     };
-  }, [user, id, profileData, profileVisibility, setActiveModal]);
+  }, [user, id, profileData]);
 
   const successHandler = () => {
     setUser(false);
@@ -87,10 +81,15 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
   return (
     <div
       data-testid="profile-modal"
-      ref={modalRef}
+      ref={userProfileModal}
       className={
         "absolute left-[calc(100%+1rem)] bottom-[1rem] bg-black-200 " +
-        `rounded-[8px] ${profileVisibility ? "" : "hidden"}`
+        `rounded-[8px] ${
+          activeModals.length &&
+          activeModals[0]?.current === userProfileModal?.current
+            ? ""
+            : "hidden"
+        }`
       }
     >
       <div

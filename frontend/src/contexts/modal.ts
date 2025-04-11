@@ -1,19 +1,24 @@
 import { createContext } from "react";
 
-type ActiveModalContext = {
-  activeModal: null | React.RefObject<null | HTMLDivElement>;
-  setActiveModal: React.Dispatch<
-    React.SetStateAction<null | React.RefObject<null | HTMLDivElement>>
-  >;
+type ActiveModalsContext = {
+  activeModals: React.RefObject<null | HTMLDivElement>[];
+  openModal: (modal: null | React.RefObject<null | HTMLDivElement>) => void;
   closeModal: () => void;
-  setCloseModal: React.Dispatch<React.SetStateAction<() => void>>;
 };
 
-const ActiveModalContext = createContext<ActiveModalContext>({
-  activeModal: null,
-  setActiveModal: () => {},
+const ActiveModalsContext = createContext<ActiveModalsContext>({
+  activeModals: [],
+  //eslint-disable-next-line
+  openModal: (modal: null | React.RefObject<null | HTMLDivElement>) => {},
   closeModal: () => {},
-  setCloseModal: () => {},
 });
 
-export { ActiveModalContext };
+type UserProfileModalContext = {
+  userProfileModal: null | React.RefObject<null | HTMLDivElement>;
+};
+
+const UserProfileModalContext = createContext<UserProfileModalContext>({
+  userProfileModal: null,
+});
+
+export { ActiveModalsContext, UserProfileModalContext };

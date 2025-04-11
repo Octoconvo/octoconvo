@@ -5,14 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useContext } from "react";
-import { ProfileVisibilityContext } from "@/contexts/visibility";
+import { ActiveModalsContext, UserProfileModalContext } from "@/contexts/modal";
 
 const LobbyNav = () => {
   const pathname = usePathname();
   const { userProfile } = useContext(UserProfileContext);
-  const { profileVisibility, setProfileVisibility } = useContext(
-    ProfileVisibilityContext
-  );
+  const { userProfileModal } = useContext(UserProfileModalContext);
+  const { openModal } = useContext(ActiveModalsContext);
 
   return (
     <>
@@ -103,7 +102,7 @@ const LobbyNav = () => {
           data-testid="profile-btn"
           className="rounded-full h-[3rem] w-[3rem] bg-white-200"
           onClick={() => {
-            setProfileVisibility(!profileVisibility);
+            openModal(userProfileModal);
           }}
         >
           <Image

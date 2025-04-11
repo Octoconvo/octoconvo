@@ -1,12 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { ActiveModalContext } from "@/contexts/modal";
+import { ActiveModalsContext } from "@/contexts/modal";
 
 const ActiveModalProvider = ({ children }: { children: React.ReactNode }) => {
-  const [activeModal, setActiveModal] =
-    useState<null | React.RefObject<null | HTMLDivElement>>(null);
-  const [closeModal, setCloseModal] = useState<() => void>(() => {});
+  const [activeModals, setActiveModals] = useState<
+    React.RefObject<null | HTMLDivElement>[]
+  >([]);
+
+  const closeModal = () => {
+    if (activeModals.length) {
+      const updatedModals = activeModals.filter(
+        // eslint-disable-ext-line
+        (modal: React.RefObject<null | HTMLDivElement>, index: number) =>
+          index !== 0
+      );
+
+      setActiveModals(updatedModals);
+    }
+  };
+
+  const openModal = (modal: null | React.RefObject<null | HTMLDivElement>) => {
+    if (modal !== null) {
+      setActiveModals([modal]);
+    }
+  };
 
   return (
     <div
@@ -14,32 +32,28 @@ const ActiveModalProvider = ({ children }: { children: React.ReactNode }) => {
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           closeModal();
-
-          setActiveModal(null);
-          setCloseModal(() => {});
         }
       }}
       onClick={(e) => {
-        if (activeModal) {
-          const isChildren = activeModal?.current?.contains(
-            e.target as HTMLElement
-          );
+        if (activeModals.length) {
+          activeModals.forEach((modal) => {
+            const isChildren = modal.current?.contains(e.target as HTMLElement);
 
-          console.log(isChildren);
-          if (!isChildren && activeModal?.current !== e.target) {
-            closeModal();
-
-            setActiveModal(null);
-            setCloseModal(() => {});
-          }
+            if (!isChildren && modal.current !== e.target) {
+              const updatedModals = activeModals.filter(
+                (toFilter) => toFilter !== modal
+              );
+              setActiveModals(updatedModals);
+            }
+          });
         }
       }}
     >
-      <ActiveModalContext.Provider
-        value={{ activeModal, setActiveModal, closeModal, setCloseModal }}
+      <ActiveModalsContext.Provider
+        value={{ activeModals, openModal, closeModal }}
       >
         {children}
-      </ActiveModalContext.Provider>
+      </ActiveModalsContext.Provider>
     </div>
   );
 };
