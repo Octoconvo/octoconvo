@@ -28,6 +28,50 @@ const passwordValidation = {
   },
 };
 
+const displayNameValidation = {
+  required: "Display name is required",
+  maxLength: {
+    value: 32,
+    message: "Display name must not exceed 32 characters",
+  },
+};
+
+const bioValidation = {
+  required: "Bio is required",
+  maxLength: {
+    value: 255,
+    message: "Bio must not exceed 255 characters",
+  },
+};
+
+const profileImgMimetype = ["image/png", "image/jpeg"];
+
+const avatarValidation = {
+  // eslint-disable-next-line
+  validate: (value: any) => {
+    if (value.length < 1) {
+      return value;
+    } else {
+      const file = value[0] as File;
+      const isValid = profileImgMimetype.includes(file.type);
+      return isValid ? value : "Image must be either JPEG or PNG";
+    }
+  },
+};
+
+const bannerValidation = {
+  // eslint-disable-next-line
+  validate: (value: any) => {
+    if (value.length < 1) {
+      return value;
+    } else {
+      const file = value[0] as File;
+      const isValid = profileImgMimetype.includes(file.type);
+      return isValid ? value : "Image must be either JPEG or PNG";
+    }
+  },
+};
+
 const createSignupOnSubmit = ({
   errorHandler,
   successHandler,
@@ -129,6 +173,10 @@ const createOnSubmit =
 export {
   usernameValidation,
   passwordValidation,
+  avatarValidation,
+  bannerValidation,
+  displayNameValidation,
+  bioValidation,
   createSignupOnSubmit,
   createOnSubmit,
 };
