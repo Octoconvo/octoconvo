@@ -2,6 +2,7 @@ import { createSignupOnSubmit, createOnSubmit } from "@/utils/form";
 import { SignupForm as SignupFormType } from "@/types/form";
 import SignupForm from "@/components/SignupForm";
 import { User } from "@/types/user";
+import { avatarValidation, bannerValidation } from "@/utils/form";
 
 const errorObj = {
   message: "Failed to sign up",
@@ -213,5 +214,47 @@ describe("Test createOnSubmit function", () => {
       expect(console.log).toHaveBeenCalledTimes(1);
       expect(console.log).toHaveBeenCalledWith("Network Error");
     });
+  });
+});
+
+describe("Test bannerValidation", () => {
+  test("Return value if fileList is emtpy", () => {
+    // eslint-disable-next-line
+    const fileListMock = [] as any;
+    const result = bannerValidation.validate(fileListMock);
+
+    expect(result).toBe(fileListMock);
+  });
+
+  test("Return value if file is valid", () => {
+    const file = new File(["a".repeat(1024)], "image-test", {
+      type: "image/png",
+    });
+    // eslint-disable-next-line
+    const fileListMock = [file] as any;
+    const result = bannerValidation.validate(fileListMock);
+
+    expect(result).toBe(fileListMock);
+  });
+});
+
+describe("Test avatarValidation", () => {
+  test("Return value if fileList is emtpy", () => {
+    // eslint-disable-next-line
+    const fileListMock = [] as any;
+    const result = avatarValidation.validate(fileListMock);
+
+    expect(result).toBe(fileListMock);
+  });
+
+  test("Return value if file is valid", () => {
+    const file = new File(["a".repeat(1024)], "image-test", {
+      type: "image/png",
+    });
+    // eslint-disable-next-line
+    const fileListMock = [file] as any;
+    const result = avatarValidation.validate(fileListMock);
+
+    expect(result).toBe(fileListMock);
   });
 });
