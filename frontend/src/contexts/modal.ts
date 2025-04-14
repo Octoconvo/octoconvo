@@ -21,4 +21,16 @@ const UserProfileModalContext = createContext<UserProfileModalContext>({
   userProfileModal: null,
 });
 
-export { ActiveModalsContext, UserProfileModalContext };
+type EditProfileModalContext = {
+  editProfileModal: null | React.RefObject<null | HTMLDivElement>;
+};
+
+const EditProfileModalContext = createContext<EditProfileModalContext>({
+  editProfileModal: null,
+});
+
+export {
+  ActiveModalsContext,
+  EditProfileModalContext,
+  UserProfileModalContext,
+};
