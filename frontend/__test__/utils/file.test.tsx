@@ -1,5 +1,7 @@
 import { readFileAsDataURL, previewFile, selectFile } from "@/utils/file";
 
+jest.unmock("@/utils/file");
+
 describe("Test readFileAsDataURL", () => {
   test("Return dataURL on success", async () => {
     const file = new File(["a".repeat(1024)], "image-test");
