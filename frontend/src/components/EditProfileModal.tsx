@@ -11,7 +11,7 @@ const EditProfileModal = () => {
   return (
     <div
       ref={editProfileModal}
-      data-testid="edit-profile-modal"
+      data-testid="edt-prfl-mdl-main"
       className={
         "absolute flex justify-center top-0 left-0 w-[100vw] h-full backdrop-blur-md z-20" +
         (activeModals.length > 0 &&
@@ -23,6 +23,7 @@ const EditProfileModal = () => {
       <div className="flex flex-col overflow-y-auto items-center bg-black-400 h-full w-min scrollbar p-8">
         <div className="flex w-full justify-end">
           <button
+            data-testid="edt-prfl-mdl-cls-btn"
             className="flex justify-center items-center min-w-[48px] min-h-[48px] bg-grey-100 rounded-full hover:bg-grey-200"
             onClick={() => closeModal()}
           >
