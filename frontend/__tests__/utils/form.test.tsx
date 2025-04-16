@@ -2,7 +2,7 @@ import { createSignupOnSubmit, createOnSubmit } from "@/utils/form";
 import { SignupForm as SignupFormType } from "@/types/form";
 import SignupForm from "@/components/SignupForm";
 import { User } from "@/types/user";
-import { avatarValidation, bannerValidation } from "@/utils/form";
+import { avatarValidation, bannerValidation, getFormData } from "@/utils/form";
 
 const errorObj = {
   message: "Failed to sign up",
@@ -256,5 +256,22 @@ describe("Test avatarValidation", () => {
     const result = avatarValidation.validate(fileListMock);
 
     expect(result).toBe(fileListMock);
+  });
+});
+
+describe("Test getFormData function", () => {
+  const file = new File(["a".repeat(1024)], "test-file", {
+    type: "imaga/png",
+  });
+
+  const userData = {
+    username: "username_test_1",
+    avatat: [file],
+  };
+
+  test("Test getFormData function", () => {
+    const result = getFormData(userData);
+    console.log({ result });
+    expect(result).toBeDefined();
   });
 });
