@@ -7,7 +7,11 @@ import avatarIcon from "../../public/images/avatar_icon.svg";
 import { formatDateString } from "@/utils/date";
 import socket from "@/socket/socket";
 import { UserContext } from "@/contexts/user";
-import { ActiveModalsContext, UserProfileModalContext } from "@/contexts/modal";
+import {
+  ActiveModalsContext,
+  UserProfileModalContext,
+  EditProfileModalContext,
+} from "@/contexts/modal";
 import { connectToRoom } from "@/socket/eventHandler";
 import { logout } from "@/utils/authentication";
 
@@ -19,8 +23,9 @@ type ProfileModalProps = {
 const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
   const { user, setUser } = useContext(UserContext);
   const [userProfile, setUserProfile] = useState<null | UserProfile>(null);
-  const { activeModals } = useContext(ActiveModalsContext);
+  const { activeModals, openModal } = useContext(ActiveModalsContext);
   const { userProfileModal } = useContext(UserProfileModalContext);
+  const { editProfileModal } = useContext(EditProfileModalContext);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -135,6 +140,9 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
                     "font-normal leading-normal " +
                     "hover:bg-brand-1"
                   }
+                  onClick={() => {
+                    openModal(editProfileModal);
+                  }}
                 >
                   Edit Profile
                 </button>
