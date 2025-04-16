@@ -170,6 +170,22 @@ const createOnSubmit =
     }
   };
 
+const getFormData = <type>(data: type) => {
+  const formData = new FormData();
+  for (const key in data) {
+    let value;
+
+    if (data[key] instanceof FileList) {
+      value = data[key][0] as Blob;
+    } else {
+      value = data[key] as string;
+    }
+    formData.append(`${key}`, value);
+  }
+
+  return formData;
+};
+
 export {
   usernameValidation,
   passwordValidation,
@@ -179,4 +195,5 @@ export {
   bioValidation,
   createSignupOnSubmit,
   createOnSubmit,
+  getFormData,
 };

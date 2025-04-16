@@ -8,7 +8,7 @@ import {
 } from "@/types/form";
 import { User, UserProfile } from "@/types/user";
 import EditProfileForm from "@/components/EditProfileForm";
-import { createOnSubmit } from "@/utils/form";
+import { createOnSubmit, getFormData } from "@/utils/form";
 
 const EditProfileFormWrapper = () => {
   const { userProfile } = useContext(UserProfileContext);
@@ -30,22 +30,6 @@ const EditProfileFormWrapper = () => {
 
   const successHandler = (data: User) => {
     console.log(data);
-  };
-
-  const getFormData = <EditProfileFormType,>(data: EditProfileFormType) => {
-    const formData = new FormData();
-    for (const key in data) {
-      let value;
-
-      if (data[key] instanceof FileList) {
-        value = data[key][0] as Blob;
-      } else {
-        value = data[key] as string;
-      }
-      formData.append(`${key}`, value);
-    }
-
-    return formData;
   };
 
   const onSubmit = createOnSubmit<
