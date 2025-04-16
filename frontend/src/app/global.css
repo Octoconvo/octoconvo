@@ -104,6 +104,39 @@
     height: 3em;
     background: center / 3em 3em no-repeat;
   }
+
+  .close-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .close-icon::after {
+    display: block;
+    content: "";
+    width: 1.5rem;
+    height: 1.5rem;
+    background: center/ 1.5rem 1.5rem no-repeat url("/images/close-icon.svg");
+  }
+
+  .scrollbar {
+    color: inherit;
+  }
+
+  .scrollbar::-webkit-scrollbar {
+    width: 0.5vw;
+  }
+
+  .scrollbar::-webkit-sccrollbar-track {
+    background-color: var(--black-100);
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    background: var(--grey-100);
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--brand-1);
+  }
 }
 
 :root {
