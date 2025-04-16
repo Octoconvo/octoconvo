@@ -119,6 +119,7 @@ const createSignupOnSubmit = ({
 
 const createOnSubmit =
   <FormType extends object, Data, errorHandlerType>({
+    dataKey,
     initialHandler,
     doneHandler,
     errorHandler,
@@ -127,6 +128,7 @@ const createOnSubmit =
     getFormData,
     config,
   }: {
+    dataKey: string;
     initialHandler: () => void;
     doneHandler: () => void;
     errorHandler: (status: number, error: errorHandlerType) => void;
@@ -159,7 +161,7 @@ const createOnSubmit =
       if (response.status === 401) {
         errorHandler(response.status, responseData.error.message);
       } else {
-        successHandler(responseData.user);
+        successHandler(responseData[dataKey]);
       }
     } catch (err) {
       if (err instanceof Error) {
