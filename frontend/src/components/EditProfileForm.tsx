@@ -249,6 +249,7 @@ const EditProfileForm = ({
             </InputWrapper>
             <div className="flex justify-end">
               <button
+                data-testid="edt-prfl-sbmt-btn"
                 type="submit"
                 className={
                   "w-min bg-grey-100 py-2 px-6 rounded-[8px]" +
