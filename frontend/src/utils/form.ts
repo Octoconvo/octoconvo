@@ -37,7 +37,6 @@ const displayNameValidation = {
 };
 
 const bioValidation = {
-  required: "Bio is required",
   maxLength: {
     value: 255,
     message: "Bio must not exceed 255 characters",
