@@ -102,6 +102,7 @@ const EditProfileForm = ({
       ) {
         setAvatarFile(null);
         setBannerFile(null);
+        initialiseInput();
         initialiseFileInput();
         if (formRef?.current) {
           formRef?.current.reset();
