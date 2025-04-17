@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ActiveModalsContext } from "@/contexts/modal";
 
 const ActiveModalProvider = ({ children }: { children: React.ReactNode }) => {
@@ -26,14 +26,23 @@ const ActiveModalProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  useEffect(() => {
+    const closeOnEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeModal();
+      }
+    };
+
+    window.addEventListener("keydown", closeOnEsc);
+
+    return () => {
+      window.removeEventListener("keydown", closeOnEsc);
+    };
+  });
+
   return (
     <div
       className="flex w-full"
-      onKeyDown={(e) => {
-        if (e.key === "Escape") {
-          closeModal();
-        }
-      }}
       onClick={(e) => {
         if (activeModals.length) {
           activeModals.forEach((modal) => {
