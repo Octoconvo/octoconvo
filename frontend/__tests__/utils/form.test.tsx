@@ -3,6 +3,7 @@ import { SignupForm as SignupFormType } from "@/types/form";
 import SignupForm from "@/components/SignupForm";
 import { User } from "@/types/user";
 import { avatarValidation, bannerValidation, getFormData } from "@/utils/form";
+import { ValidationError } from "@/types/form";
 
 const errorObj = {
   message: "Failed to sign up",
@@ -23,6 +24,8 @@ const successObj = {
     id: "12345678",
   },
 };
+
+type ErrorHandlerType = ValidationError[] | string;
 
 type Config = { body: URLSearchParams };
 global.fetch = jest.fn((_url, config: Config) => {
@@ -136,7 +139,8 @@ describe("Test createOnSubmit function", () => {
   });
 
   it("Run errorHandler when response status >= 400", async () => {
-    const onSubmit = createOnSubmit<SignupForm, User>({
+    const onSubmit = createOnSubmit<SignupForm, User, ErrorHandlerType>({
+      dataKey: "user",
       initialHandler,
       doneHandler,
       errorHandler,
@@ -155,7 +159,8 @@ describe("Test createOnSubmit function", () => {
   });
 
   it("Run successHandler when response status < 400", async () => {
-    const onSubmit = createOnSubmit<SignupForm, User>({
+    const onSubmit = createOnSubmit<SignupForm, User, ErrorHandlerType>({
+      dataKey: "user",
       initialHandler,
       doneHandler,
       errorHandler,
@@ -175,7 +180,8 @@ describe("Test createOnSubmit function", () => {
 
   describe("Test createSignupOnSubmit function", () => {
     it("Run errorHandler when response status >= 400", async () => {
-      const onSubmit = createOnSubmit<SignupFormType, User>({
+      const onSubmit = createOnSubmit<SignupFormType, User, ErrorHandlerType>({
+        dataKey: "user",
         initialHandler,
         doneHandler,
         errorHandler,
@@ -194,7 +200,8 @@ describe("Test createOnSubmit function", () => {
     });
 
     it("Catch err if fetch throw an error", async () => {
-      const onSubmit = createOnSubmit<SignupFormType, User>({
+      const onSubmit = createOnSubmit<SignupFormType, User, ErrorHandlerType>({
+        dataKey: "user",
         initialHandler,
         doneHandler,
         errorHandler,
@@ -266,7 +273,7 @@ describe("Test getFormData function", () => {
 
   const userData = {
     username: "username_test_1",
-    avatat: [file],
+    avatar: [file],
   };
 
   test("Test getFormData function", () => {
