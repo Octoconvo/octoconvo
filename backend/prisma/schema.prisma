@@ -69,12 +69,12 @@ model DirectMessage {
 }
 
 model Inbox {
-  id              String        @id @default(uuid())
+  id              String         @id @default(uuid())
   inboxType       InboxType
-  community       Community     @relation(fields: [communityId], references: [id])
-  communityId     String        @unique
-  directMessage   DirectMessage @relation(fields: [directMessageId], references: [id])
-  directMessageId String        @unique
+  community       Community?     @relation(fields: [communityId], references: [id])
+  communityId     String?        @unique
+  directMessage   DirectMessage? @relation(fields: [directMessageId], references: [id])
+  directMessageId String?        @unique
   messages        Message[]
 }
 
@@ -89,10 +89,10 @@ model Participant {
   userId          String
   role            ParticipantRole
   status          ParticipantStatus @default(PENDING)
-  community       Community         @relation(fields: [communityId], references: [id])
-  communityId     String
-  directMessage   DirectMessage     @relation(fields: [directMessageId], references: [id])
-  directMessageId String
+  community       Community?        @relation(fields: [communityId], references: [id])
+  communityId     String?
+  directMessage   DirectMessage?    @relation(fields: [directMessageId], references: [id])
+  directMessageId String?
   createdAt       DateTime          @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime          @default(now()) @db.Timestamptz(3)
   member_since    DateTime?         @db.Timestamptz(3)
