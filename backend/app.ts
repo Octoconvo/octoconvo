@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import { PrismaClient } from "@prisma/client";
+import prisma from "./database/prisma/client";
 import passportConfig from "./config/passportConfig";
 import { expr404ErrorHandler, exprErrorHandler } from "./utils/error";
 import cors from "cors";
@@ -12,6 +12,7 @@ import indexRouter from "./routes/index";
 import userRouter from "./routes/user";
 import accountRouter from "./routes/account";
 import profileRouter from "./routes/profile";
+import communityRouter from "./routes/community";
 
 const app = express();
 app.use(logger("dev"));
@@ -30,7 +31,7 @@ app.use(
     secret: process.env.SECRET as string,
     resave: true,
     saveUninitialized: true,
-    store: new PrismaSessionStore(new PrismaClient(), {
+    store: new PrismaSessionStore(prisma, {
       checkPeriod: 2 * 60 * 1000, // 2 minutes,
       dbRecordIdIsSessionId: true,
       dbRecordIdFunction: undefined,
@@ -47,6 +48,7 @@ app.use("/", indexRouter);
 app.use("/users", userRouter);
 app.use("/account", accountRouter);
 app.use("/profile", profileRouter);
+app.use("/community", communityRouter);
 
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
