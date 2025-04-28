@@ -7,6 +7,7 @@ import * as profileController from "../controllers/profile";
 import { expr404ErrorHandler, exprErrorHandler } from "../utils/error";
 import { createServer } from "node:http";
 import { createSocketServer } from "../events/socketIO";
+import * as communityController from "../controllers/community";
 
 const app = express();
 const httpServer = createServer(app);
@@ -35,6 +36,8 @@ app.post("/account/logout", userController.user_log_out_post);
 
 app.get("/profile/:id", profileController.user_profile_get);
 app.post("/profile/:id", profileController.user_profile_post);
+
+app.post("/community", communityController.community_post);
 
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
