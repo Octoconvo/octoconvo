@@ -30,10 +30,12 @@ const EditProfileModal = () => {
             <span className="close-icon"></span>
           </button>
         </div>
-
-        <div className="bg-black-400 h-min py-8">
-          <EditProfileFormWrapper />
-        </div>
+        {activeModals.length > 0 &&
+          activeModals[0]?.current === editProfileModal?.current && (
+            <div className="bg-black-400 h-min py-8">
+              <EditProfileFormWrapper />
+            </div>
+          )}
       </div>
     </div>
   );
