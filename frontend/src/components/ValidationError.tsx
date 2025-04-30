@@ -15,7 +15,7 @@ const ValidationError = ({
     <ul>
       {fieldValidationError.map((error: ValidationError) => {
         return (
-          <li key={error.field} className="text-invalid">
+          <li key={error.field} className="text-invalid text-p">
             {error.msg}
           </li>
         );
