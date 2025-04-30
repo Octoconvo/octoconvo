@@ -132,13 +132,16 @@ const EditProfileForm = ({
         method="POST"
         encType="multipart/form-data"
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-end bg-black-400"
+        className="flex flex-col items-end"
       >
-        <div className="flex flex-col w-full rounded-t-[8px]">
+        <div className="flex flex-col w-full">
           <button
             data-testid="edt-prfl-banner-btn"
             type="button"
-            className="w-full bg-brand-1 relative rounded-t-[inherit] aspect-[7/2]"
+            className={
+              "w-full bg-gr-brand-dark-d relative rounded-t-[inherit] aspect-[7/2]" +
+              " add-image-icon before:h-[64px] before:w-[64px] w-full"
+            }
             onClick={() => {
               triggerInputClick(bannerInputRef);
             }}
@@ -160,18 +163,23 @@ const EditProfileForm = ({
               <button
                 data-testid="edt-prfl-avatar-btn"
                 type="button"
-                className="absolute left-0 top-[-64px] rounded-full w-[128px] h-[128px] bg-grey-200 overflow-hidden"
+                className={
+                  "absolute left-0 top-[-64px] rounded-full w-[128px]" +
+                  " h-[128px] bg-grey-200 overflow-visible" +
+                  " add-image-icon before:h-[32px] before:w-[32px]"
+                }
                 onClick={() => {
                   triggerInputClick(avatarInputRef);
                 }}
               >
+                {!avatar && <span className="avatar-add-icon"></span>}
                 {avatar && (
                   <Image
                     data-testid="edt-prfl-avatar-img"
                     src={avatar}
                     alt="avatar image"
                     fill
-                    className="object-cover"
+                    className="object-cover rounded-full"
                     sizes="(max-width: 128px) 128px, (max-height: 128px) 128px"
                     priority
                   ></Image>
@@ -225,7 +233,7 @@ const EditProfileForm = ({
                 data-testid="edt-prfl-displayname"
                 id="displayname"
                 type="text"
-                className="bg-grey-100 rounded-[8px] px-2 py-1 text-h6"
+                className="bg-grey-200 rounded-[8px] px-2 py-1 text-h6"
                 defaultValue={userProfile ? userProfile.displayName : ""}
                 {...register("displayname", displayNameValidation)}
               />
@@ -245,7 +253,7 @@ const EditProfileForm = ({
                   userProfile ? (userProfile.bio ? userProfile.bio : "") : ""
                 }
                 {...register("bio", bioValidation)}
-                className="bg-grey-100 rounded-[8px] px-2 py-1 resize-none text-h6"
+                className="bg-grey-200 rounded-[8px] px-2 py-1 resize-none text-h6"
               ></textarea>
             </InputWrapper>
             <div className="flex justify-end">
@@ -253,7 +261,7 @@ const EditProfileForm = ({
                 data-testid="edt-prfl-sbmt-btn"
                 type="submit"
                 className={
-                  "w-min bg-grey-100 py-2 px-6 rounded-[8px]" +
+                  "w-min bg-black-100 py-2 px-6 rounded-[8px]" +
                   " hover:bg-brand-1"
                 }
               >
