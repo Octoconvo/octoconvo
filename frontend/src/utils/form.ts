@@ -53,7 +53,7 @@ const avatarValidation = {
     } else {
       const file = value[0] as File;
       const isValid = profileImgMimetype.includes(file.type);
-      return isValid ? value : "Image must be either JPEG or PNG";
+      return isValid ? value : "Avatar must be either JPEG or PNG";
     }
   },
 };
@@ -66,7 +66,7 @@ const bannerValidation = {
     } else {
       const file = value[0] as File;
       const isValid = profileImgMimetype.includes(file.type);
-      return isValid ? value : "Image must be either JPEG or PNG";
+      return isValid ? value : "Banner must be either JPEG or PNG";
     }
   },
 };
