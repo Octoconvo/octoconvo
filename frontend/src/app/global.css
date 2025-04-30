@@ -131,7 +131,7 @@
   }
 
   .scrollbar::-webkit-scrollbar-thumb {
-    background: var(--grey-100);
+    background: var(--black-500);
   }
 
   .scrollbar::-webkit-scrollbar-thumb:hover {
