@@ -25,12 +25,15 @@ export default {
         grey: {
           100: "var(--grey-100)",
           200: "var(--grey-200)",
+          300: "var(--grey-300)",
         },
         black: {
           100: "var(--black-100)",
           200: "var(--black-200)",
           300: "var(--black-300)",
           400: "var(--black-400)",
+          500: "var(--black-500)",
+          600: "var(--black-600)",
         },
         invalid: "var(--invalid)",
         background: "var(--background)",
@@ -51,6 +54,7 @@ export default {
         "gr-1-d45": "var(--gradient-1-d45)",
         "gr-2-t": "var(--gradient-2-t)",
         "gr-bg-d": "var(--gradient-bg-d)",
+        "gr-brand-dark-d": "var(--gradient-brand-dark-d)",
       },
     },
   },
