@@ -21,4 +21,17 @@ type EditProfileForm = {
   bio: string;
 };
 
-export type { SignupForm, LoginForm, ValidationError, EditProfileForm };
+type CreateCommunityForm = {
+  avatar: File;
+  banner: File;
+  name: string;
+  bio: string;
+};
+
+export type {
+  SignupForm,
+  LoginForm,
+  ValidationError,
+  EditProfileForm,
+  CreateCommunityForm,
+};
