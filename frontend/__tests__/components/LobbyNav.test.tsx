@@ -39,12 +39,11 @@ describe("Render LobbyNav component", () => {
     expect(loginLink.href).toContain("/communities");
   });
 
-  it("Create communityk nav link exists", () => {
+  it("Create community button exists", () => {
     const loginLink = screen.getByTestId(
-      "create-community-l"
+      "crt-cmmnty-mdl-opn-btn"
     ) as HTMLAnchorElement;
     expect(loginLink).toBeInTheDocument();
-    expect(loginLink.href).toContain("/community/create");
   });
 
   it("Explore nav link exists", () => {
