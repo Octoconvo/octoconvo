@@ -5,12 +5,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useContext } from "react";
-import { ActiveModalsContext, UserProfileModalContext } from "@/contexts/modal";
+import {
+  ActiveModalsContext,
+  UserProfileModalContext,
+  CreateCommunityModalContext,
+} from "@/contexts/modal";
 
 const LobbyNav = () => {
   const pathname = usePathname();
   const { userProfile } = useContext(UserProfileContext);
   const { userProfileModal } = useContext(UserProfileModalContext);
+  const { createCommunityModal } = useContext(CreateCommunityModalContext);
   const { openModal } = useContext(ActiveModalsContext);
 
   return (
@@ -64,22 +69,24 @@ const LobbyNav = () => {
               }
             ></span>
           </Link>
-          <Link
-            data-testid="create-community-l"
-            href={`${pathname}/community/create`}
+          <button
+            data-testid="crt-cmmnty-mdl-opn-btn"
             className={
               "flex relative items-center justify-center h-12 before:bg-brand-1" +
               " before:w-full before:h-full before:rounded-full transition-all" +
               " hover:transition-all hover:before:scale-105" +
               " hover:before:rounded-[1rem]"
             }
+            onClick={() => {
+              openModal(createCommunityModal);
+            }}
           >
             <span
               className={
                 "lobby-nav-icon" + " after:bg-[url(/images/add-icon.svg)]"
               }
             ></span>
-          </Link>
+          </button>
           <Link
             data-testid="explore-l"
             href={`${pathname}/explore`}
