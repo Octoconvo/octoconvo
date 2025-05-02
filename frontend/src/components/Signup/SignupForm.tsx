@@ -1,29 +1,23 @@
 "use client";
-import InputWrapper from "./InputWrapper";
-import ValidationError from "./ValidationError";
+import InputWrapper from "@/components/InputWrapper";
+import ValidationError from "@/components/ValidationError";
 import type {
-  LoginForm,
+  SignupForm,
   ValidationError as ValidationErrorType,
 } from "@/types/form";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
-import VisibilityButton from "./VisibilityButton";
+import VisibilityButton from "@/components/VisibilityButton";
 import { useState } from "react";
 import { usernameValidation, passwordValidation } from "@/utils/form";
 
-const LoginForm = ({
+const SignupForm = ({
   onSubmit,
   validationError,
-  unauthorizedError,
-  isSubmitting,
-  resetError,
 }: {
-  onSubmit: SubmitHandler<LoginForm>;
+  onSubmit: SubmitHandler<SignupForm>;
   validationError: ValidationErrorType[];
-  unauthorizedError: string;
-  isSubmitting: boolean;
-  resetError: () => void;
 }) => {
-  const methods = useForm<LoginForm>();
+  const methods = useForm<SignupForm>();
   const {
     handleSubmit,
     register,
@@ -36,11 +30,6 @@ const LoginForm = ({
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
         <InputWrapper>
           <label htmlFor="username">Username</label>
-          {unauthorizedError && (
-            <div data-testid="401-err" className="text-invalid">
-              {unauthorizedError}
-            </div>
-          )}
           {errors.username && (
             <div data-testid="rfh-username-err" className="text-invalid">
               {errors.username?.message}
@@ -56,7 +45,6 @@ const LoginForm = ({
             data-testid="username"
             id="username"
             autoComplete="username"
-            onInput={() => resetError()}
             {...register("username", usernameValidation)}
             className="rounded-[8px] box-border py-1 px-2 text-black-300 bg-white-100"
           ></input>
@@ -73,8 +61,7 @@ const LoginForm = ({
               data-testid="password"
               id="password"
               type={isPasswordVisible ? "text" : "password"}
-              autoComplete="current-password"
-              onInput={() => resetError()}
+              autoComplete="password-new"
               {...register("password", passwordValidation)}
               className="rounded-[8px] box-border py-1 px-2 text-black-300 w-full bg-white-100"
             ></input>
@@ -91,11 +78,11 @@ const LoginForm = ({
             "hover:bg-gr-1-d45 transition-all"
           }
         >
-          {isSubmitting ? "submitting..." : "Log in"}
+          Sign up
         </button>
       </form>
     </FormProvider>
   );
 };
 
-export default LoginForm;
+export default SignupForm;

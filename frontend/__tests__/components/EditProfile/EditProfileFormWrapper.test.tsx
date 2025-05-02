@@ -1,4 +1,4 @@
-import EditProfileFormWrapper from "@/components/EditProfileFormWrapper";
+import EditProfileFormWrapper from "@/components/EditProfile/EditProfileFormWrapper";
 import { render, screen, act } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { UserProfileContext } from "@/contexts/user";

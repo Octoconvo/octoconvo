@@ -1,4 +1,4 @@
-import LoginFormWrapper from "@/components/LoginFormWrapper";
+import LoginFormWrapper from "@/components/Login/LoginFormWrapper";
 import Link from "next/link";
 
 export default function page() {

@@ -2,7 +2,7 @@
 
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import type { EditProfileForm } from "@/types/form";
-import InputWrapper from "./InputWrapper";
+import InputWrapper from "@/components/InputWrapper";
 import { UserProfileContext } from "@/contexts/user";
 import { useContext, useState, useEffect, useRef } from "react";
 import Image from "next/image";

@@ -1,7 +1,7 @@
 import ActiveModalProvider from "@/components/ActiveModalProvider";
-import LobbyNavWrapper from "@/components/LobbyNavWrapper";
+import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 import ProtectedRouteWrapper from "@/components/ProtectedRouteWrapper";
-import EditProfileModalProvider from "@/components/EditProfileModalProvider";
+import EditProfileModalProvider from "@/components/EditProfile/EditProfileModalProvider";
 import CreateCommunityModalProvider from "@/components/CreateCommunity/CreateCommunityModalProvider";
 
 export default async function Layout({

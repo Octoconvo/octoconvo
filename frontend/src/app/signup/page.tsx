@@ -1,4 +1,4 @@
-import SignupFormWrapper from "@/components/SignupFormWrapper";
+import SignupFormWrapper from "@/components/Signup/SignupFormWrapper";
 import Link from "next/link";
 
 export default function page() {

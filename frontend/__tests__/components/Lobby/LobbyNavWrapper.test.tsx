@@ -1,4 +1,4 @@
-import LobbyNavWrapper from "@/components/LobbyNavWrapper";
+import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 import { UserProfileContext } from "@/contexts/user";
 import { UserProfile } from "@/types/user";
 import "@testing-library/jest-dom";

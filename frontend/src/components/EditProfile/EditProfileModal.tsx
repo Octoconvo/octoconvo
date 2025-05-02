@@ -1,6 +1,6 @@
 "use client";
 
-import EditProfileFormWrapper from "@/components/EditProfileFormWrapper";
+import EditProfileFormWrapper from "@/components/EditProfile/EditProfileFormWrapper";
 import { EditProfileModalContext, ActiveModalsContext } from "@/contexts/modal";
 import { useContext } from "react";
 

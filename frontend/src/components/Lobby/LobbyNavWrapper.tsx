@@ -2,7 +2,7 @@
 
 import { useContext, useRef } from "react";
 import LobbyNav from "./LobbyNav";
-import ProfileModal from "./ProfileModal";
+import ProfileModal from "@/components/ProfileModal";
 import { UserProfileContext } from "@/contexts/user";
 import { UserProfileModalContext } from "@/contexts/modal";
 

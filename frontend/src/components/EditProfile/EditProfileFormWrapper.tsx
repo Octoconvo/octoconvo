@@ -7,7 +7,7 @@ import {
   EditProfileForm as EditProfileFormType,
 } from "@/types/form";
 import { User, UserProfile } from "@/types/user";
-import EditProfileForm from "@/components/EditProfileForm";
+import EditProfileForm from "@/components/EditProfile/EditProfileForm";
 import { createOnSubmit, getFormData } from "@/utils/form";
 
 const EditProfileFormWrapper = () => {

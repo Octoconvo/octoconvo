@@ -5,7 +5,7 @@ import { render, screen } from "@testing-library/react";
 import { UserProfile } from "@/types/user";
 import React, { act } from "react";
 import { UserContext } from "@/contexts/user";
-import LobbyNavWrapper from "@/components/LobbyNavWrapper";
+import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 
 const userProfile: UserProfile = {
   id: "513c920c-3921-48b2-88d7-5b8156b9e6b8",

@@ -1,4 +1,4 @@
-import LobbyNav from "@/components/LobbyNav";
+import LobbyNav from "@/components/Lobby/LobbyNav";
 import { UserProfile } from "@/types/user";
 import { UserProfileContext } from "@/contexts/user";
 import "@testing-library/jest-dom";

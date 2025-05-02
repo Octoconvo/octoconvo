@@ -1,10 +1,10 @@
-import EditProfileModal from "@/components/EditProfileModal";
+import EditProfileModal from "@/components/EditProfile/EditProfileModal";
 import { act, render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { ActiveModalsContext } from "@/contexts/modal";
 import ActiveModalProvider from "@/components/ActiveModalProvider";
-import EditProfileModalProvider from "@/components/EditProfileModalProvider";
-import LobbyNavWrapper from "@/components/LobbyNavWrapper";
+import EditProfileModalProvider from "@/components/EditProfile/EditProfileModalProvider";
+import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 
 const openModalMock = jest.fn();
 const closeModalMock = jest.fn();

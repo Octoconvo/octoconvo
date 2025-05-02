@@ -4,7 +4,7 @@ import { userEvent } from "@testing-library/user-event";
 import { ActiveModalsContext } from "@/contexts/modal";
 import ActiveModalProvider from "@/components/ActiveModalProvider";
 import CreateCommunityModalProvider from "@/components/CreateCommunity/CreateCommunityModalProvider";
-import LobbyNavWrapper from "@/components/LobbyNavWrapper";
+import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 
 const openModalMock = jest.fn();
 const closeModalMock = jest.fn();

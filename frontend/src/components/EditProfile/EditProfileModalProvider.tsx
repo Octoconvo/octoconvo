@@ -2,7 +2,7 @@
 
 import { EditProfileModalContext } from "@/contexts/modal";
 import { useRef } from "react";
-import EditProfileModal from "@/components/EditProfileModal";
+import EditProfileModal from "@/components/EditProfile/EditProfileModal";
 
 const EditProfileModalProvider = ({
   children,

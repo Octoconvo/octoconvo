@@ -1,4 +1,4 @@
-import EditProfileForm from "@/components/EditProfileForm";
+import EditProfileForm from "@/components/EditProfile/EditProfileForm";
 import "@testing-library/jest-dom";
 import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
