@@ -71,6 +71,21 @@ const bannerValidation = {
   },
 };
 
+const communityNameValidation = {
+  required: "Community name is required",
+  maxLength: {
+    value: 128,
+    message: "Community name must not exceed 128 characters",
+  },
+};
+
+const communityBioValidation = {
+  maxLength: {
+    value: 255,
+    message: "Community bio must not exceed 255 characters",
+  },
+};
+
 const createSignupOnSubmit = ({
   errorHandler,
   successHandler,
@@ -194,6 +209,8 @@ export {
   bannerValidation,
   displayNameValidation,
   bioValidation,
+  communityNameValidation,
+  communityBioValidation,
   createSignupOnSubmit,
   createOnSubmit,
   getFormData,
