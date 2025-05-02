@@ -2,6 +2,7 @@ import ActiveModalProvider from "@/components/ActiveModalProvider";
 import LobbyNavWrapper from "@/components/LobbyNavWrapper";
 import ProtectedRouteWrapper from "@/components/ProtectedRouteWrapper";
 import EditProfileModalProvider from "@/components/EditProfileModalProvider";
+import CreateCommunityModalProvider from "@/components/CreateCommunity/CreateCommunityModalProvider";
 
 export default async function Layout({
   children,
@@ -13,8 +14,10 @@ export default async function Layout({
       <ProtectedRouteWrapper route="\login">
         <ActiveModalProvider>
           <EditProfileModalProvider>
-            <LobbyNavWrapper />
-            {children}
+            <CreateCommunityModalProvider>
+              {children}
+              <LobbyNavWrapper />
+            </CreateCommunityModalProvider>
           </EditProfileModalProvider>
         </ActiveModalProvider>
       </ProtectedRouteWrapper>
