@@ -263,8 +263,6 @@ describe("Test community post controller", () => {
         expect(message).toBe("Successfully created community");
       })
       .expect(200, done);
-
-    console.log("hi");
   });
 
   test("Failed to create community name is taken", done => {
@@ -281,7 +279,6 @@ describe("Test community post controller", () => {
         const message = res.body.message;
         const error = res.body.error;
 
-        console.log(error);
         expect(message).toBeDefined();
         expect(message).toBe("Failed to create community");
         expect(error).toBeDefined();
@@ -290,5 +287,41 @@ describe("Test community post controller", () => {
         );
       })
       .expect(422, done);
+  });
+});
+
+describe("Test Communities_get controller", () => {
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "client_user_1",
+    password: "Client_password_1",
+  });
+
+  test("Failed to fetch user's communities if user is unauthenticated", done => {
+    request(app)
+      .get("/communities")
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch user's communities",
+        error: {
+          message: "You are not authenticated",
+        },
+      })
+      .expect(401, done);
+  });
+
+  test("Successfully fetched user's communities if user is authenticated", done => {
+    agent
+      .get("/communities")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const communities = res.body.communities;
+
+        expect(message).toBe("Successfully fetched user's communities");
+        expect(Array.isArray(communities)).toBeTruthy();
+      })
+      .expect(200, done);
   });
 });
