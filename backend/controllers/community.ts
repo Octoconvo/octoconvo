@@ -6,6 +6,7 @@ import { createValidationErrObj } from "../utils/error";
 import {
   getCommunityByName,
   createCommunity,
+  getUserCommunities,
 } from "../database/prisma/communityQueries";
 import { convertFileName } from "../utils/file";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -106,7 +107,6 @@ const community_post = [
       banner: Express.Multer.File[];
     };
 
-    console.log({ avatar: files.avatar, banner: files.banner });
     const avatar: null | Express.Multer.File = files?.avatar
       ? convertFileName(files.avatar[0])
       : null;
@@ -195,4 +195,21 @@ const community_post = [
   }),
 ];
 
-export { community_post };
+const communities_get = [
+  createAuthenticationHandler({
+    message: "Failed to fetch user's communities",
+    errMessage: "You are not authenticated",
+  }),
+  asyncHandler(async (req: Request, res: Response) => {
+    const id = req.user?.id as string;
+
+    const communities = await getUserCommunities({ userId: id });
+
+    res.json({
+      message: "Successfully fetched user's communities",
+      communities,
+    });
+  }),
+];
+
+export { community_post, communities_get };
