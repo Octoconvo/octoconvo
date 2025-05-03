@@ -72,4 +72,23 @@ const createCommunity = async ({
   return community;
 };
 
-export { getCommunityByName, createCommunity, deleteCommunityById };
+const getUserCommunities = async ({ userId }: { userId: string }) => {
+  const communities = await prisma.community.findMany({
+    where: {
+      participants: {
+        every: {
+          userId: userId,
+        },
+      },
+    },
+  });
+
+  return communities;
+};
+
+export {
+  getCommunityByName,
+  createCommunity,
+  deleteCommunityById,
+  getUserCommunities,
+};
