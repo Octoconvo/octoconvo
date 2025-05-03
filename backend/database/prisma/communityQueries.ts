@@ -64,8 +64,12 @@ const createCommunity = async ({
           userId: id,
           role: "OWNER",
           status: "ACTIVE",
+          memberSince: new Date(),
         },
       },
+    },
+    include: {
+      participants: true,
     },
   });
 
