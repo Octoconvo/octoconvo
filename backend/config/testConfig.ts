@@ -37,6 +37,7 @@ app.post("/account/logout", userController.user_log_out_post);
 app.get("/profile/:id", profileController.user_profile_get);
 app.post("/profile/:id", profileController.user_profile_post);
 
+app.get("/communities", communityController.communities_get);
 app.post("/community", communityController.community_post);
 
 app.use(expr404ErrorHandler);
