@@ -95,7 +95,7 @@ model Participant {
   directMessageId String?
   createdAt       DateTime          @default(now()) @db.Timestamptz(3)
   updatedAt       DateTime          @default(now()) @db.Timestamptz(3)
-  member_since    DateTime?         @db.Timestamptz(3)
+  memberSince     DateTime?         @db.Timestamptz(3)
 }
 
 enum ParticipantRole {
@@ -115,8 +115,8 @@ model Message {
   author              User         @relation(fields: [authorId], references: [id])
   authorId            String
   content             String       @db.VarChar(2560)
-  created_at          DateTime     @default(now()) @db.Timestamptz(3)
-  updated_at          DateTime     @default(now()) @db.Timestamptz(3)
+  createdAt           DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime     @default(now()) @db.Timestamptz(3)
   isDeleted           Boolean      @default(false)
   isRead              Boolean      @default(false)
   hiddenFromAuthor    Boolean      @default(false)
