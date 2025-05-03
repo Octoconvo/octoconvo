@@ -60,7 +60,11 @@ jest.mock("../../database/supabase/supabaseQueries", () => ({
 
 describe("Test community post controller", () => {
   beforeAll(() => {
-    const communities = ["community_name_test", "community_name_test_1"];
+    const communities = [
+      "community_name_test",
+      "community_name_test_1",
+      "Community_name_test_2",
+    ];
 
     communities.forEach(async item => {
       const community: null | CommunityPOST = await getCommunityByName(item);
@@ -264,6 +268,34 @@ describe("Test community post controller", () => {
       })
       .expect(200, done);
   });
+
+  test(
+    "Created community's owner participant is correct and created" +
+      "and updated date is not null",
+    done => {
+      agent
+        .post("/community")
+        .set("Content-Type", "multipart/form-data")
+        .accept("application/json")
+        .field({
+          name: "community_name_test_2",
+          bio: "community_bio_test",
+        })
+        .attach("banner", __dirname + "/../assets/test-img-valid-01.jpg")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          console.log(res.body);
+          const participants = res.body.community.participants;
+
+          expect(participants).toBeDefined();
+          expect(participants.length).toBe(1);
+          expect(participants[0].role).toBe("OWNER");
+          expect(participants[0].memberSince).toBeDefined();
+          expect(participants[0].memberSince).not.toBeNull();
+        })
+        .expect(200, done);
+    },
+  );
 
   test("Failed to create community name is taken", done => {
     agent
