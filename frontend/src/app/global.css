@@ -172,6 +172,18 @@
     background-position: center;
     background-size: 100% auto;
   }
+
+  @keyframes slide-right {
+    from {
+      translate: -50% 0;
+      opacity: 50%;
+    }
+
+    to {
+      translate: 0;
+      opacity: 1;
+    }
+  }
 }
 
 :root {
@@ -205,6 +217,7 @@
   --h2: 4.209rem;
   --h1: 5.61rem;
 
+  --gradient-main-r: linear-gradient(to right, var(--brand-2), var(--brand-1));
   --gradient-1-t: linear-gradient(to top, var(--brand-3), var(--brand-1));
   --gradient-1-d45: linear-gradient(45deg, var(--brand-3), var(--brand-1));
   --gradient-2-t: linear-gradient(to top, var(--brand-4), var(--brand-1));
@@ -214,6 +227,7 @@
     var(--black-200),
     var(--black-300)
   );
+  --slide-right: ;
 }
 
 body {

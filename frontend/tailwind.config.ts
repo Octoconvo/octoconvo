@@ -55,6 +55,10 @@ export default {
         "gr-2-t": "var(--gradient-2-t)",
         "gr-bg-d": "var(--gradient-bg-d)",
         "gr-brand-dark-d": "var(--gradient-brand-dark-d)",
+        "gr-main-r": "var(--gradient-main-r)",
+      },
+      animation: {
+        "slide-right": "300ms slide-right",
       },
     },
   },
