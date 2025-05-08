@@ -11,7 +11,7 @@ const CommunitiesList = ({
   return (
     <ul
       className={
-        "overflow-y-auto scrollbar flex flex-col gap-4 p-4 w-full box-border"
+        "overflow-y-auto scrollbar flex flex-col p-4 w-full box-border"
       }
     >
       {communitiesList.map((community: CommunitiesResponseGET) => {
