@@ -26,10 +26,12 @@ const CreateCommunityForm = ({
   isSubmitting,
   onSubmit,
   validationError,
+  resetError,
 }: {
   isSubmitting: boolean;
   onSubmit: SubmitHandler<CreateCommunityForm>;
   validationError: ValidationErrorType[];
+  resetError: () => void;
 }) => {
   const { activeModals } = useContext(ActiveModalsContext);
   const { createCommunityModal } = useContext(CreateCommunityModalContext);
@@ -52,7 +54,6 @@ const CreateCommunityForm = ({
 
   useEffect(() => {
     const previewFiles = async () => {
-      console.log({ validationError });
       if (bannerFile) {
         const bannerPreview = await previewFile({ file: bannerFile });
 
@@ -205,6 +206,11 @@ const CreateCommunityForm = ({
               type="text"
               {...register("name", communityNameValidation)}
               className="bg-grey-200 rounded-[8px] px-2 py-1 text-h6"
+              onInput={() => {
+                if (validationError.length) {
+                  resetError();
+                }
+              }}
             />
           </InputWrapper>
           <InputWrapper>

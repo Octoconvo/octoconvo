@@ -25,7 +25,6 @@ const EditProfileFormWrapper = () => {
 
   const errorHandler = (status: number, error: ErrorHandlerType) => {
     console.log(error);
-    console.log(status === 422);
     if (status === 422) {
       setValidationError(error as ValidationError[]);
     }
@@ -60,6 +59,9 @@ const EditProfileFormWrapper = () => {
         onSubmit={onSubmit}
         isSubmitting={isSubmitting}
         validationError={validationError}
+        resetError={() => {
+          setValidationError([]);
+        }}
       ></CreateCommunityForm>
     </>
   );
