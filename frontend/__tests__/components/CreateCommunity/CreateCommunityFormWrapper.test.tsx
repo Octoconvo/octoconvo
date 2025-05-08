@@ -1,7 +1,8 @@
 import CreateCommunityFormWrapper from "@/components/CreateCommunity/CreateCommunityFormWrapper";
-import { render, screen, act, waitFor } from "@testing-library/react";
+import { render, screen, act } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { CommunityResponsePOST } from "@/types/response";
+import "@testing-library/jest-dom";
 
 const community: CommunityResponsePOST = {
   id: "123",
@@ -93,7 +94,6 @@ describe("Render CreateCommunityWrapper", () => {
     await user.type(bioInput, "ABC");
     await user.click(button);
 
-    await user.click(button);
     expect(console.log).toHaveBeenCalledWith(failureObj.error.message);
   });
 
@@ -113,9 +113,8 @@ describe("Render CreateCommunityWrapper", () => {
       failureObj422.error.validationError
     );
 
-    waitFor(async () => {
-      expect(screen.getByText("Community name is taken")).toBeInTheDocument();
-    });
+    const validationError = screen.getByText("Community name is already taken");
+    expect(validationError).toBeInTheDocument();
   });
 
   test("Test success onsubmit", async () => {
@@ -128,7 +127,6 @@ describe("Render CreateCommunityWrapper", () => {
     expect(button).toBeDefined();
     await user.type(nameInput, "ABC");
     await user.type(bioInput, "ABC");
-    await user.click(button);
 
     await user.click(button);
     expect(console.log).toHaveBeenCalledWith(successObj.community);
