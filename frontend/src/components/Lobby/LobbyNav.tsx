@@ -116,7 +116,7 @@ const LobbyNav = () => {
             src={
               userProfile && userProfile?.avatar
                 ? userProfile?.avatar
-                : "images/avatar_icon.svg"
+                : "/images/avatar_icon.svg"
             }
             width={64}
             height={64}
