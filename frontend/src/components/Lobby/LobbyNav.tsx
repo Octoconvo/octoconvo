@@ -3,7 +3,6 @@
 import { UserProfileContext } from "@/contexts/user";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useContext } from "react";
 import {
   ActiveModalsContext,
@@ -12,7 +11,6 @@ import {
 } from "@/contexts/modal";
 
 const LobbyNav = () => {
-  const pathname = usePathname();
   const { userProfile } = useContext(UserProfileContext);
   const { userProfileModal } = useContext(UserProfileModalContext);
   const { createCommunityModal } = useContext(CreateCommunityModalContext);
@@ -28,7 +26,7 @@ const LobbyNav = () => {
         <div className="flex flex-col justify-between gap-8">
           <Link
             data-testid="friends-l"
-            href={`${pathname}/friends`}
+            href={`/lobby/friends`}
             className={
               "flex relative items-center justify-center h-12 transition-all" +
               " hover:transition-all hover:shadow-[0_0.1rem_0_0_var(--white-200)]"
@@ -42,7 +40,7 @@ const LobbyNav = () => {
           </Link>
           <Link
             data-testid="dm-l"
-            href={`${pathname}/dm`}
+            href={`lobby/dm`}
             className={
               "flex relative items-center justify-center h-12 translation-all" +
               " hover:transition-all hover:shadow-[0_0.1rem_0_0_var(--white-200)]"
@@ -56,7 +54,7 @@ const LobbyNav = () => {
           </Link>
           <Link
             data-testid="communities-l"
-            href={`${pathname}/communities`}
+            href={`/lobby/communities`}
             className={
               "flex relative items-center justify-center h-12 translation-all" +
               " hover:transition-all hover:shadow-[0_0.1rem_0_0_var(--white-200)]"
@@ -89,7 +87,7 @@ const LobbyNav = () => {
           </button>
           <Link
             data-testid="explore-l"
-            href={`${pathname}/explore`}
+            href={`/lobby/explore`}
             className={
               "flex relative items-center justify-center h-12 before:bg-brand-1" +
               " before:rounded-full transition-all hover:transition-all" +
