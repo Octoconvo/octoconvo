@@ -187,6 +187,14 @@
     background-size: 100% auto;
   }
 
+  .community-circle {
+    display: flex;
+    padding: 32px;
+    background-image: url("/images/octoconvo-circle-icon.svg");
+    background-size: 100% auto;
+    background-position: center;
+  }
+
   @keyframes slide-right {
     from {
       translate: -50% 0;
