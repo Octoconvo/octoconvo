@@ -11,7 +11,7 @@ const LobbyNavWrapper = () => {
   const userProfileModal = useRef<null | HTMLDivElement>(null);
 
   return (
-    <div className="relative">
+    <div className="relative z-10">
       <UserProfileModalContext.Provider value={{ userProfileModal }}>
         <LobbyNav />
         <ProfileModal profileData={userProfile} />

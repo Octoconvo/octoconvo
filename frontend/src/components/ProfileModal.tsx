@@ -92,7 +92,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
         `rounded-[8px] ${
           activeModals.length &&
           activeModals[0]?.current === userProfileModal?.current
-            ? ""
+            ? " z-20"
             : "hidden"
         }`
       }
