@@ -30,6 +30,7 @@ describe("Render CreateCommunityForm to test selectFile invocation on file selec
           isSubmitting={false}
           onSubmit={onSubmit}
           validationError={[]}
+          resetError={() => {}}
         ></CreateCommunityForm>
       )
     );
@@ -69,6 +70,8 @@ describe("Render CreateCommunityForm to test selectFile invocation on file selec
 });
 
 describe("Render CreateCommunityForm to test validationError", () => {
+  const user = userEvent.setup();
+  const resetError = jest.fn(() => {});
   beforeEach(async () => {
     await act(async () =>
       render(
@@ -82,6 +85,7 @@ describe("Render CreateCommunityForm to test validationError", () => {
               value: "",
             },
           ]}
+          resetError={resetError}
         ></CreateCommunityForm>
       )
     );
@@ -92,6 +96,14 @@ describe("Render CreateCommunityForm to test validationError", () => {
       "Community name is already taken"
     ) as HTMLDivElement;
     expect(error).toBeDefined();
+  });
+
+  it("ResetError is called onInput when validationError is not empty", async () => {
+    const nameInput = screen.getByTestId("crt-cmmnty-name");
+
+    expect(nameInput).toBeInTheDocument();
+    await user.type(nameInput, "A");
+    expect(resetError).toHaveBeenCalled();
   });
 });
 
@@ -108,6 +120,7 @@ describe("Render CreateCommunityProfile and reset mock to test previewFile invoc
           isSubmitting={false}
           onSubmit={onSubmit}
           validationError={[]}
+          resetError={() => {}}
         ></CreateCommunityForm>
       )
     );
