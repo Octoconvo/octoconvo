@@ -15,8 +15,8 @@ export default async function Layout({
         <ActiveModalProvider>
           <EditProfileModalProvider>
             <CreateCommunityModalProvider>
-              {children}
               <LobbyNavWrapper />
+              {children}
             </CreateCommunityModalProvider>
           </EditProfileModalProvider>
         </ActiveModalProvider>
