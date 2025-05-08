@@ -157,7 +157,6 @@
     position: absolute;
     top: 0;
     right: 0;
-    display: flex;
     padding: 8px;
     background-color: var(--brand-1);
     border-radius: 50%;
@@ -226,6 +225,16 @@
     to bottom,
     var(--black-200),
     var(--black-300)
+  );
+  --gradient-brand-2-fade-b: linear-gradient(
+    to bottom,
+    var(--brand-2),
+    #ffffff00
+  );
+  --gradient-white-100-fade-b: linear-gradient(
+    to bottom,
+    var(--white-100),
+    #ffffff00
   );
   --slide-right: ;
 }

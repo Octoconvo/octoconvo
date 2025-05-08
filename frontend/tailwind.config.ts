@@ -56,6 +56,7 @@ export default {
         "gr-bg-d": "var(--gradient-bg-d)",
         "gr-brand-dark-d": "var(--gradient-brand-dark-d)",
         "gr-main-r": "var(--gradient-main-r)",
+        "gr-white-100-fade-b": "var(--gradient-white-100-fade-b)",
       },
       animation: {
         "slide-right": "300ms slide-right",
