@@ -140,7 +140,7 @@ const EditProfileForm = ({
             type="button"
             className={
               "w-full bg-gr-brand-dark-d relative rounded-t-[inherit] aspect-[7/2]" +
-              " add-image-icon before:h-[64px] before:w-[64px] w-full"
+              (!avatar ? " add-image-icon before:h-[64px] before:w-[64px]" : "")
             }
             onClick={() => {
               triggerInputClick(bannerInputRef);
