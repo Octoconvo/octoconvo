@@ -20,7 +20,7 @@ const CommunitiesItem = ({
       onMouseLeave={() => {
         setIsHovered(false);
       }}
-      className="flex w-full"
+      className="flex w-full border-b-[1px] border-[#80fffb1a]"
     >
       <button className="flex w-full items-center gap-4 p-8 font-semibold text-h6 hover:bg-brand-1 hover:rounded-[8px]">
         <div
