@@ -172,6 +172,21 @@
     background-size: 100% auto;
   }
 
+  .octoconvo-community-icon {
+    display: flex;
+    position: absolute;
+    background-image: linear-gradient(to bottom, var(--brand-2), #ffffff00);
+    border-radius: 50%;
+  }
+
+  .octoconvo-community-icon::after {
+    content: " ";
+    background-image: url("/images/octoconvo-community-icon.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% auto;
+  }
+
   @keyframes slide-right {
     from {
       translate: -50% 0;
