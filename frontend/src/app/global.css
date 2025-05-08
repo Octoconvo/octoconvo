@@ -195,6 +195,16 @@
     background-position: center;
   }
 
+  @keyframes fade-out {
+    from {
+      opacity: 0;
+    }
+
+    t0 {
+      opacity: 1;
+    }
+  }
+
   @keyframes slide-right {
     from {
       translate: -50% 0;
