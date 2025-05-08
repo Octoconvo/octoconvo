@@ -1,0 +1,24 @@
+"use client";
+
+import { CommunitiesResponseGET } from "@/types/response";
+import CommunitiesItem from "@/components/Communities/CommunitiesList/CommunitiesItem";
+
+const CommunitiesList = ({
+  communitiesList,
+}: {
+  communitiesList: CommunitiesResponseGET[];
+}) => {
+  return (
+    <ul
+      className={
+        "overflow-y-auto scrollbar flex flex-col gap-4 p-4 w-full box-border"
+      }
+    >
+      {communitiesList.map((community: CommunitiesResponseGET) => {
+        return <CommunitiesItem key={community.id} community={community} />;
+      })}
+    </ul>
+  );
+};
+
+export default CommunitiesList;
