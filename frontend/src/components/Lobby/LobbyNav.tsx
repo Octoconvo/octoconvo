@@ -63,7 +63,7 @@ const LobbyNav = () => {
             <span
               className={
                 "lobby-nav-icon" +
-                " after:bg-[url(/images/communities-icon.svg)]"
+                " after:bg-[url(/images/octoconvo-community-button-icon.svg)]"
               }
             ></span>
           </Link>
