@@ -2,6 +2,7 @@ import CommunitiesListWrapper from "@/components/Communities/CommunitiesList/Com
 import { render, act, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { UserContext } from "@/contexts/user";
+import socket from "@/socket/socket";
 
 const communitiesList = [
   {
@@ -104,5 +105,23 @@ describe("Render CommunitiesListWrapper with null user context", () => {
     const list = screen.queryAllByTestId("cmmnts-cmmnty-lst");
 
     expect(list.length).toBe(0);
+  });
+});
+
+describe("Test communitiesListWrapper socket events", () => {
+  jest.spyOn(socket, "emit").mockImplementationOnce(jest.fn());
+
+  beforeEach(async () => {
+    await act(async () =>
+      render(
+        <UserContext.Provider value={{ user: { id: "1" }, setUser: () => {} }}>
+          <CommunitiesListWrapper />
+        </UserContext.Provider>
+      )
+    );
+  });
+
+  test("Check if the socket subcribe to the correct communities id", async () => {
+    expect(socket.emit).toHaveBeenCalledWith("subscribe", "communities:1");
   });
 });
