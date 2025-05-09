@@ -170,6 +170,8 @@ const community_post = [
         banner: bannerURL,
       });
 
+      req.app.get("io").to(`communities:${id}`).emit("communitycreate");
+
       res.json({
         message: "Successfully created community",
         community,
