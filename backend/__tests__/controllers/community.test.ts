@@ -167,9 +167,12 @@ describe("Test community post controller", () => {
 
         expect(message).toBe("Failed to create community");
         expect(error.validationError).toBeDefined();
-        expect(error.validationError[0].msg).toBe(
-          "Community bio must not exceed 255 characters",
-        );
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "bio",
+          ).msg,
+        ).toBe("Community bio must not exceed 255 characters");
       })
       .expect(422, done);
   });
@@ -188,9 +191,12 @@ describe("Test community post controller", () => {
 
         expect(message).toEqual("Failed to create community");
         expect(error).toBeDefined();
-        expect(error.validationError[0].msg).toEqual(
-          "Avatar must only be in jpeg or png format",
-        );
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "avatar",
+          ).msg,
+        ).toEqual("Avatar must only be in jpeg or png format");
       })
       .expect(422)
       .end(done);
@@ -210,9 +216,12 @@ describe("Test community post controller", () => {
 
         expect(message).toEqual("Failed to create community");
         expect(error).toBeDefined();
-        expect(error.validationError[0].msg).toEqual(
-          "Banner must only be in jpeg or png format",
-        );
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "banner",
+          ).msg,
+        ).toEqual("Banner must only be in jpeg or png format");
       })
       .expect(422)
       .end(done);
