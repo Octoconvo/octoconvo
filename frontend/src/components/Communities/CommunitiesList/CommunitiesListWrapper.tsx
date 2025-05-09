@@ -4,6 +4,8 @@ import CommunitiesList from "./CommunitiesList";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "@/contexts/user";
 import { CommunitiesResponseGET } from "@/types/response";
+import { connectToRoom } from "@/socket/eventHandler";
+import socket from "@/socket/socket";
 
 const CommunitiesListWrapper = () => {
   const { user } = useContext(UserContext);
@@ -38,7 +40,25 @@ const CommunitiesListWrapper = () => {
 
     if (user) {
       fetchUserCommunities();
+
+      socket.emit("subscribe", `communities:${user.id}`);
+      socket.on("communitycreate", fetchUserCommunities);
+      socket.on(
+        "initiate",
+        connectToRoom.bind(this, socket, `communities:${user.id}`)
+      );
     }
+
+    return () => {
+      if (user) {
+        socket.emit("unsubscribe", `communities:${user.id}`);
+        socket.off("communitycreate", fetchUserCommunities);
+        socket.off(
+          "initiate",
+          connectToRoom.bind(this, socket, `communities:${user.id}`)
+        );
+      }
+    };
   }, [user]);
 
   return (
