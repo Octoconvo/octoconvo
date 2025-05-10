@@ -29,7 +29,8 @@ const LobbyNav = () => {
             href={`/lobby/friends`}
             className={
               "flex relative items-center justify-center h-12 transition-all" +
-              " hover:transition-all hover:shadow-[0_0.1rem_0_0_var(--white-200)]"
+              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
+              "  hover:transition-all"
             }
           >
             <span
@@ -43,7 +44,8 @@ const LobbyNav = () => {
             href={`lobby/dm`}
             className={
               "flex relative items-center justify-center h-12 translation-all" +
-              " hover:transition-all hover:shadow-[0_0.1rem_0_0_var(--white-200)]"
+              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
+              "  hover:transition-all"
             }
           >
             <span
@@ -57,13 +59,30 @@ const LobbyNav = () => {
             href={`/lobby/communities`}
             className={
               "flex relative items-center justify-center h-12 translation-all" +
-              " hover:transition-all hover:shadow-[0_0.1rem_0_0_var(--white-200)]"
+              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
+              "  hover:transition-all"
             }
           >
             <span
               className={
                 "lobby-nav-icon" +
                 " after:bg-[url(/images/octoconvo-community-button-icon.svg)]"
+              }
+            ></span>
+          </Link>
+
+          <Link
+            data-testid="explore-l"
+            href={`/lobby/explore`}
+            className={
+              "flex relative items-center justify-center h-12" +
+              " before:rounded-full transition-all hover:transition-all" +
+              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px] "
+            }
+          >
+            <span
+              className={
+                "lobby-nav-icon after:bg-[url(/images/explore-icon.svg)]"
               }
             ></span>
           </Link>
@@ -85,22 +104,6 @@ const LobbyNav = () => {
               }
             ></span>
           </button>
-          <Link
-            data-testid="explore-l"
-            href={`/lobby/explore`}
-            className={
-              "flex relative items-center justify-center h-12 before:bg-brand-1" +
-              " before:rounded-full transition-all hover:transition-all" +
-              " hover:before:scale-105 before:w-full before:h-full" +
-              " hover:before:rounded-[1rem]"
-            }
-          >
-            <span
-              className={
-                "lobby-nav-icon after:bg-[url(/images/explore-icon.svg)]"
-              }
-            ></span>
-          </Link>
         </div>
 
         <button
