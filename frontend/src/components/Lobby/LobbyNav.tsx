@@ -9,8 +9,11 @@ import {
   UserProfileModalContext,
   CreateCommunityModalContext,
 } from "@/contexts/modal";
+import { usePathname } from "next/navigation";
 
 const LobbyNav = () => {
+  const path = usePathname();
+  console.log({ path });
   const { userProfile } = useContext(UserProfileContext);
   const { userProfileModal } = useContext(UserProfileModalContext);
   const { createCommunityModal } = useContext(CreateCommunityModalContext);
@@ -30,7 +33,12 @@ const LobbyNav = () => {
             className={
               "flex relative items-center justify-center h-12 transition-all" +
               " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
-              "  hover:transition-all"
+              "  hover:transition-all" +
+              (path && path.split("/").includes("friends")
+                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
+                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
+                  " hover:before:bg-brand-3-d-1 hover:before:bg-none"
+                : "")
             }
           >
             <span
@@ -45,7 +53,12 @@ const LobbyNav = () => {
             className={
               "flex relative items-center justify-center h-12 translation-all" +
               " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
-              "  hover:transition-all"
+              "  hover:transition-all" +
+              (path && path.split("/").includes("dm")
+                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
+                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
+                  " hover:before:bg-brand-3-d-1 hover:before:bg-none"
+                : "")
             }
           >
             <span
@@ -60,7 +73,12 @@ const LobbyNav = () => {
             className={
               "flex relative items-center justify-center h-12 translation-all" +
               " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
-              "  hover:transition-all"
+              "  hover:transition-all" +
+              (path && path.split("/").includes("communities")
+                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
+                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
+                  " hover:before:bg-brand-3-d-1 hover:before:bg-none"
+                : "")
             }
           >
             <span
@@ -77,7 +95,12 @@ const LobbyNav = () => {
             className={
               "flex relative items-center justify-center h-12" +
               " before:rounded-full transition-all hover:transition-all" +
-              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px] "
+              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px] " +
+              (path && path.split("/").includes("explore")
+                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
+                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
+                  " hover:before:bg-brand-3-d-1 hover:before:bg-none"
+                : "")
             }
           >
             <span
