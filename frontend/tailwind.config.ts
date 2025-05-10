@@ -16,7 +16,9 @@ export default {
           1: "var(--brand-1)",
           2: "var(--brand-2)",
           3: "var(--brand-3)",
+          "3-d-1": "var(--brand-3-d-1)",
           4: "var(--brand-4)",
+          5: "var(--brand-5)",
         },
         white: {
           100: "var(--white-100)",
@@ -57,6 +59,7 @@ export default {
         "gr-brand-dark-d": "var(--gradient-brand-dark-d)",
         "gr-main-r": "var(--gradient-main-r)",
         "gr-white-100-fade-b": "var(--gradient-white-100-fade-b)",
+        "gr-brand-1-3-d-1-b": "var(--gradient-brand-1-3-d-1-b)",
       },
       animation: {
         "slide-right": "300ms slide-right",
