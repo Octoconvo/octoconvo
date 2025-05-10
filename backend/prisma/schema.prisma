@@ -121,18 +121,10 @@ model Message {
   isRead              Boolean      @default(false)
   hiddenFromAuthor    Boolean      @default(false)
   hiddenFromRecipient Boolean      @default(false)
-  replyTo             Replies[]    @relation("replyBy")
-  replyBy             Replies[]    @relation("replyTo")
+  replyToId           String?
+  replyTo             Message?     @relation("replies", fields: [replyToId], references: [id])
+  replyBy             Message[]    @relation("replies")
   attachments         Attachment[]
-}
-
-model Replies {
-  replyBy   Message @relation("replyBy", fields: [replyById], references: [id])
-  replyById String
-  replyTo   Message @relation("replyTo", fields: [replyToId], references: [id])
-  replyToId String
-
-  @@id([replyById, replyToId])
 }
 
 model Attachment {
