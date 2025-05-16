@@ -48,7 +48,7 @@ Example for multiple test data of user type:
 
 While the naming convention should be used for all fields of the data, including URL fields, we need to define how to write the values in some fields that conflict with the convention. In most cases, fields allow all the characters used in the naming convention, but, some limit and require certain characters and patterns.
 
-##### Alphabetical only
+###### Alphabetical only
 
 In alphabetical only fields, replace the id with its word equivalent, for example, '1' should be replaced with 'one'.
 
@@ -58,7 +58,7 @@ Examples:
 - testuser12 -> testuseronetwo
 - seeduser123 -> seeduseroneonethree
 
-##### Length limit
+###### Length limit
 
 Most values won't exceed the length limit, but when they do, we need to reduce the length by removing the vowels from the first and second words. This helps the value to stay within the length limit and enables us to follow the convention.
 
@@ -67,7 +67,7 @@ Example:
 - seeduser1 -> sdusr1.
 - testcommunity1 -> tstcmmnty1.
 
-###### What if the length still exceeds the maximum length?
+**_What if the length still exceeds the maximum length?_**
 
 In these cases, use only the first letter of the object name for the second word.
 
@@ -76,7 +76,7 @@ Example
 - testuser1 -> tstu1.
 - seedcommunity1 -> sdc1.
 
-##### Special pattern requirements
+###### Special pattern requirements
 
 In some fields, there are some requirements that are needed to pass the validation. In these cases, consider whether it is feasible to partially comply with the guidelines or if a radical change is needed.
 
