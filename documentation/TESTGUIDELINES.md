@@ -74,7 +74,7 @@ In these cases, use only the first letter of the object name for the second word
 Example
 
 - testuser1 -> tstu1.
-- seedcommunity -> sdc1.
+- seedcommunity1 -> sdc1.
 
 ##### Special pattern requirements
 
@@ -84,13 +84,13 @@ For example, the password field requires the value to contain an uppercase lette
 
 Example:
 
-- seeduserone -> seed@User1
+- seeduser1 -> seed@User1
 
 In other cases, like a phone number field, it is not feasible to partially follow the guidelines, and it is recommended to give them a special treatment.
 
 Example:
 
-- seednumberone -> 12345678
+- seeduser1 -> 12345678
 
 #### Testing Data Examples
 
