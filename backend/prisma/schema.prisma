@@ -128,15 +128,16 @@ model Message {
 }
 
 model Attachment {
-  id        String            @id @default(uuid())
-  message   Message?          @relation(fields: [messageId], references: [id])
-  messageId String?
-  type      AttachmentType
-  subtype   AttachmentSubtype
-  height    Int?
-  width     Int?
-  size      Int?
-  url       String            @db.Text
+  id           String            @id @default(uuid())
+  message      Message?          @relation(fields: [messageId], references: [id])
+  messageId    String?
+  type         AttachmentType
+  subtype      AttachmentSubtype
+  height       Int?
+  width        Int?
+  size         Int?
+  url          String            @db.Text
+  thumbnailUrl String            @db.Text
 }
 
 enum AttachmentType {
