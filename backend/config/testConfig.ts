@@ -2,14 +2,28 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passportConfig from "../config/passportConfig";
-import * as userController from "../controllers/user";
-import * as profileController from "../controllers/profile";
 import { expr404ErrorHandler, exprErrorHandler } from "../utils/error";
 import { createServer } from "node:http";
 import { createSocketServer } from "../events/socketIO";
+
+//Controllers
+import * as userController from "../controllers/user";
+import * as profileController from "../controllers/profile";
 import * as communityController from "../controllers/community";
+import * as messageController from "../controllers/message";
 
 const app = express();
+
+app.use(
+  session({
+    cookie: {
+      secure: false,
+    },
+    secret: "test",
+    resave: false,
+    saveUninitialized: true,
+  }),
+);
 const httpServer = createServer(app);
 createSocketServer(httpServer, app);
 
@@ -39,6 +53,8 @@ app.post("/profile/:id", profileController.user_profile_post);
 
 app.get("/communities", communityController.communities_get);
 app.post("/community", communityController.community_post);
+
+app.post("/message", messageController.message_post);
 
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
