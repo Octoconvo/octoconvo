@@ -40,4 +40,26 @@ const createMessage = async ({
   return message;
 };
 
-export { createMessage };
+const deleteAllMessageByContent = async (content: string) => {
+  const messages = await prisma.message.findMany({
+    where: {
+      content: content,
+    },
+  });
+
+  for (const message of messages) {
+    const deleteMessage = prisma.message.delete({
+      where: { id: message.id },
+    });
+
+    const deleteAttachments = prisma.attachment.deleteMany({
+      where: {
+        messageId: message.id,
+      },
+    });
+
+    prisma.$transaction([deleteAttachments, deleteMessage]);
+  }
+};
+
+export { createMessage, deleteAllMessageByContent };
