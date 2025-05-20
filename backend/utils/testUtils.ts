@@ -4,7 +4,7 @@ const login = (
   agent: TestAgent,
   { username, password }: { username: string; password: string },
 ) =>
-  test("Successfully log in as client_user_1", done => {
+  test(`Successfully log in as ${username}`, done => {
     agent
       .post("/account/login")
       .type("form")
