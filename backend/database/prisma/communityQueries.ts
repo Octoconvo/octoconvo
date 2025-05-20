@@ -85,6 +85,9 @@ const getUserCommunities = async ({ userId }: { userId: string }) => {
         },
       },
     },
+    include: {
+      inbox: true,
+    },
   });
 
   return communities;
