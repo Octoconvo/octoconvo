@@ -8,7 +8,9 @@
     "devstart": "ts-node-dev ./bin/www",
     "serverstart": "DEBUG=backend:* & npm run devstart",
     "test": "NODE_ENV=test && jest",
-    "test-watch": "NODE_ENV=test && jest --watchAll"
+    "test-watch": "NODE_ENV=test && jest --watchAll",
+    "populate": "ts-node populateDB.ts",
+    "unpopulate": "ts-node unpopulateDB.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.3.1",
