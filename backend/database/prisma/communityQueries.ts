@@ -90,9 +90,31 @@ const getUserCommunities = async ({ userId }: { userId: string }) => {
   return communities;
 };
 
+const getCommunityByIdAndParticipant = async ({
+  communityId,
+  participantId,
+}: {
+  communityId: string;
+  participantId: string;
+}) => {
+  const community = await prisma.community.findUnique({
+    where: {
+      id: communityId,
+      participants: {
+        some: {
+          userId: participantId,
+        },
+      },
+    },
+  });
+
+  return community;
+};
+
 export {
   getCommunityByName,
   createCommunity,
   deleteCommunityById,
   getUserCommunities,
+  getCommunityByIdAndParticipant,
 };
