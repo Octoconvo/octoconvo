@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import bcrypt from "bcrypt";
-import { body, validationResult } from "express-validator";
+import { body, ValidationError, validationResult } from "express-validator";
 import { createUser, getUserByUsername } from "../database/prisma/userQueries";
 import { NextFunction, Request, Response } from "express";
 import { createValidationErrObj } from "../utils/error";
@@ -72,6 +72,12 @@ const user_sign_up_post = [
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
 
+    errors.array().map((error: ValidationError) => {
+      if (error.type === "field" && error.path === "password") {
+        error.value = "";
+      }
+    });
+
     if (!errors.isEmpty()) {
       const obj = createValidationErrObj(
         errors,
@@ -142,6 +148,14 @@ const user_log_in_post = [
   userValidation.password,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
+
+    console.log(errors.array());
+
+    errors.array().map((error: ValidationError) => {
+      if (error.type === "field" && error.path === "password") {
+        error.value = "";
+      }
+    });
 
     if (!errors.isEmpty()) {
       const obj = createValidationErrObj(errors, "Failed to log in");
