@@ -59,7 +59,7 @@ jest.mock("../../database/supabase/supabaseQueries", () => ({
 }));
 
 describe("Test community post controller", () => {
-  beforeAll(() => {
+  afterAll(() => {
     const communities = [
       "community_name_test",
       "community_name_test_1",
