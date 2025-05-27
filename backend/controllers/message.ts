@@ -2,14 +2,17 @@ import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
 import { createAuthenticationHandler } from "../utils/authentication";
 import { createValidationErrObj } from "../utils/error";
-import { body, check, validationResult } from "express-validator";
+import { body, check, query, validationResult } from "express-validator";
 import { getInboxById } from "../database/prisma/inboxQueries";
-import { createMessage } from "../database/prisma/messageQueries";
+import { createMessage, getMessages } from "../database/prisma/messageQueries";
 import sharp from "sharp";
 import multer from "multer";
 import { getPublicURL, uploadFile } from "../database/supabase/supabaseQueries";
 import { getCommunityByIdAndParticipant } from "../database/prisma/communityQueries";
 import { convertFileName } from "../utils/file";
+import { isUUID, isISOString } from "../utils/validation";
+
+// Process file forms
 const storage = multer.memoryStorage();
 const imageMimeTypes = ["image/jpeg", "image/png", "image/gif"];
 const upload = multer({
@@ -66,6 +69,57 @@ const messageValidation = {
 
     return true;
   }),
+  limit: query("limit")
+    .optional({ values: "falsy" })
+    .bail()
+    .isInt({
+      min: 1,
+      max: 100,
+      allow_leading_zeroes: false,
+    })
+    .withMessage("Limit must be an integer between 1 and 100"),
+  cursor: query("cursor")
+    .trim()
+    .optional({
+      values: "falsy",
+    })
+    .bail()
+    .custom(
+      // eslint-disable-next-line
+      (value, { req }) => {
+        const cursor = value;
+        const id = cursor ? cursor.split("_")[0] : null;
+        const createdAt = cursor ? cursor.split("_")[1] : null;
+
+        // Validate cursor createdAt and id
+        if (!(isISOString(createdAt) && isUUID(id))) {
+          throw new Error("Cursor value is invalid");
+        }
+
+        return true;
+      },
+    ),
+  direction: query("direction")
+    .trim()
+    .optional({
+      values: "falsy",
+    })
+    .bail()
+    .custom(
+      // eslint-disable-next-line
+      (value, { req }) => {
+        // Check if the value is either forward or backward
+        const regex = new RegExp(/^(forward)$|^(backward)$/);
+
+        if (!regex.test(value)) {
+          throw new Error(
+            "Cursor direction must be either backward or forward",
+          );
+        }
+
+        return true;
+      },
+    ),
 };
 
 const message_post = [
@@ -127,6 +181,8 @@ const message_post = [
       res.status(422).json(obj);
       return;
     }
+
+    console.log(errors.array());
 
     const user = req.user as Express.User;
     const inboxId = req.body.inboxid;
@@ -265,8 +321,6 @@ const message_post = [
         .emit("communitycreate");
     }
 
-    console.log(message);
-
     res.json({
       message: "Successfully created message",
       messageData: message,
@@ -274,4 +328,121 @@ const message_post = [
   }),
 ];
 
-export { message_post };
+const messages_get = [
+  createAuthenticationHandler({
+    message: "Failed to fetch messages",
+    errMessage: "You are not authenticated",
+  }),
+  messageValidation.inboxId,
+  messageValidation.limit,
+  messageValidation.cursor,
+  messageValidation.direction,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    const inboxId = req.body.inboxid;
+    const user = req.user as Express.User;
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(errors, `Failed to fetch messages`);
+
+      res.status(422).json(obj);
+      return;
+    }
+
+    // Check if inbox exists
+    const inbox = await getInboxById(inboxId);
+
+    // send 404 error if the inbox doesn't exist
+    if (inbox === null) {
+      res.status(404).json({
+        message: `Failed to fetch messages`,
+        error: {
+          message: "The inbox doesn't exist",
+        },
+      });
+
+      return;
+    }
+
+    // Check authorization
+    if (inbox.inboxType === "COMMUNITY") {
+      const community = await getCommunityByIdAndParticipant({
+        communityId: inbox.communityId as string,
+        participantId: user.id as string,
+      });
+
+      if (community === null) {
+        res.status(403).json({
+          message: `Failed to fetch messages`,
+          error: {
+            message: "You are not a member of this community",
+          },
+        });
+
+        return;
+      }
+    }
+
+    const limit = req.query.limit ? Number(req.query.limit) : 100;
+    type Direction = "forward" | "backward";
+    const direction = req.query.direction
+      ? (req.query.direction as Direction)
+      : "backward";
+    // Get id and timestamp from cursor
+    const cursor =
+      req.query.cursor && typeof req.query.cursor === "string"
+        ? {
+            id: req.query.cursor.split("_")[0],
+            createdAt: req.query.cursor.split("_")[1],
+          }
+        : null;
+
+    const messages = await getMessages({ cursor, inboxId, limit, direction });
+
+    // Capture the first message id and createAt fields for the next cursor
+    const firstMessage = messages.length ? messages[0] : null;
+    const firstMsgCursor = firstMessage
+      ? `${firstMessage.id}_${new Date(firstMessage.createdAt).toISOString()}`
+      : null;
+
+    // Capture the last message id and createAt fields for the previous cursor
+    const lastMessage = messages.length ? messages[messages.length - 1] : null;
+    const lastMsgCursor = lastMessage
+      ? `${lastMessage.id}_${new Date(lastMessage.createdAt).toISOString()}`
+      : null;
+
+    // Get the oldest message as the previous cursor
+    let prevCursor = direction
+      ? direction === "backward"
+        ? lastMsgCursor
+        : firstMsgCursor
+      : firstMsgCursor;
+
+    // Get the latest message as the next cursor
+    let nextCursor = direction
+      ? direction === "backward"
+        ? firstMsgCursor
+        : lastMsgCursor
+      : lastMsgCursor;
+
+    // Change cursor to null when the messages length less than limit
+    if (messages.length < limit) {
+      if (direction === "backward") {
+        prevCursor = null;
+      }
+
+      if (direction === "forward") {
+        nextCursor = null;
+      }
+    }
+
+    res.json({
+      message: `Successfully fetched messages from inbox ${inboxId}`,
+      prevCursor: prevCursor,
+      nextCursor: nextCursor,
+      messagesData: messages,
+    });
+  }),
+];
+
+export { message_post, messages_get };
