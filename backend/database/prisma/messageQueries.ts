@@ -62,4 +62,64 @@ const deleteAllMessageByContent = async (content: string) => {
   }
 };
 
-export { createMessage, deleteAllMessageByContent };
+const getMessages = async ({
+  inboxId,
+  limit,
+  cursor,
+  direction,
+}: {
+  inboxId: string;
+  cursor: {
+    createdAt: string;
+    id: string;
+  } | null;
+  limit: number | null;
+  direction: "forward" | "backward";
+}) => {
+  console.log({
+    limit,
+    cursor,
+    direction,
+  });
+  const messages = await prisma.message.findMany({
+    where: {
+      inboxId: inboxId,
+      ...(cursor
+        ? {
+            OR: [
+              {
+                AND: [
+                  {
+                    id: {
+                      ...(direction === "backward"
+                        ? { gt: cursor.id }
+                        : { lt: cursor.id }),
+                    },
+                  },
+                  { createdAt: cursor.createdAt },
+                ],
+              },
+              {
+                // Get messages before or after the created date of the cursor
+                // createdAt value
+                createdAt: {
+                  ...(direction === "backward"
+                    ? { lt: cursor.createdAt }
+                    : { gt: cursor.createdAt }),
+                },
+              },
+            ],
+          }
+        : {}),
+    },
+    orderBy: [
+      { createdAt: direction === "backward" ? "desc" : "asc" },
+      { id: "asc" },
+    ],
+    ...(limit ? { take: limit } : {}),
+  });
+
+  return messages;
+};
+
+export { createMessage, deleteAllMessageByContent, getMessages };
