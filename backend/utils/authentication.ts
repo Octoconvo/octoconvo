@@ -17,8 +17,9 @@ const createAuthenticationHandler = ({
           message: errMessage,
         },
       });
-    }
 
+      return;
+    }
     next();
   };
 };
