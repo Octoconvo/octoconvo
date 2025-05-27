@@ -55,6 +55,7 @@ app.get("/communities", communityController.communities_get);
 app.post("/community", communityController.community_post);
 
 app.post("/message", messageController.message_post);
+app.get("/messages", messageController.messages_get);
 
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);

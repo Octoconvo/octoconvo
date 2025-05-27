@@ -3,7 +3,7 @@ import app from "../../config/testConfig";
 import { login } from "../../utils/testUtils";
 import prisma from "../../database/prisma/client";
 import { console } from "node:inspector";
-import { Community, Inbox } from "@prisma/client";
+import { Community, Inbox, Message } from "@prisma/client";
 import { deleteAllMessageByContent } from "../../database/prisma/messageQueries";
 
 jest.mock("../../database/supabase/supabaseQueries", () => ({
@@ -341,6 +341,319 @@ describe("Test message post controller", () => {
         expect(message).toBe("Successfully created message");
         expect(messageData).toBeDefined();
         expect(messageData.inboxId).toBe(community1?.inbox.id);
+      })
+      .expect(200)
+      .end(done);
+  });
+});
+
+describe("Test messages get controller", () => {
+  type CommunityGET = Community & {
+    inbox: Inbox;
+  };
+  let community1: CommunityGET | null = null;
+  let community2: CommunityGET | null = null;
+  let messages1: Message[] = [];
+
+  beforeAll(async () => {
+    try {
+      community1 = (await prisma.community.findUnique({
+        where: {
+          name: "seedcommunity1",
+        },
+        include: {
+          inbox: true,
+        },
+      })) as CommunityGET;
+
+      community2 = (await prisma.community.findUnique({
+        where: {
+          name: "seedcommunity2",
+        },
+        include: {
+          inbox: true,
+        },
+      })) as CommunityGET;
+
+      messages1 = await prisma.message.findMany({
+        where: {
+          inboxId: community1.inbox.id,
+        },
+        orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  test(
+    "Return 401 unauthorized if user tries to get messages without" +
+      " being authenticated",
+    done => {
+      request(app)
+        .get("/messages")
+        .type("form")
+        .send({
+          inboxid: "1",
+        })
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to fetch messages",
+          error: {
+            message: "You are not authenticated",
+          },
+        })
+        .expect(401, done);
+    },
+  );
+
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser1",
+    password: "seed@User1",
+  });
+
+  test("Return 422 error when limit query is invalid", done => {
+    agent
+      .get("/messages?limit=0.1")
+      .type("form")
+      .send({})
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch messages");
+        expect(error.validationError).toBeDefined();
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "limit",
+          ).msg,
+        ).toBe("Limit must be an integer between 1 and 100");
+      })
+      .expect(422)
+      .end(done);
+  });
+
+  test("Return 422 error when cursor query is invalid", done => {
+    agent
+      .get("/messages?cursor=testcursor1_testcursor1")
+      .type("form")
+      .send({})
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch messages");
+        expect(error.validationError).toBeDefined();
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "cursor",
+          ).msg,
+        ).toBe("Cursor value is invalid");
+      })
+      .expect(422)
+      .end(done);
+  });
+
+  test("Return 422 error when direction query is invalid", done => {
+    agent
+      .get("/messages?direction=test")
+      .type("form")
+      .send({})
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch messages");
+        expect(error.validationError).toBeDefined();
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "direction",
+          ).msg,
+        ).toBe("Cursor direction must be either backward or forward");
+      })
+      .expect(422)
+      .end(done);
+  });
+
+  test("Return 403 error when user is not authorized to access the inbox", done => {
+    agent
+      .get("/messages")
+      .type("form")
+      .send({ inboxid: community2?.inbox.id })
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch messages",
+        error: {
+          message: "You are not a member of this community",
+        },
+      })
+      .expect(403)
+      .end(done);
+  });
+
+  test("Return 404 error when inbox doesn't exist", done => {
+    agent
+      .get("/messages")
+      .type("form")
+      .send({ inboxid: community1?.id })
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch messages",
+        error: {
+          message: "The inbox doesn't exist",
+        },
+      })
+      .expect(404)
+      .end(done);
+  });
+
+  test("Return two messages when limit query is 2", done => {
+    agent
+      .get("/messages?limit=2")
+      .type("form")
+      .send({ inboxid: community1?.inbox.id })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const messagesData = res.body.messagesData;
+
+        expect(message).toBe(
+          `Successfully fetched messages from inbox ${community1?.inbox.id}`,
+        );
+        expect(messagesData).toBeDefined();
+        expect(messagesData.length).toBe(2);
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return correct cursor when the direction query is backward", done => {
+    agent
+      .get("/messages?direction=backward&limit=2")
+      .type("form")
+      .send({ inboxid: community1?.inbox.id })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const prevCursor = res.body.prevCursor;
+        const nextCursor = res.body.nextCursor;
+
+        expect(prevCursor).toBe(
+          `${messages1[18].id}_${new Date(messages1[18].createdAt).toISOString()}`,
+        );
+
+        expect(nextCursor).toBe(
+          `${messages1[19].id}_${new Date(messages1[19].createdAt).toISOString()}`,
+        );
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return correct cursor when the direction query is forward", done => {
+    agent
+      .get("/messages?direction=forward&limit=2")
+      .type("form")
+      .send({ inboxid: community1?.inbox.id })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const prevCursor = res.body.prevCursor;
+        const nextCursor = res.body.nextCursor;
+
+        expect(prevCursor).toBe(
+          `${messages1[0].id}_${new Date(messages1[0].createdAt).toISOString()}`,
+        );
+
+        expect(nextCursor).toBe(
+          `${messages1[1].id}_${new Date(messages1[1].createdAt).toISOString()}`,
+        );
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return null prev cursor when messages data less than limit", done => {
+    const cursor =
+      `${messages1[2].id}` +
+      "_" +
+      `${new Date(messages1[2].createdAt).toISOString()}`;
+
+    agent
+      .get(`/messages?cursor=${cursor}&direction=backward&limit=5`)
+      .type("form")
+      .send({ inboxid: community1?.inbox.id })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const prevCursor = res.body.prevCursor;
+
+        expect(prevCursor).toBeNull();
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return null next cursor when messages data less than limit", done => {
+    const cursor =
+      `${messages1[18].id}` +
+      "_" +
+      `${new Date(messages1[18].createdAt).toISOString()}`;
+
+    agent
+      .get(`/messages?cursor=${cursor}&direction=forward&limit=5`)
+      .type("form")
+      .send({ inboxid: community1?.inbox.id })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const nextCursor = res.body.nextCursor;
+
+        expect(nextCursor).toBeNull();
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return correct messages with cursor and backward direction", done => {
+    const cursor =
+      `${messages1[10].id}` +
+      "_" +
+      `${new Date(messages1[10].createdAt).toISOString()}`;
+
+    agent
+      .get(`/messages?cursor=${cursor}&direction=backward&limit=1`)
+      .type("form")
+      .send({ inboxid: community1?.inbox.id })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const messagesData = res.body.messagesData;
+
+        expect(messagesData[0].id).toBe(messages1[9].id);
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return correct messages with cursor and forward direction", done => {
+    const cursor =
+      `${messages1[10].id}` +
+      "_" +
+      `${new Date(messages1[10].createdAt).toISOString()}`;
+
+    agent
+      .get(`/messages?cursor=${cursor}&direction=forward&limit=1`)
+      .type("form")
+      .send({ inboxid: community1?.inbox.id })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const messagesData = res.body.messagesData;
+
+        expect(messagesData[0].id).toBe(messages1[11].id);
       })
       .expect(200)
       .end(done);
