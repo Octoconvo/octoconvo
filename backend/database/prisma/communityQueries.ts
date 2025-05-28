@@ -22,6 +22,19 @@ const deleteCommunityById = async (id: string) => {
   await prisma.$transaction([deleteInbox, deleteParticipants, deleteCommunity]);
 };
 
+const getCommunityById = async (id: string) => {
+  const community = await prisma.community.findUnique({
+    where: {
+      id: id,
+    },
+    include: {
+      inbox: true,
+    },
+  });
+
+  return community;
+};
+
 const getCommunityByName = async (name: string) => {
   const community = await prisma.community.findFirst({
     where: {
@@ -115,6 +128,7 @@ const getCommunityByIdAndParticipant = async ({
 };
 
 export {
+  getCommunityById,
   getCommunityByName,
   createCommunity,
   deleteCommunityById,
