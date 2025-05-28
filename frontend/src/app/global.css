@@ -72,8 +72,7 @@
     content: "";
     width: 1.25em;
     height: 1.25em;
-    background: center / 1.25em 1.25em no-repeat
-      url("/images/visibility-on-icon.svg");
+    background: center / 1.25em 1.25em no-repeat url("/images/visibility-on-icon.svg");
   }
 
   .visibility-off-icon {
@@ -87,8 +86,7 @@
     content: "";
     width: 1.25em;
     height: 1.25em;
-    background: center / 1.25em 1.25em no-repeat
-      url("/images/visibility-off-icon.svg");
+    background: center / 1.25em 1.25em no-repeat url("/images/visibility-off-icon.svg");
   }
 
   .lobby-nav-icon {
@@ -172,27 +170,13 @@
     background-size: 100% auto;
   }
 
-  .octoconvo-community-icon {
+  .community-bg {
     display: flex;
-    position: absolute;
-    background-image: linear-gradient(to bottom, var(--brand-2), #ffffff00);
-    border-radius: 50%;
-  }
-
-  .octoconvo-community-icon::after {
-    content: " ";
-    background-image: url("/images/octoconvo-community-icon.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 100% auto;
-  }
-
-  .community-circle {
-    display: flex;
-    padding: 32px;
-    background-image: url("/images/octoconvo-circle-icon.svg");
-    background-size: 100% auto;
-    background-position: center;
+    background-image: url("/images/octoconvo-community-icon.svg"),
+      url("/images/octoconvo-circle-icon.svg");
+    background-repeat: no-repeat no-repeat;
+    background-position: center center;
+    background-size: 128px 128px, 256px 256px;
   }
 
   @keyframes fade-out {
@@ -255,26 +239,10 @@
   --gradient-1-d45: linear-gradient(45deg, var(--brand-3), var(--brand-1));
   --gradient-2-t: linear-gradient(to top, var(--brand-4), var(--brand-1));
   --gradient-bg-d: linear-gradient(to top, var(--brand-1), var(--black-300));
-  --gradient-brand-dark-d: linear-gradient(
-    to bottom,
-    var(--black-200),
-    var(--black-300)
-  );
-  --gradient-brand-2-fade-b: linear-gradient(
-    to bottom,
-    var(--brand-2),
-    #ffffff00
-  );
-  --gradient-white-100-fade-b: linear-gradient(
-    to bottom,
-    var(--white-100),
-    #ffffff00
-  );
-  --gradient-brand-1-3-d-1-b: linear-gradient(
-    to bottom,
-    var(--brand-1),
-    var(--brand-3-d-1)
-  );
+  --gradient-brand-dark-d: linear-gradient(to bottom, var(--black-200), var(--black-300));
+  --gradient-brand-2-fade-b: linear-gradient(to bottom, var(--brand-2), #ffffff00);
+  --gradient-white-100-fade-b: linear-gradient(to bottom, var(--white-100), #ffffff00);
+  --gradient-brand-1-3-d-1-b: linear-gradient(to bottom, var(--brand-1), var(--brand-3-d-1));
 }
 
 body {
