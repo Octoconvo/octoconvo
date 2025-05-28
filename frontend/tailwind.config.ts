@@ -60,6 +60,7 @@ export default {
         "gr-main-r": "var(--gradient-main-r)",
         "gr-white-100-fade-b": "var(--gradient-white-100-fade-b)",
         "gr-brand-1-3-d-1-b": "var(--gradient-brand-1-3-d-1-b)",
+        "gr-black-1-b": "var(--gradient-black-1-b)",
       },
       animation: {
         "slide-right": "300ms slide-right",
