@@ -4,6 +4,7 @@ import { createAuthenticationHandler } from "../utils/authentication";
 import { body, check, validationResult } from "express-validator";
 import { createValidationErrObj } from "../utils/error";
 import {
+  getCommunityById,
   getCommunityByName,
   createCommunity,
   getUserCommunities,
@@ -13,6 +14,7 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import sharp from "sharp";
 import { getPublicURL, uploadFile } from "../database/supabase/supabaseQueries";
 import multer from "multer";
+import { isUUID } from "../utils/validation";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -72,7 +74,54 @@ const communityValidation = {
 
     return true;
   }),
+  communityId: check("communityid").custom((val, { req }) => {
+    const communityId = req.params?.communityid;
+
+    if (!isUUID(communityId)) {
+      throw new Error("Community id is invalid");
+    }
+
+    return true;
+  }),
 };
+
+const community_get = [
+  createAuthenticationHandler({
+    message: "Failed to fetch community",
+    errMessage: "You are not authenticated",
+  }),
+  communityValidation.communityId,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(errors, "Failed to fetch community");
+
+      res.status(422).json(obj);
+      return;
+    }
+
+    const communityId = req.params.communityid;
+
+    const community = await getCommunityById(communityId);
+
+    if (community === null) {
+      res.status(404).json({
+        message: "Failed to fetch community",
+        error: {
+          message: "Community with that id doesn't exist",
+        },
+      });
+
+      return;
+    }
+
+    res.json({
+      message: `Successfully fetched community with id ${communityId}`,
+      community,
+    });
+  }),
+];
 
 const community_post = [
   createAuthenticationHandler({
@@ -214,4 +263,4 @@ const communities_get = [
   }),
 ];
 
-export { community_post, communities_get };
+export { community_get, community_post, communities_get };
