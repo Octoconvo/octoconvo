@@ -6,6 +6,8 @@ import {
   getCommunityByName,
 } from "../../database/prisma/communityQueries";
 import { CommunityPOST } from "../../@types/apiResponse";
+import { Community, Inbox } from "@prisma/client";
+import prisma from "../../database/prisma/client";
 
 jest.mock("../../database/supabase/supabaseQueries", () => ({
   uploadFile: async ({
@@ -362,6 +364,96 @@ describe("Test Communities_get controller", () => {
 
         expect(message).toBe("Successfully fetched user's communities");
         expect(Array.isArray(communities)).toBeTruthy();
+      })
+      .expect(200, done);
+  });
+});
+
+describe("Test community_get controller", () => {
+  type CommunityGET = Community & {
+    inbox: Inbox;
+  };
+  let community1: CommunityGET | null = null;
+
+  beforeAll(async () => {
+    try {
+      community1 = (await prisma.community.findUnique({
+        where: {
+          name: "seedcommunity1",
+        },
+        include: {
+          inbox: true,
+        },
+      })) as CommunityGET;
+    } catch (err) {
+      console.error(err);
+    }
+  });
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "client_user_1",
+    password: "Client_password_1",
+  });
+
+  test("Failed to fetch community if user is unauthenticated", done => {
+    request(app)
+      .get("/community/testcommunity1")
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch community",
+        error: {
+          message: "You are not authenticated",
+        },
+      })
+      .expect(401, done);
+  });
+
+  test("Return 422 HTTP error when community id is invalid", done => {
+    agent
+      .get("/community/testcommunity1")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch community");
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "communityid",
+          ).msg,
+        ).toBe("Community id is invalid");
+      })
+      .expect(422, done);
+  });
+
+  test("Return 404 HTTP error when community doesn't exist", done => {
+    agent
+      .get(`/community/${community1?.inbox.id}`)
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch community",
+        error: {
+          message: "Community with that id doesn't exist",
+        },
+      })
+      .expect(404, done);
+  });
+
+  test("Successfully fetched community if user is authenticated", done => {
+    agent
+      .get(`/community/${community1?.id}`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const community = res.body.community;
+
+        expect(message).toBe(
+          `Successfully fetched community with id ${community1?.id}`,
+        );
+        expect(community.id).toBe(community1?.id);
+        expect(community.inbox.id).toBe(community1?.inbox.id);
       })
       .expect(200, done);
   });
