@@ -179,6 +179,21 @@
     background-size: 128px 128px, 256px 256px;
   }
 
+  .spinner {
+    border-radius: 50%;
+    background: radial-gradient(farthest-side, var(--brand-1) 94%, #0000) top/9px 9px no-repeat,
+      conic-gradient(#0000 30%, var(--brand-1));
+    mask: radial-gradient(farthest-side, #0000 calc(100% - 25%), #000 0);
+    -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 25%), #000 0);
+    animation: spinner 1s infinite linear;
+  }
+
+  @keyframes spinner {
+    to {
+      transform: rotate(1turn);
+    }
+  }
+
   @keyframes fade-out {
     from {
       opacity: 0;
