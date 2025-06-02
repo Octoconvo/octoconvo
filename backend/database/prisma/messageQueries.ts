@@ -116,6 +116,15 @@ const getMessages = async ({
       { createdAt: direction === "backward" ? "desc" : "asc" },
       { id: "asc" },
     ],
+    include: {
+      author: {
+        select: {
+          username: true,
+          displayName: true,
+          avatar: true,
+        },
+      },
+    },
     ...(limit ? { take: limit } : {}),
   });
 
