@@ -11,7 +11,8 @@
     "test-watch": "NODE_ENV=test && jest --watchAll",
     "populate": "ts-node populateDB.ts",
     "unpopulate": "ts-node unpopulateDB.ts",
-    "populateClient": "ts-node clientPopulateDB.ts"
+    "populateClient": "ts-node clientPopulateDB.ts",
+    "unpopulateClient": "ts-node clientUnpopulateDB.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.3.1",
