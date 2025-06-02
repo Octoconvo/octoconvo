@@ -122,6 +122,7 @@
 
   .scrollbar::-webkit-scrollbar {
     width: 0.5vw;
+    height: 0.5vh;
   }
 
   .scrollbar::-webkit-sccrollbar-track {
