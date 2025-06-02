@@ -180,6 +180,22 @@
     background-size: 128px 128px, 256px 256px;
   }
 
+  .delete-btn {
+    position: absolute;
+    display: flex;
+    width: 32px;
+    height: 32px;
+    padding: 8px;
+    background-color: var(--black-400);
+    background-image: url("/images/delete-icon.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 32px 32px;
+    border-radius: 0 0 8px 8px;
+    right: 8px;
+    top: 0;
+  }
+
   .spinner {
     border-radius: 50%;
     background: radial-gradient(farthest-side, var(--brand-1) 94%, #0000) top/9px 9px no-repeat,
