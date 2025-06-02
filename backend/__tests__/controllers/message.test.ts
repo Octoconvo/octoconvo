@@ -391,11 +391,8 @@ describe("Test messages get controller", () => {
       " being authenticated",
     done => {
       request(app)
-        .get("/messages")
+        .get("/inbox/textinbox1/messages")
         .type("form")
-        .send({
-          inboxid: "1",
-        })
         .expect("Content-Type", /json/)
         .expect({
           message: "Failed to fetch messages",
@@ -414,11 +411,32 @@ describe("Test messages get controller", () => {
     password: "seed@User1",
   });
 
+  test("Return 422 error when inbox ID  is invalid", done => {
+    agent
+      .get("/inbox/testinbox1/messages?limit=0.1")
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch messages");
+        expect(error.validationError).toBeDefined();
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "inboxid",
+          ).msg,
+        ).toBe("Invalid inbox id");
+      })
+      .expect(422)
+      .end(done);
+  });
+
   test("Return 422 error when limit query is invalid", done => {
     agent
-      .get("/messages?limit=0.1")
+      .get("/inbox/testinbox1/messages?limit=0.1")
       .type("form")
-      .send({})
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
@@ -439,9 +457,8 @@ describe("Test messages get controller", () => {
 
   test("Return 422 error when cursor query is invalid", done => {
     agent
-      .get("/messages?cursor=testcursor1_testcursor1")
+      .get("/inbox/testinbox1/messages?cursor=testcursor1_testcursor1")
       .type("form")
-      .send({})
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
@@ -462,9 +479,8 @@ describe("Test messages get controller", () => {
 
   test("Return 422 error when direction query is invalid", done => {
     agent
-      .get("/messages?direction=test")
+      .get("/inbox/testinbox1/messages?direction=test")
       .type("form")
-      .send({})
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
@@ -485,9 +501,8 @@ describe("Test messages get controller", () => {
 
   test("Return 403 error when user is not authorized to access the inbox", done => {
     agent
-      .get("/messages")
+      .get(`/inbox/${community2?.inbox.id}/messages`)
       .type("form")
-      .send({ inboxid: community2?.inbox.id })
       .expect("Content-Type", /json/)
       .expect({
         message: "Failed to fetch messages",
@@ -501,9 +516,8 @@ describe("Test messages get controller", () => {
 
   test("Return 404 error when inbox doesn't exist", done => {
     agent
-      .get("/messages")
+      .get(`/inbox/${community1?.id}/messages`)
       .type("form")
-      .send({ inboxid: community1?.id })
       .expect("Content-Type", /json/)
       .expect({
         message: "Failed to fetch messages",
@@ -517,9 +531,8 @@ describe("Test messages get controller", () => {
 
   test("Return two messages when limit query is 2", done => {
     agent
-      .get("/messages?limit=2")
+      .get(`/inbox/${community1?.inbox.id}/messages?limit=2`)
       .type("form")
-      .send({ inboxid: community1?.inbox.id })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
@@ -537,9 +550,8 @@ describe("Test messages get controller", () => {
 
   test("Return correct cursor when the direction query is backward", done => {
     agent
-      .get("/messages?direction=backward&limit=2")
+      .get(`/inbox/${community1?.inbox.id}/messages?direction=backward&limit=2`)
       .type("form")
-      .send({ inboxid: community1?.inbox.id })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const prevCursor = res.body.prevCursor;
@@ -559,9 +571,8 @@ describe("Test messages get controller", () => {
 
   test("Return correct cursor when the direction query is forward", done => {
     agent
-      .get("/messages?direction=forward&limit=2")
+      .get(`/inbox/${community1?.inbox.id}/messages?direction=forward&limit=2`)
       .type("form")
-      .send({ inboxid: community1?.inbox.id })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const prevCursor = res.body.prevCursor;
@@ -586,9 +597,10 @@ describe("Test messages get controller", () => {
       `${new Date(messages1[2].createdAt).toISOString()}`;
 
     agent
-      .get(`/messages?cursor=${cursor}&direction=backward&limit=5`)
+      .get(
+        `/inbox/${community1?.inbox.id}/messages?cursor=${cursor}&direction=backward&limit=5`,
+      )
       .type("form")
-      .send({ inboxid: community1?.inbox.id })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const prevCursor = res.body.prevCursor;
@@ -606,9 +618,10 @@ describe("Test messages get controller", () => {
       `${new Date(messages1[18].createdAt).toISOString()}`;
 
     agent
-      .get(`/messages?cursor=${cursor}&direction=forward&limit=5`)
+      .get(
+        `/inbox/${community1?.inbox.id}/messages?cursor=${cursor}&direction=forward&limit=5`,
+      )
       .type("form")
-      .send({ inboxid: community1?.inbox.id })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const nextCursor = res.body.nextCursor;
@@ -626,9 +639,10 @@ describe("Test messages get controller", () => {
       `${new Date(messages1[10].createdAt).toISOString()}`;
 
     agent
-      .get(`/messages?cursor=${cursor}&direction=backward&limit=1`)
+      .get(
+        `/inbox/${community1?.inbox.id}/messages?cursor=${cursor}&direction=backward&limit=1`,
+      )
       .type("form")
-      .send({ inboxid: community1?.inbox.id })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const messagesData = res.body.messagesData;
@@ -646,9 +660,10 @@ describe("Test messages get controller", () => {
       `${new Date(messages1[10].createdAt).toISOString()}`;
 
     agent
-      .get(`/messages?cursor=${cursor}&direction=forward&limit=1`)
+      .get(
+        `/inbox/${community1?.inbox.id}/messages?cursor=${cursor}&direction=forward&limit=1`,
+      )
       .type("form")
-      .send({ inboxid: community1?.inbox.id })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const messagesData = res.body.messagesData;

@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
 import { createAuthenticationHandler } from "../utils/authentication";
 import { createValidationErrObj } from "../utils/error";
-import { body, check, query, validationResult } from "express-validator";
+import { body, check, param, query, validationResult } from "express-validator";
 import { getInboxById } from "../database/prisma/inboxQueries";
 import { createMessage, getMessages } from "../database/prisma/messageQueries";
 import sharp from "sharp";
@@ -11,6 +11,7 @@ import { getPublicURL, uploadFile } from "../database/supabase/supabaseQueries";
 import { getCommunityByIdAndParticipant } from "../database/prisma/communityQueries";
 import { convertFileName } from "../utils/file";
 import { isUUID, isISOString } from "../utils/validation";
+import { Message } from "@prisma/client";
 
 // Process file forms
 const storage = multer.memoryStorage();
@@ -38,6 +39,22 @@ const messageValidation = {
     .withMessage("Message must not exceed 2048 characters")
     .escape(),
   inboxId: body("inboxid")
+    .trim()
+    .isLength({ min: 1 })
+    .withMessage("Inbox id is required")
+    .bail()
+    .custom(val => {
+      const uuidRegex = new RegExp(
+        /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/,
+      );
+
+      if (!uuidRegex.test(val)) {
+        throw new Error("Invalid inbox id");
+      }
+
+      return true;
+    }),
+  inboxIdParam: param("inboxid")
     .trim()
     .isLength({ min: 1 })
     .withMessage("Inbox id is required")
@@ -333,13 +350,13 @@ const messages_get = [
     message: "Failed to fetch messages",
     errMessage: "You are not authenticated",
   }),
-  messageValidation.inboxId,
+  messageValidation.inboxIdParam,
   messageValidation.limit,
   messageValidation.cursor,
   messageValidation.direction,
   asyncHandler(async (req: Request, res: Response) => {
     const errors = validationResult(req);
-    const inboxId = req.body.inboxid;
+    const inboxId = req.params.inboxid;
     const user = req.user as Express.User;
 
     if (!errors.isEmpty()) {
@@ -436,11 +453,24 @@ const messages_get = [
       }
     }
 
+    let sortedMessages: Message[] = [];
+
+    // Sort backward direction to show the latesr message last
+    if (direction === "backward") {
+      for (let i = 0; i < messages.length; i++) {
+        sortedMessages.unshift(messages[i]);
+      }
+    } else {
+      // No need to sort the messages
+      // The forward direction already sorted to show the latest message last
+      sortedMessages = messages;
+    }
+
     res.json({
       message: `Successfully fetched messages from inbox ${inboxId}`,
       prevCursor: prevCursor,
       nextCursor: nextCursor,
-      messagesData: messages,
+      messagesData: sortedMessages,
     });
   }),
 ];
