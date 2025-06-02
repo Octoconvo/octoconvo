@@ -6,7 +6,7 @@ import { UserProfile } from "@/types/user";
 import avatarIcon from "../../public/images/avatar_icon.svg";
 import { formatDateString } from "@/utils/date";
 import socket from "@/socket/socket";
-import { UserContext } from "@/contexts/user";
+import { UserContext, UserProfileContext } from "@/contexts/user";
 import {
   ActiveModalsContext,
   UserProfileModalContext,
@@ -22,7 +22,8 @@ type ProfileModalProps = {
 
 const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
   const { user, setUser } = useContext(UserContext);
-  const [userProfile, setUserProfile] = useState<null | UserProfile>(null);
+  const { setUserProfile } = useContext(UserProfileContext);
+  const [profile, setProfile] = useState<null | UserProfile>(null);
   const { activeModals, openModal } = useContext(ActiveModalsContext);
   const { userProfileModal } = useContext(UserProfileModalContext);
   const { editProfileModal } = useContext(EditProfileModalContext);
@@ -43,7 +44,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
         }
 
         if (res.status >= 200 && res.status <= 300) {
-          setUserProfile(resData.userProfile);
+          setProfile(resData.userProfile);
         }
         // Handle 404 errors
       } catch (err) {
@@ -61,7 +62,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
     }
 
     if (profileData) {
-      setUserProfile(profileData);
+      setProfile(profileData);
     }
 
     return () => {
@@ -75,7 +76,8 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
 
   const successHandler = () => {
     setUser(false);
-    setUserProfile(null);
+    setTimeout(() => setUserProfile(null), 1000);
+    setProfile(null);
 
     if (id) {
       socket.disconnect();
@@ -90,8 +92,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
       className={
         "absolute left-[calc(100%+1rem)] bottom-[1rem] bg-black-200 " +
         `rounded-[8px] ${
-          activeModals.length &&
-          activeModals[0]?.current === userProfileModal?.current
+          activeModals.length && activeModals[0]?.current === userProfileModal?.current
             ? " z-20"
             : "hidden"
         }`
@@ -99,16 +100,15 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
     >
       <div
         className={
-          "bg-black-400 w-[480px] rounded-[inherit] border-b-solid " +
-          "border-b-brand-3 border-b-8"
+          "bg-black-400 w-[480px] rounded-[inherit] border-b-solid " + "border-b-brand-3 border-b-8"
         }
       >
         <article className="rounded-[inherit]">
           <figure className="relative h-[115px] max-w-full bg-brand-1 rounded-t-[inherit]">
-            {userProfile?.banner && (
+            {profile?.banner && (
               <Image
                 data-testid="banner"
-                src={userProfile?.banner}
+                src={profile?.banner}
                 fill
                 className="object-cover object-center rounded-[inherit] max-h-(100%)"
                 alt="User avatar"
@@ -125,7 +125,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
               >
                 <Image
                   data-testid="avatar"
-                  src={userProfile?.avatar ? userProfile?.avatar : avatarIcon}
+                  src={profile?.avatar ? profile?.avatar : avatarIcon}
                   width={64}
                   height={64}
                   className="rounded-full min-w-[64px] min-h-[64px] bg-white-200"
@@ -151,20 +151,14 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
                 data-testid="display-name"
                 className="text-h6 text-white-100 font-regular leading-normal"
               >
-                {userProfile?.displayName}
+                {profile?.displayName}
               </h1>
-              <p
-                data-testid="username"
-                className="text-s font-bold leading-normal text-white-200"
-              >
-                @{userProfile?.username}
+              <p data-testid="username" className="text-s font-bold leading-normal text-white-200">
+                @{profile?.username}
               </p>
             </header>
-            <p
-              data-testid="bio"
-              className="text-white-200 leading-normal text-p"
-            >
-              {userProfile?.bio}
+            <p data-testid="bio" className="text-white-200 leading-normal text-p">
+              {profile?.bio}
             </p>
             <footer>
               <p className="text-brand-3 text-s leading-normal">Member since</p>
@@ -172,8 +166,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
                 data-testid="membersince"
                 className="text-white-200 text-s leading-normal font-extralight"
               >
-                {userProfile?.createdAt &&
-                  formatDateString(userProfile?.createdAt)}
+                {profile?.createdAt && formatDateString(profile?.createdAt)}
               </p>
             </footer>
           </section>
@@ -183,8 +176,7 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
             <button
               data-testid="logout"
               className={
-                "bg-grey-100 py-2 px-4 text-white-100 rounded-[4px] " +
-                "hover:bg-grey-200"
+                "bg-grey-100 py-2 px-4 text-white-100 rounded-[4px] " + "hover:bg-grey-200"
               }
               onClick={() => logout({ successHandler, errorHandler })}
             >
