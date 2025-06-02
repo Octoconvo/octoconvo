@@ -180,6 +180,20 @@
     background-size: 128px 128px, 256px 256px;
   }
 
+  .attachment-btn {
+    display: flex;
+    background-image: url("/images/add-icon.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100%;
+    background-color: var(--black-300);
+    border-radius: 8px;
+  }
+
+  .attachment-btn:hover {
+    background-image: url("/images/add-icon.svg"), var(--gradient-bg-d);
+  }
+
   .delete-btn {
     position: absolute;
     display: flex;
