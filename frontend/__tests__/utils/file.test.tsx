@@ -1,4 +1,4 @@
-import { readFileAsDataURL, previewFile, selectFile } from "@/utils/file";
+import { readFileAsDataURL, previewFile, selectFile, validateFiles } from "@/utils/file";
 
 jest.unmock("@/utils/file");
 
@@ -21,9 +21,7 @@ describe("Test previewFile function", () => {
   });
 
   test("Test previewFile error", async () => {
-    const logSpy = jest
-      .spyOn(console, "log")
-      .mockImplementation(jest.fn((val: string) => val));
+    const logSpy = jest.spyOn(console, "log").mockImplementation(jest.fn((val: string) => val));
     const file = new File(["a".repeat(1024)], "image-test");
     await previewFile({ file: file });
     expect(logSpy).toHaveBeenCalledWith("An error has occured");
@@ -71,5 +69,101 @@ describe("Test selectFile function", () => {
     selectFile(eventMock, setFile, mimetype);
 
     expect(setFile).toHaveBeenCalled();
+  });
+});
+
+describe("Test validateFiles function", () => {
+  test("Return files if validation passed", () => {
+    const file = new File(["a".repeat(1024)], "test-file", {
+      type: "image/png",
+    });
+
+    const eventMock = {
+      target: {
+        files: [file, file],
+      },
+    } as unknown as React.FormEvent<HTMLInputElement>;
+
+    const mimetype = ["image/png"];
+
+    const files = validateFiles({
+      e: eventMock,
+      mimetype,
+      maxSize: 5000000,
+    });
+
+    expect(files).toContain(file);
+  });
+
+  test("Throw error if file exceeds max file size", () => {
+    const file = new File(["a".repeat(1024)], "test-file", {
+      type: "image/png",
+    });
+
+    const eventMock = {
+      target: {
+        files: [file, file],
+      },
+    } as unknown as React.FormEvent<HTMLInputElement>;
+
+    const mimetype = ["image/png"];
+
+    try {
+      validateFiles({
+        e: eventMock,
+        mimetype,
+        maxSize: 500,
+      });
+    } catch (err) {
+      if (err instanceof Error) expect(err.message).toBe("File size is too big");
+    }
+  });
+
+  test("Test mimetype white list using array", () => {
+    const file = new File(["a".repeat(1024)], "test-file", {
+      type: "image/svg",
+    });
+
+    const eventMock = {
+      target: {
+        files: [file, file],
+      },
+    } as unknown as React.FormEvent<HTMLInputElement>;
+
+    const mimetype = ["image/png"];
+
+    try {
+      validateFiles({
+        e: eventMock,
+        mimetype,
+        maxSize: 5000000,
+      });
+    } catch (err) {
+      if (err instanceof Error) expect(err.message).toBe("Invalid mimetype");
+    }
+  });
+
+  test("Test mimetype white list using regex", () => {
+    const file = new File(["a".repeat(1024)], "test-file", {
+      type: "image/svg",
+    });
+
+    const eventMock = {
+      target: {
+        files: [file, file],
+      },
+    } as unknown as React.FormEvent<HTMLInputElement>;
+
+    const mimetype = new RegExp(/^[image/png]$/);
+
+    try {
+      validateFiles({
+        e: eventMock,
+        mimetype,
+        maxSize: 5000000,
+      });
+    } catch (err) {
+      if (err instanceof Error) expect(err.message).toBe("Invalid mimetype");
+    }
   });
 });
