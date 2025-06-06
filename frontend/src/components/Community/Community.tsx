@@ -90,7 +90,8 @@ const Community = ({ id }: { id: string | null }) => {
 
       try {
         const res = await fetch(
-          `${domainURL}/inbox/${inboxId}/messages?limit=10&direction=backward&cursor=${prevCursor}`,
+          `${domainURL}/inbox/${inboxId}/messages` +
+            `?limit=10&direction=backward&cursor=${prevCursor}`,
           {
             method: "GET",
             credentials: "include",
@@ -172,14 +173,27 @@ const Community = ({ id }: { id: string | null }) => {
   }, [user, messages, community, id, prevCursor, scrollHeight, scrollToBottom]);
 
   return (
-    <section className="flex min-w-0 flex-col w-full h-full max-h-[100dvh] box-border bg-gr-black-1-b">
-      <h1 className="bg-pink-50 p-[32px] text-white-100 text-h6 font-bold bg-gr-black-1-l text-center">
+    <section
+      className={
+        "flex min-w-0 flex-col w-full h-full max-h-[100dvh]" +
+        " box-border bg-gr-black-1-b"
+      }
+    >
+      <h1
+        className={
+          "bg-pink-50 p-[32px] text-white-100 text-h6 font-bold" +
+          " bg-gr-black-1-l text-center"
+        }
+      >
         {community ? community.name : ""}
       </h1>
       <ul
         data-testid="cmmnty-msgs-ulst"
         ref={messageListRef}
-        className="relative scrollbar flex flex-col flex-auto overflow-x-auto max-h-full box-border p-[48px] gap-[64px]"
+        className={
+          "relative scrollbar flex flex-col flex-auto overflow-x-auto" +
+          " max-h-full box-border p-[48px] gap-[64px]"
+        }
       >
         <div
           ref={prevObserverRef}
@@ -189,26 +203,38 @@ const Community = ({ id }: { id: string | null }) => {
           messages.map((message) => {
             return (
               <li key={message.id} className="flex gap-[32px] scroll-smooth">
-                <figure
+                <div>
+                  {" "}
+                  <figure
+                    className={
+                      "flex-grow-0 bg-black-200 " +
+                      " min-w-[48px] min-h-[48px] rounded-full"
+                    }
+                  >
+                    <Image
+                      data-testid="avatar"
+                      src={
+                        message?.author.avatar
+                          ? message.author?.avatar
+                          : "/images/avatar_icon.svg"
+                      }
+                      width={48}
+                      height={48}
+                      className={
+                        "rounded-full min-w-[48px] min-h-[48x]" +
+                        " bg-white-200"
+                      }
+                      alt="User avatar"
+                    ></Image>
+                  </figure>
+                </div>
+
+                <div
                   className={
-                    "p-2 top-[calc(-32px-0.25rem)] bg-black-200 " +
-                    " min-w-[48px] min-h-[48px] rounded-full"
+                    "flex flex-col gap-[8px] text-p bg-grey-100" +
+                    " p-[32px] rounded-tr-[8px] rounded-br-[8px]"
                   }
                 >
-                  <Image
-                    data-testid="avatar"
-                    src={
-                      message?.author.avatar
-                        ? message.author?.avatar
-                        : "/images/avatar_icon.svg"
-                    }
-                    width={48}
-                    height={48}
-                    className="rounded-full min-w-[48px] min-h-[48x] bg-white-200"
-                    alt="User avatar"
-                  ></Image>
-                </figure>
-                <div className="flex flex-col gap-[8px] text-p bg-grey-100 p-[32px] rounded-tr-[8px] rounded-br-[8px]">
                   <p
                     className={
                       "font-bold" +
