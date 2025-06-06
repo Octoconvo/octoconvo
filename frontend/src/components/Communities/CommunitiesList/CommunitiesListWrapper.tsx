@@ -63,9 +63,10 @@ const CommunitiesListWrapper = () => {
 
   return (
     <div className="flex flex-col items-center bg-black-200 border-l-[2px] border-[#45009933] animate-slide-right">
-      <h3 className="text-center bg-gr-main-r py-6 px-8 text-h5 font-bold w-[480px]">
+      <h3 className="text-center bg-gr-main-r py-6 px-8 text-h5 font-bold w-full">
         Communities
       </h3>
+
       <CommunitiesList communitiesList={userCommunities} />
     </div>
   );
