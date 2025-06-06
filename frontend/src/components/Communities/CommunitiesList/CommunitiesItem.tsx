@@ -4,6 +4,7 @@ import Image from "next/image";
 import { CommunitiesResponseGET } from "@/types/response";
 import { useRef, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 const CommunitiesItem = ({
   community,
@@ -12,6 +13,7 @@ const CommunitiesItem = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const linkRef = useRef<null | HTMLAnchorElement>(null);
+  const { communityid } = useParams();
 
   return (
     <li
@@ -22,7 +24,10 @@ const CommunitiesItem = ({
       onMouseLeave={() => {
         setIsHovered(false);
       }}
-      className="flex box-border w-full max-w-full border-b-[1px] border-[#80fffb1a] overflow-hidden"
+      className={
+        "flex box-border w-full max-w-full border-b-[1px]" +
+        " border-[#80fffb1a] overflow-hidden"
+      }
     >
       <button
         onClick={() => {
@@ -30,13 +35,20 @@ const CommunitiesItem = ({
             linkRef.current.click();
           }
         }}
-        className="flex w-full box-border items-center gap-4 p-8 font-semibold text-h6 hover:bg-brand-1 hover:rounded-[8px]"
+        className={
+          "flex w-full box-border items-center gap-4 p-8 font-semibold" +
+          " text-h6 hover:bg-brand-1 rounded-[8px]" +
+          (communityid === community.id ? " bg-brand-1-2" : "")
+        }
       >
         <div
           data-testid="cmmnts-cmmnty-lst-avatar-cntnr"
           className={
-            "w-12 h-12 min-w-[64px] min-h-[64px] rounded-tr-[8px] rounded-br-[8px]" +
-            (isHovered ? " bg-black-100" : " bg-gr-main-r")
+            "w-12 h-12 min-w-[64px] min-h-[64px] rounded-tr-[8px]" +
+            " rounded-br-[8px]" +
+            (isHovered || communityid === community.id
+              ? " bg-black-100"
+              : " bg-gr-main-r")
           }
         >
           {community.avatar && (
