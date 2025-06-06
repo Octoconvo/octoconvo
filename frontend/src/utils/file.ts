@@ -26,6 +26,52 @@ const previewFile = async ({ file }: { file: File }): Promise<string | null> => 
   }
 };
 
+// Preview image with specified max height for better performance
+const previewImage = async ({
+  file,
+  maxHeight = 320,
+}: {
+  file: File;
+  maxHeight: number;
+}): Promise<string | null> => {
+  try {
+    const image = await createImageBitmap(file);
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+
+    if (context) {
+      // Scale down image
+      const ratio = maxHeight / image.height;
+
+      const width = image.width * ratio;
+      const height = image.height * ratio;
+
+      console.log({ ratio });
+      canvas.width = width;
+      canvas.height = height;
+
+      context.drawImage(image, 0, 0, width, height);
+
+      const blob: string | null = await new Promise((resolve) =>
+        canvas.toBlob((blob) => {
+          if (blob) {
+            resolve(URL.createObjectURL(blob));
+          } else {
+            resolve(null);
+          }
+        })
+      );
+
+      return blob;
+    }
+
+    return null;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
+};
+
 const selectFile = (
   e: React.FormEvent<HTMLInputElement>,
   setFile: React.Dispatch<React.SetStateAction<null | File>>,
@@ -84,4 +130,4 @@ const validateFiles = ({
   return files;
 };
 
-export { readFileAsDataURL, previewFile, selectFile, validateFiles };
+export { readFileAsDataURL, previewFile, selectFile, validateFiles, previewImage };
