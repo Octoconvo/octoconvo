@@ -28,10 +28,16 @@ type CreateCommunityForm = {
   bio: string;
 };
 
+type CommunityMessageForm = {
+  attachments: File[];
+  content: string;
+};
+
 export type {
   SignupForm,
   LoginForm,
   ValidationError,
   EditProfileForm,
   CreateCommunityForm,
+  CommunityMessageForm,
 };
