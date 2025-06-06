@@ -87,7 +87,7 @@ const communityBioValidation = {
 };
 
 const communityMessageValidation = {
-  required: "Username is required",
+  required: "Message is required",
   maxLength: {
     value: 2048,
     message: "Message must not exceed 2048 characters",
