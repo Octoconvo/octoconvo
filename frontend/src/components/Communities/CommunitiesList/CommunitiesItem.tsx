@@ -26,7 +26,7 @@ const CommunitiesItem = ({
       }}
       className={
         "flex box-border w-full max-w-full border-b-[1px]" +
-        " border-[#80fffb1a] overflow-hidden"
+        " border-[#80fffb1a] overflow-hidden min-h-[min-content]"
       }
     >
       <button

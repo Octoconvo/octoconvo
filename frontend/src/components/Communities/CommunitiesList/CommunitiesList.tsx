@@ -1,7 +1,7 @@
 "use client";
 
 import { CommunitiesResponseGET } from "@/types/response";
-import CommunitiesItem from "@/components/Communities/CommunitiesList/CommunitiesItem";
+import CommunitiesItem from "./CommunitiesItem";
 
 const CommunitiesList = ({
   communitiesList,
@@ -11,7 +11,8 @@ const CommunitiesList = ({
   return (
     <ul
       className={
-        "overflow-y-auto scrollbar flex flex-col p-4 w-full box-border"
+        "overflow-y-auto scrollbar max-h-full flex flex-col p-4 w-full" +
+        " box-border"
       }
     >
       {communitiesList.map((community: CommunitiesResponseGET) => {
