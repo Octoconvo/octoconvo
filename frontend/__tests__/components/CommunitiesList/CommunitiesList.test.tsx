@@ -2,6 +2,7 @@ import CommunitiesItem from "@/components/Communities/CommunitiesList/Communitie
 import { render, act, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { userEvent } from "@testing-library/user-event";
+import { CommunitiesResponseGET } from "@/types/response";
 
 const communitiesList = [
   {
@@ -13,6 +14,12 @@ const communitiesList = [
     isDeleted: false,
     createdAt: "test",
     updatedAt: "test",
+    inbox: {
+      id: "1",
+      inboxType: "COMMUNITY",
+      communityId: "1",
+      directMessageId: null,
+    },
   },
   {
     id: "2",
@@ -23,16 +30,20 @@ const communitiesList = [
     isDeleted: false,
     createdAt: "test",
     updatedAt: "test",
+    inbox: {
+      id: "2",
+      inboxType: "COMMUNITY",
+      communityId: "2",
+      directMessageId: null,
+    },
   },
-];
+] as CommunitiesResponseGET[];
 
 describe("Render communitiesList one", () => {
   const user = userEvent.setup();
 
   beforeEach(async () => {
-    await act(async () =>
-      render(<CommunitiesItem community={communitiesList[0]} />)
-    );
+    await act(async () => render(<CommunitiesItem community={communitiesList[0]} />));
   });
 
   test("Render community name", () => {
