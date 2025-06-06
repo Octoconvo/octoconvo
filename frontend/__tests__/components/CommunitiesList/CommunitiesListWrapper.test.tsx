@@ -14,6 +14,12 @@ const communitiesList = [
     isDeleted: false,
     createdAt: "test",
     updatedAt: "test",
+    inbox: {
+      id: "1",
+      inboxType: "COMMUNITY",
+      communityId: "1",
+      directMessageId: null,
+    },
   },
   {
     id: "2",
@@ -24,6 +30,12 @@ const communitiesList = [
     isDeleted: false,
     createdAt: "test",
     updatedAt: "test",
+    inbox: {
+      id: "1",
+      inboxType: "COMMUNITY",
+      communityId: "2",
+      directMessageId: null,
+    },
   },
 ];
 
