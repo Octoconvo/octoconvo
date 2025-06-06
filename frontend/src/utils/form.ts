@@ -86,6 +86,14 @@ const communityBioValidation = {
   },
 };
 
+const communityMessageValidation = {
+  required: "Username is required",
+  maxLength: {
+    value: 2048,
+    message: "Message must not exceed 2048 characters",
+  },
+};
+
 const createSignupOnSubmit = ({
   errorHandler,
   successHandler,
@@ -211,6 +219,7 @@ export {
   bioValidation,
   communityNameValidation,
   communityBioValidation,
+  communityMessageValidation,
   createSignupOnSubmit,
   createOnSubmit,
   getFormData,
