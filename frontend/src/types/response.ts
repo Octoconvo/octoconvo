@@ -43,4 +43,28 @@ type CommunityResponseGET = {
   };
 };
 
-export type { CommunityResponsePOST, CommunitiesResponseGET, CommunityResponseGET };
+type InboxMessageGET = {
+  id: string;
+  inboxId: string;
+  authorId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  isDeleted: boolean;
+  isRead: boolean;
+  hiddenFromAuthor: boolean;
+  hiddenFromRecipient: boolean;
+  replyToId: null | string;
+  author: {
+    username: string;
+    displayName: string;
+    avatar: null | string;
+  };
+};
+
+export type {
+  CommunityResponsePOST,
+  CommunitiesResponseGET,
+  CommunityResponseGET,
+  InboxMessageGET,
+};
