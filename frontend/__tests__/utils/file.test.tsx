@@ -1,4 +1,9 @@
-import { readFileAsDataURL, previewFile, selectFile, validateFiles } from "@/utils/file";
+import {
+  readFileAsDataURL,
+  previewFile,
+  selectFile,
+  validateFiles,
+} from "@/utils/file";
 
 jest.unmock("@/utils/file");
 
@@ -21,7 +26,9 @@ describe("Test previewFile function", () => {
   });
 
   test("Test previewFile error", async () => {
-    const logSpy = jest.spyOn(console, "log").mockImplementation(jest.fn((val: string) => val));
+    const logSpy = jest
+      .spyOn(console, "log")
+      .mockImplementation(jest.fn((val: string) => val));
     const file = new File(["a".repeat(1024)], "image-test");
     await previewFile({ file: file });
     expect(logSpy).toHaveBeenCalledWith("An error has occured");
@@ -115,7 +122,8 @@ describe("Test validateFiles function", () => {
         maxSize: 500,
       });
     } catch (err) {
-      if (err instanceof Error) expect(err.message).toBe("File size is too big");
+      if (err instanceof Error)
+        expect(err.message).toBe("File size is too big");
     }
   });
 

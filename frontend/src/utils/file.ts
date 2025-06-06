@@ -13,7 +13,11 @@ const readFileAsDataURL = async ({ file }: { file: File }): Promise<string> => {
   });
 };
 
-const previewFile = async ({ file }: { file: File }): Promise<string | null> => {
+const previewFile = async ({
+  file,
+}: {
+  file: File;
+}): Promise<string | null> => {
   try {
     const image: string = await readFileAsDataURL({ file });
     return image;
@@ -130,4 +134,10 @@ const validateFiles = ({
   return files;
 };
 
-export { readFileAsDataURL, previewFile, selectFile, validateFiles, previewImage };
+export {
+  readFileAsDataURL,
+  previewFile,
+  selectFile,
+  validateFiles,
+  previewImage,
+};

@@ -70,7 +70,9 @@ describe("Render MessageBox", () => {
     expect(attachmentInput).toBeInTheDocument();
     /* Use accepted mimetype due to userevent upload not emitting onInput when 
     the mimetype is not in the accept attribure */
-    const file = new File(["testfile1"], "testfile1.png", { type: "image/png" });
+    const file = new File(["testfile1"], "testfile1.png", {
+      type: "image/png",
+    });
 
     // Attchment UList shouldn't be rendered
     const attachmentUList = screen.queryByTestId("fl-err-mdl");
@@ -100,7 +102,9 @@ describe("Render MessageBox", () => {
     const attachmentInput = screen.getByTestId("msg-box-attchmnt-input");
 
     expect(attachmentInput).toBeInTheDocument();
-    const file = new File(["testfile1"], "testfile1.png", { type: "image/png" });
+    const file = new File(["testfile1"], "testfile1.png", {
+      type: "image/png",
+    });
 
     // Attchment UList shouldn't be rendered
     const attachmentUList = screen.queryByTestId("fl-err-mdl");
@@ -130,7 +134,9 @@ describe("Render MessageBox", () => {
     const attachmentInput = screen.getByTestId("msg-box-attchmnt-input");
 
     expect(attachmentInput).toBeInTheDocument();
-    const file = new File(["testfile1"], "testfile1.png", { type: "image/png" });
+    const file = new File(["testfile1"], "testfile1.png", {
+      type: "image/png",
+    });
 
     // Attchment UList shouldn't be rendered
     const attachmentUList = screen.queryByTestId("fl-err-mdl");
@@ -160,7 +166,9 @@ describe("Render MessageBox", () => {
     const attachmentInput = screen.getByTestId("msg-box-attchmnt-input");
 
     expect(attachmentInput).toBeInTheDocument();
-    const file = new File(["testfile1"], "testfile1.png", { type: "image/png" });
+    const file = new File(["testfile1"], "testfile1.png", {
+      type: "image/png",
+    });
 
     // Attchment UList shouldn't be rendered
     const attachmentUList = screen.queryByTestId("fl-err-mdl");
@@ -187,10 +195,14 @@ describe("Render MessageBox", () => {
       );
     });
 
-    const attachmentInput = screen.getByTestId("msg-box-attchmnt-input") as HTMLInputElement;
+    const attachmentInput = screen.getByTestId(
+      "msg-box-attchmnt-input"
+    ) as HTMLInputElement;
 
     expect(attachmentInput).toBeInTheDocument();
-    const file = new File(["testfile1"], "testfile1.png", { type: "image/png" });
+    const file = new File(["testfile1"], "testfile1.png", {
+      type: "image/png",
+    });
 
     await user.upload(attachmentInput, file);
 

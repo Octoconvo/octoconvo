@@ -8,7 +8,9 @@ export default function Communities() {
 
   return (
     <div className="w-full h-full bg-gr-black-1-b">
-      <Community id={params.communityid ? (params.communityid as string) : null} />
+      <Community
+        id={params.communityid ? (params.communityid as string) : null}
+      />
     </div>
   );
 }

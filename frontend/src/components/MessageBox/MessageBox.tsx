@@ -1,6 +1,9 @@
 import { useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { CommunityMessageForm, ValidationError as ValidationErrorType } from "@/types/form";
+import {
+  CommunityMessageForm,
+  ValidationError as ValidationErrorType,
+} from "@/types/form";
 import { triggerInputClick } from "@/utils/controller";
 import { communityMessageValidation } from "@/utils/form";
 import { previewImage, validateFiles } from "@/utils/file";
@@ -22,7 +25,9 @@ const MessageBox = ({
     limit: number;
   };
 }) => {
-  const [attachments, setAttachments] = useState<{ file: File; string: string | null }[]>([]);
+  const [attachments, setAttachments] = useState<
+    { file: File; string: string | null }[]
+  >([]);
   const attachmentsInputRef = useRef<null | HTMLInputElement>(null);
   const {
     handleSubmit,
@@ -30,11 +35,18 @@ const MessageBox = ({
     formState: { errors },
   } = useForm<CommunityMessageForm>();
   const attachmentsRegister = register("attachments");
-  const [fileError, setFileError] = useState<{ heading: string; message: string } | null>(null);
+  const [fileError, setFileError] = useState<{
+    heading: string;
+    message: string;
+  } | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [validationError, setValidationError] = useState<ValidationErrorType[]>([]);
+  const [validationError, setValidationError] = useState<ValidationErrorType[]>(
+    []
+  );
 
-  const onSubmit: SubmitHandler<CommunityMessageForm> = async (data: CommunityMessageForm) => {
+  const onSubmit: SubmitHandler<CommunityMessageForm> = async (
+    data: CommunityMessageForm
+  ) => {
     setIsSubmitting(false);
 
     const formData = new FormData();
@@ -78,7 +90,10 @@ const MessageBox = ({
   return (
     <div className="flex flex-col w-full">
       {fileError && (
-        <FileErrorModal fileError={fileError} resetFileError={() => setFileError(null)} />
+        <FileErrorModal
+          fileError={fileError}
+          resetFileError={() => setFileError(null)}
+        />
       )}
       {attachments.length ? (
         <div className="relative">
@@ -100,9 +115,14 @@ const MessageBox = ({
                       index: number;
                     };
                   }) => {
-                    const updatedAttachments = attachments.filter((attachment, index) => {
-                      return !(attachment.file.name === image.file.name && index === image.index);
-                    });
+                    const updatedAttachments = attachments.filter(
+                      (attachment, index) => {
+                        return !(
+                          attachment.file.name === image.file.name &&
+                          index === image.index
+                        );
+                      }
+                    );
 
                     setAttachments([...updatedAttachments]);
                   }}
@@ -131,7 +151,9 @@ const MessageBox = ({
             field={error.field}
           />
         ))}
-        {errors.content && <div className="text-invalid text-p">{errors.content.message}</div>}
+        {errors.content && (
+          <div className="text-invalid text-p">{errors.content.message}</div>
+        )}
         <div className="flex items-center gap-[16px] px-[32PX] py-[16PX] bg-grey-100 rounded-[8px]">
           <div className="hover:scale-105 bg-gr-silver-b p-[4px] rounded-[8px]">
             <button
@@ -162,7 +184,8 @@ const MessageBox = ({
                 // Validate attachments input file limit
                 if (attachmentsInputRef.current) {
                   const length =
-                    (attachmentsInputRef.current.files?.length || 0) + attachments.length;
+                    (attachmentsInputRef.current.files?.length || 0) +
+                    attachments.length;
                   let totalSize = 0;
 
                   if (attachmentsInputRef.current.files) {
@@ -188,7 +211,10 @@ const MessageBox = ({
                 }
 
                 // Process attachments input files and previews
-                const processedAttachments: { file: File; string: string | null }[] = [];
+                const processedAttachments: {
+                  file: File;
+                  string: string | null;
+                }[] = [];
 
                 const images = validateFiles({
                   e,
@@ -199,8 +225,14 @@ const MessageBox = ({
                 if (images) {
                   for (const image of images) {
                     const setFile = async () => {
-                      const preview = await previewImage({ file: image, maxHeight: 320 });
-                      processedAttachments.push({ file: image, string: preview });
+                      const preview = await previewImage({
+                        file: image,
+                        maxHeight: 320,
+                      });
+                      processedAttachments.push({
+                        file: image,
+                        string: preview,
+                      });
                     };
 
                     await setFile();
@@ -267,7 +299,10 @@ const MessageBox = ({
           {isSubmitting ? (
             <Loader size={32} />
           ) : (
-            <button aria-label="Send" className="send-btn min-w-[32px] min-h-[32px]"></button>
+            <button
+              aria-label="Send"
+              className="send-btn min-w-[32px] min-h-[32px]"
+            ></button>
           )}
         </div>
       </form>

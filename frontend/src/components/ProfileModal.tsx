@@ -92,7 +92,8 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
       className={
         "absolute left-[calc(100%+1rem)] bottom-[1rem] bg-black-200 " +
         `rounded-[8px] ${
-          activeModals.length && activeModals[0]?.current === userProfileModal?.current
+          activeModals.length &&
+          activeModals[0]?.current === userProfileModal?.current
             ? " z-20"
             : "hidden"
         }`
@@ -100,7 +101,8 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
     >
       <div
         className={
-          "bg-black-400 w-[480px] rounded-[inherit] border-b-solid " + "border-b-brand-3 border-b-8"
+          "bg-black-400 w-[480px] rounded-[inherit] border-b-solid " +
+          "border-b-brand-3 border-b-8"
         }
       >
         <article className="rounded-[inherit]">
@@ -153,11 +155,17 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
               >
                 {profile?.displayName}
               </h1>
-              <p data-testid="username" className="text-s font-bold leading-normal text-white-200">
+              <p
+                data-testid="username"
+                className="text-s font-bold leading-normal text-white-200"
+              >
                 @{profile?.username}
               </p>
             </header>
-            <p data-testid="bio" className="text-white-200 leading-normal text-p">
+            <p
+              data-testid="bio"
+              className="text-white-200 leading-normal text-p"
+            >
               {profile?.bio}
             </p>
             <footer>
@@ -176,7 +184,8 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
             <button
               data-testid="logout"
               className={
-                "bg-grey-100 py-2 px-4 text-white-100 rounded-[4px] " + "hover:bg-grey-200"
+                "bg-grey-100 py-2 px-4 text-white-100 rounded-[4px] " +
+                "hover:bg-grey-200"
               }
               onClick={() => logout({ successHandler, errorHandler })}
             >

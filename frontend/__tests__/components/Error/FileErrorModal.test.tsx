@@ -15,7 +15,12 @@ describe("Render FileErrorModal", () => {
 
   beforeEach(() => {
     act(() => {
-      render(<FileErrorModal fileError={mockFileError} resetFileError={mockResetFileError} />);
+      render(
+        <FileErrorModal
+          fileError={mockFileError}
+          resetFileError={mockResetFileError}
+        />
+      );
     });
   });
 

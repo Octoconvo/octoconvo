@@ -43,7 +43,9 @@ describe("Render communitiesList one", () => {
   const user = userEvent.setup();
 
   beforeEach(async () => {
-    await act(async () => render(<CommunitiesItem community={communitiesList[0]} />));
+    await act(async () =>
+      render(<CommunitiesItem community={communitiesList[0]} />)
+    );
   });
 
   test("Render community name", () => {

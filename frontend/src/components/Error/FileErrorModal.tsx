@@ -31,7 +31,9 @@ const FileErrorModal = ({
       data-testid="fl-err-mdl-cntnr"
       className="absolute w-full h-full left-0 top-0 bg-[rgb(39,36,42,0.1)] z-40"
       onClick={(e) => {
-        const isChildren = fileErrorRef.current?.contains(e.target as HTMLElement);
+        const isChildren = fileErrorRef.current?.contains(
+          e.target as HTMLElement
+        );
 
         if (!isChildren && fileErrorRef.current !== e.target) {
           resetFileError();

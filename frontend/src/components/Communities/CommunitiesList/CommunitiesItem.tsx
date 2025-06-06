@@ -5,7 +5,11 @@ import { CommunitiesResponseGET } from "@/types/response";
 import { useRef, useState } from "react";
 import Link from "next/link";
 
-const CommunitiesItem = ({ community }: { community: CommunitiesResponseGET }) => {
+const CommunitiesItem = ({
+  community,
+}: {
+  community: CommunitiesResponseGET;
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const linkRef = useRef<null | HTMLAnchorElement>(null);
 

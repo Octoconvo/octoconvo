@@ -10,7 +10,8 @@
 
   @font-face {
     font-family: "ibm-plex-mono";
-    src: url("/fonts/ibm-plex-mono/ibmplexmono-medium.woff") format("woff"),
+    src:
+      url("/fonts/ibm-plex-mono/ibmplexmono-medium.woff") format("woff"),
       url("/fonts/ibm-plex-mono/ibmplexmono-medium.woff2") format("woff2");
   }
 
@@ -33,7 +34,9 @@
 
   .back-button:hover {
     @apply transition-all translate-y-2;
-    box-shadow: 0 0.25rem 0.25rem var(--brand-4), 0 0 0.5rem var(--brand-3);
+    box-shadow:
+      0 0.25rem 0.25rem var(--brand-4),
+      0 0 0.5rem var(--brand-3);
   }
 
   .back-button-icon {
@@ -72,7 +75,8 @@
     content: "";
     width: 1.25em;
     height: 1.25em;
-    background: center / 1.25em 1.25em no-repeat url("/images/visibility-on-icon.svg");
+    background: center / 1.25em 1.25em no-repeat
+      url("/images/visibility-on-icon.svg");
   }
 
   .visibility-off-icon {
@@ -86,7 +90,8 @@
     content: "";
     width: 1.25em;
     height: 1.25em;
-    background: center / 1.25em 1.25em no-repeat url("/images/visibility-off-icon.svg");
+    background: center / 1.25em 1.25em no-repeat
+      url("/images/visibility-off-icon.svg");
   }
 
   .lobby-nav-icon {
@@ -173,11 +178,14 @@
 
   .community-bg {
     display: flex;
-    background-image: url("/images/octoconvo-community-icon.svg"),
+    background-image:
+      url("/images/octoconvo-community-icon.svg"),
       url("/images/octoconvo-circle-icon.svg");
     background-repeat: no-repeat no-repeat;
     background-position: center center;
-    background-size: 128px 128px, 256px 256px;
+    background-size:
+      128px 128px,
+      256px 256px;
   }
 
   .attachment-btn {
@@ -225,10 +233,16 @@
 
   .spinner {
     border-radius: 50%;
-    background: radial-gradient(farthest-side, var(--brand-1) 94%, #0000) top/9px 9px no-repeat,
+    background:
+      radial-gradient(farthest-side, var(--brand-1) 94%, #0000) top/9px 9px
+        no-repeat,
       conic-gradient(#0000 30%, var(--brand-1));
     mask: radial-gradient(farthest-side, #0000 calc(100% - 25%), #000 0);
-    -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 25%), #000 0);
+    -webkit-mask: radial-gradient(
+      farthest-side,
+      #0000 calc(100% - 25%),
+      #000 0
+    );
     animation: spinner 1s infinite linear;
   }
 
@@ -298,14 +312,46 @@
   --gradient-1-d45: linear-gradient(45deg, var(--brand-3), var(--brand-1));
   --gradient-2-t: linear-gradient(to top, var(--brand-4), var(--brand-1));
   --gradient-bg-d: linear-gradient(to top, var(--brand-1), var(--black-300));
-  --gradient-brand-dark-d: linear-gradient(to bottom, var(--black-200), var(--black-300));
-  --gradient-brand-2-fade-b: linear-gradient(to bottom, var(--brand-2), #ffffff00);
-  --gradient-white-100-fade-b: linear-gradient(to bottom, var(--white-100), #ffffff00);
-  --gradient-brand-1-3-d-1-b: linear-gradient(to bottom, var(--brand-1), var(--brand-3-d-1));
-  --gradient-black-1-b: linear-gradient(to bottom, var(--black-200), var(--black-400));
-  --gradient-black-1-l: linear-gradient(to left, var(--black-200), var(--black-400));
-  --gradient-black-2-r: linear-gradient(to right, var(--black-400), var(--grey-100));
-  --gradient-silver-b: linear-gradient(to bottom, var(--black-400), var(--white-100));
+  --gradient-brand-dark-d: linear-gradient(
+    to bottom,
+    var(--black-200),
+    var(--black-300)
+  );
+  --gradient-brand-2-fade-b: linear-gradient(
+    to bottom,
+    var(--brand-2),
+    #ffffff00
+  );
+  --gradient-white-100-fade-b: linear-gradient(
+    to bottom,
+    var(--white-100),
+    #ffffff00
+  );
+  --gradient-brand-1-3-d-1-b: linear-gradient(
+    to bottom,
+    var(--brand-1),
+    var(--brand-3-d-1)
+  );
+  --gradient-black-1-b: linear-gradient(
+    to bottom,
+    var(--black-200),
+    var(--black-400)
+  );
+  --gradient-black-1-l: linear-gradient(
+    to left,
+    var(--black-200),
+    var(--black-400)
+  );
+  --gradient-black-2-r: linear-gradient(
+    to right,
+    var(--black-400),
+    var(--grey-100)
+  );
+  --gradient-silver-b: linear-gradient(
+    to bottom,
+    var(--black-400),
+    var(--white-100)
+  );
 }
 
 body {

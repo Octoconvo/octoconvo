@@ -104,7 +104,10 @@ const Community = ({ id }: { id: string | null }) => {
         }
 
         if (res.status >= 200 && res.status <= 300) {
-          setMessages([...resData.messagesData, ...(messages as InboxMessageGET[])]);
+          setMessages([
+            ...resData.messagesData,
+            ...(messages as InboxMessageGET[]),
+          ]);
           setPrevCursor(resData.prevCursor);
 
           // Update prevScrollHeight to be used to retain scroll position
@@ -178,7 +181,10 @@ const Community = ({ id }: { id: string | null }) => {
         ref={messageListRef}
         className="relative scrollbar flex flex-col flex-auto overflow-x-auto max-h-full box-border p-[48px] gap-[64px]"
       >
-        <div ref={prevObserverRef} className="absolute left-0 top-0 bg-purple-50"></div>
+        <div
+          ref={prevObserverRef}
+          className="absolute left-0 top-0 bg-purple-50"
+        ></div>
         {messages &&
           messages.map((message) => {
             return (
@@ -192,7 +198,9 @@ const Community = ({ id }: { id: string | null }) => {
                   <Image
                     data-testid="avatar"
                     src={
-                      message?.author.avatar ? message.author?.avatar : "/images/avatar_icon.svg"
+                      message?.author.avatar
+                        ? message.author?.avatar
+                        : "/images/avatar_icon.svg"
                     }
                     width={48}
                     height={48}
