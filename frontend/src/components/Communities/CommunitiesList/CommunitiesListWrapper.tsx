@@ -63,7 +63,7 @@ const CommunitiesListWrapper = () => {
 
   return (
     <div className="flex flex-col items-center bg-black-200 border-l-[2px] border-[#45009933] animate-slide-right">
-      <h3 className="text-center bg-gr-main-r py-6 px-8 text-h5 font-bold w-full">
+      <h3 className="text-center bg-gr-black-1-l py-6 px-8 text-h5 font-bold w-full">
         Communities
       </h3>
 
