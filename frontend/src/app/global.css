@@ -10,8 +10,7 @@
 
   @font-face {
     font-family: "ibm-plex-mono";
-    src:
-      url("/fonts/ibm-plex-mono/ibmplexmono-medium.woff") format("woff"),
+    src: url("/fonts/ibm-plex-mono/ibmplexmono-medium.woff") format("woff"),
       url("/fonts/ibm-plex-mono/ibmplexmono-medium.woff2") format("woff2");
   }
 
@@ -34,9 +33,7 @@
 
   .back-button:hover {
     @apply transition-all translate-y-2;
-    box-shadow:
-      0 0.25rem 0.25rem var(--brand-4),
-      0 0 0.5rem var(--brand-3);
+    box-shadow: 0 0.25rem 0.25rem var(--brand-4), 0 0 0.5rem var(--brand-3);
   }
 
   .back-button-icon {
@@ -178,14 +175,11 @@
 
   .community-bg {
     display: flex;
-    background-image:
-      url("/images/octoconvo-community-icon.svg"),
+    background-image: url("/images/octoconvo-community-icon.svg"),
       url("/images/octoconvo-circle-icon.svg");
     background-repeat: no-repeat no-repeat;
     background-position: center center;
-    background-size:
-      128px 128px,
-      256px 256px;
+    background-size: 128px 128px, 256px 256px;
   }
 
   .attachment-btn {
@@ -233,9 +227,8 @@
 
   .spinner {
     border-radius: 50%;
-    background:
-      radial-gradient(farthest-side, var(--brand-1) 94%, #0000) top/9px 9px
-        no-repeat,
+    background: radial-gradient(farthest-side, var(--brand-1) 94%, #0000)
+        top/9px 9px no-repeat,
       conic-gradient(#0000 30%, var(--brand-1));
     mask: radial-gradient(farthest-side, #0000 calc(100% - 25%), #000 0);
     -webkit-mask: radial-gradient(
@@ -277,6 +270,7 @@
 
 :root {
   --brand-1: #440099;
+  --brand-1-2: #5306d8;
   --brand-2: #1d0041;
   --brand-3: #80fffb;
   --brand-3-d-1: #3bc1e7;
