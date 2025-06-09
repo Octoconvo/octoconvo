@@ -37,7 +37,7 @@ const LobbyNav = () => {
               (path && path.split("/").includes("friends")
                 ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
                   " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-brand-3-d-1 hover:before:bg-none"
+                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
                 : "")
             }
           >
@@ -57,7 +57,7 @@ const LobbyNav = () => {
               (path && path.split("/").includes("dm")
                 ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
                   " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-brand-3-d-1 hover:before:bg-none"
+                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
                 : "")
             }
           >
@@ -77,7 +77,7 @@ const LobbyNav = () => {
               (path && path.split("/").includes("communities")
                 ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
                   " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-brand-3-d-1 hover:before:bg-none"
+                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
                 : "")
             }
           >
@@ -99,7 +99,7 @@ const LobbyNav = () => {
               (path && path.split("/").includes("explore")
                 ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
                   " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-brand-3-d-1 hover:before:bg-none"
+                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
                 : "")
             }
           >
