@@ -182,7 +182,14 @@ const createOnSubmit =
 
       if (response.status === 401) {
         errorHandler(response.status, responseData.error.message);
-      } else {
+      }
+
+      if (response.status === 422) {
+        errorHandler(response.status, responseData.error.validationError);
+      }
+
+      // Handle success
+      if (response.status >= 200 && response.status < 300) {
         successHandler(responseData[dataKey]);
       }
     } catch (err) {
