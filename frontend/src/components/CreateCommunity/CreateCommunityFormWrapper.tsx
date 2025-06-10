@@ -1,17 +1,21 @@
 "use client";
 
 import CreateCommunityForm from "@/components/CreateCommunity/CreateCommunityForm";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { getFormData, createOnSubmit } from "@/utils/form";
 import { CommunityResponsePOST } from "@/types/response";
 import {
   CreateCommunityForm as CreateCommunityFormType,
   ValidationError,
 } from "@/types/form";
+import { useRouter } from "next/navigation";
+import { ActiveModalsContext } from "@/contexts/modal";
 
 const EditProfileFormWrapper = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [validationError, setValidationError] = useState<ValidationError[]>([]);
+  const { closeModal } = useContext(ActiveModalsContext);
+  const router = useRouter();
 
   const initialHandler = () => {
     setIsSubmitting(true);
@@ -31,7 +35,9 @@ const EditProfileFormWrapper = () => {
   };
 
   const successHandler = (data: CommunityResponsePOST) => {
-    console.log(data);
+    // Redirect to the created community and close the community creation modal
+    router.replace(`/lobby/communities/${data.id}`);
+    closeModal();
   };
 
   const onSubmit = createOnSubmit<
