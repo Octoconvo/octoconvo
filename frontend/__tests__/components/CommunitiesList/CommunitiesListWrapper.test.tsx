@@ -52,6 +52,15 @@ const failureObj = {
 
 type Config = { body: FormData };
 
+jest.mock(
+  "next/navigation",
+  jest.fn(() => ({
+    useParams: jest.fn(() => ({
+      communityid: 1,
+    })),
+  }))
+);
+
 global.fetch = jest
   .fn(
     (

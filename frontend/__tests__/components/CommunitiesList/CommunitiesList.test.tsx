@@ -39,6 +39,15 @@ const communitiesList = [
   },
 ] as CommunitiesResponseGET[];
 
+jest.mock(
+  "next/navigation",
+  jest.fn(() => ({
+    useParams: jest.fn(() => ({
+      communityid: 1,
+    })),
+  }))
+);
+
 describe("Render communitiesList one", () => {
   const user = userEvent.setup();
 
