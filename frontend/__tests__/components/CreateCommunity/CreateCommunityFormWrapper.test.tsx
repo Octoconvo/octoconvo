@@ -3,6 +3,16 @@ import { render, screen, act } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { CommunityResponsePOST } from "@/types/response";
 import "@testing-library/jest-dom";
+import { ActiveModalsContext } from "@/contexts/modal";
+
+let pathURL = "";
+// mock useRouter
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ replace: jest.fn((path: string) => (pathURL = path)) }),
+}));
+
+// Mock close modal context
+const closeModalMock = jest.fn(() => {});
 
 const community: CommunityResponsePOST = {
   id: "123",
@@ -78,7 +88,17 @@ describe("Render CreateCommunityWrapper", () => {
 
   beforeEach(async () => {
     await act(() =>
-      render(<CreateCommunityFormWrapper></CreateCommunityFormWrapper>)
+      render(
+        <ActiveModalsContext.Provider
+          value={{
+            activeModals: [],
+            openModal: jest.fn(),
+            closeModal: closeModalMock,
+          }}
+        >
+          <CreateCommunityFormWrapper />
+        </ActiveModalsContext.Provider>
+      )
     );
   });
 
@@ -118,9 +138,6 @@ describe("Render CreateCommunityWrapper", () => {
   });
 
   test("Test success onsubmit", async () => {
-    jest
-      .spyOn(console, "log")
-      .mockImplementation(jest.fn((string: string) => string));
     const nameInput = screen.getByTestId("crt-cmmnty-name");
     const bioInput = screen.getByTestId("crt-cmmnty-bio");
     const button = screen.getByTestId("crt-cmmnty-sbmt-btn");
@@ -129,6 +146,10 @@ describe("Render CreateCommunityWrapper", () => {
     await user.type(bioInput, "ABC");
 
     await user.click(button);
-    expect(console.log).toHaveBeenCalledWith(successObj.community);
+
+    // Expect to be redirected to created community
+    expect(pathURL).toBe(`/lobby/communities/${successObj.community.id}`);
+    // Expect the create community modal to be closed
+    expect(closeModalMock).toHaveBeenCalled();
   });
 });

@@ -9,6 +9,15 @@ import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 const openModalMock = jest.fn();
 const closeModalMock = jest.fn();
 
+// mock useRouter
+jest.mock("next/navigation", () => {
+  const originalModule = jest.requireActual("next/navigation");
+  return {
+    useRouter: jest.fn(),
+    usePathname: originalModule.usePathname,
+  };
+});
+
 describe("Render CreateCommunityModal", () => {
   const user = userEvent.setup();
 
