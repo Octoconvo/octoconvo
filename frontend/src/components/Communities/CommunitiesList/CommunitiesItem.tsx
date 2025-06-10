@@ -37,8 +37,8 @@ const CommunitiesItem = ({
         }}
         className={
           "flex w-full box-border items-center gap-4 p-8 font-semibold" +
-          " text-h6 hover:bg-brand-1 rounded-[8px]" +
-          (communityid === community.id ? " bg-brand-1-2" : "")
+          " text-h6 hover:bg-black-500 rounded-[8px]" +
+          (communityid === community.id ? " bg-brand-1-2 hover:bg-brand-1" : "")
         }
       >
         <div
