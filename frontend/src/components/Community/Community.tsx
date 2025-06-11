@@ -282,7 +282,7 @@ const Community = ({ id }: { id: string | null }) => {
           })}
       </ul>
       <MessageBox
-        path="community"
+        path="message"
         inboxId={community?.inbox.id || ""}
         attachment={{
           maxSize: 5000000,
