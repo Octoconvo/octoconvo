@@ -32,7 +32,15 @@ const createMessage = async ({
           }
         : {}),
     },
+
     include: {
+      author: {
+        select: {
+          username: true,
+          displayName: true,
+          avatar: true,
+        },
+      },
       attachments: true,
     },
   });
