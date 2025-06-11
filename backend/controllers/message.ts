@@ -199,8 +199,6 @@ const message_post = [
       return;
     }
 
-    console.log(errors.array());
-
     const user = req.user as Express.User;
     const inboxId = req.body.inboxid;
     const content = req.body.content;
@@ -334,8 +332,8 @@ const message_post = [
     if (inbox.inboxType === "COMMUNITY") {
       req.app
         .get("io")
-        .to(`communities:${inbox.communityId}`)
-        .emit("communitycreate");
+        .to(`community:${inbox.communityId}`)
+        .emit("messagecreated", message);
     }
 
     res.json({
