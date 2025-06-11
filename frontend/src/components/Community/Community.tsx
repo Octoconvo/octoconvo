@@ -5,6 +5,8 @@ import { CommunityResponseGET, InboxMessageGET } from "@/types/response";
 import { useContext, useEffect, useRef, useState } from "react";
 import MessageBox from "../MessageBox/MessageBox";
 import Image from "next/image";
+import socket from "@/socket/socket";
+import { connectToRoom } from "@/socket/eventHandler";
 
 const Community = ({ id }: { id: string | null }) => {
   const [community, setCommunity] = useState<null | CommunityResponseGET>(null);
@@ -85,7 +87,6 @@ const Community = ({ id }: { id: string | null }) => {
       inboxId: string;
       prevCursor: string;
     }) => {
-      console.log({ inboxId, prevCursor });
       const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
       try {
@@ -165,9 +166,36 @@ const Community = ({ id }: { id: string | null }) => {
       observer.observe(prevObserver);
     }
 
+    // push emited socket message inside message list
+    const pushSocketMessage = (message: InboxMessageGET) => {
+      if (messages !== null) {
+        setMessages([...messages, message]);
+      }
+    };
+
+    // Join community room
+    if (community?.id) {
+      socket.emit("subscribe", `community:${id}`);
+      socket.on("messagecreated", pushSocketMessage);
+      socket.on(
+        "initiate",
+        connectToRoom.bind(this, socket, `community:${id}`)
+      );
+    }
+
     return () => {
       if (prevObserver) {
         observer.unobserve(prevObserver);
+      }
+
+      // Remove socket listener
+      if (community?.id) {
+        socket.off(
+          "initiate",
+          connectToRoom.bind(this, socket, `community:${id}`)
+        );
+        socket.off("messageupdate", pushSocketMessage);
+        socket.emit("unsubscribe", `community:${id}`);
       }
     };
   }, [user, messages, community, id, prevCursor, scrollHeight, scrollToBottom]);
