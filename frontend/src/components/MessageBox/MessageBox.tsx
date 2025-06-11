@@ -33,6 +33,7 @@ const MessageBox = ({
     handleSubmit,
     register,
     formState: { errors },
+    reset,
   } = useForm<CommunityMessageForm>();
   const attachmentsRegister = register("attachments");
   const [fileError, setFileError] = useState<{
@@ -79,6 +80,11 @@ const MessageBox = ({
         if (response.status === 401 || response.status === 403) {
           console.log(responseData.error.message);
         }
+      }
+
+      // Handle success response
+      if (response.status < 400) {
+        reset();
       }
     } catch (err) {
       console.log(err);
@@ -138,6 +144,7 @@ const MessageBox = ({
         onSubmit={(e) => {
           e.preventDefault();
 
+          // Ensure onSubmit is not called when inboxId is an empty string
           if (inboxId && !isSubmitting) {
             handleSubmit(onSubmit)();
           }
