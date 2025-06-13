@@ -266,6 +266,17 @@
       opacity: 1;
     }
   }
+
+  @keyframes zoom-in {
+    from {
+      opacity: 50%;
+      scale: 0;
+    }
+    to {
+      opacity: 100;
+      scale: 1;
+    }
+  }
 }
 
 :root {

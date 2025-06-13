@@ -69,6 +69,7 @@ export default {
       },
       animation: {
         "slide-right": "300ms slide-right",
+        "zoom-in": "300ms zoom-in",
       },
     },
   },
