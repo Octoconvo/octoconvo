@@ -1,12 +1,18 @@
 "use client";
 
 import { UserContext } from "@/contexts/user";
-import { CommunityResponseGET, InboxMessageGET } from "@/types/response";
+import {
+  Attachment,
+  CommunityResponseGET,
+  InboxMessageGET,
+} from "@/types/response";
 import { useContext, useEffect, useRef, useState } from "react";
 import MessageBox from "../MessageBox/MessageBox";
 import Image from "next/image";
 import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
+import AttachmentBox from "../AttachmentBox/AttachmentBox";
+import ZoomedImageModal from "../ZoomedImageModal/ZoomedImagedModal";
 
 const Community = ({ id }: { id: string | null }) => {
   const [community, setCommunity] = useState<null | CommunityResponseGET>(null);
@@ -17,6 +23,7 @@ const Community = ({ id }: { id: string | null }) => {
   const messageListRef = useRef<null | HTMLUListElement>(null);
   const [scrollHeight, setScrollHeight] = useState<number>(0);
   const [scrollToBottom, setScrolltoBottom] = useState<boolean>(false);
+  const [zoomedImage, setZoomedImage] = useState<Attachment | null>(null);
 
   useEffect(() => {
     const fetchCommunity = async () => {
@@ -201,96 +208,112 @@ const Community = ({ id }: { id: string | null }) => {
   }, [user, messages, community, id, prevCursor, scrollHeight, scrollToBottom]);
 
   return (
-    <section
-      className={
-        "flex min-w-0 flex-col w-full h-full max-h-[100dvh]" +
-        " box-border bg-gr-black-1-b"
-      }
-    >
-      <h1
+    <>
+      {zoomedImage && (
+        <ZoomedImageModal
+          image={zoomedImage}
+          closeImage={() => setZoomedImage(null)}
+        />
+      )}
+      <section
         className={
-          "bg-pink-50 p-[32px] text-white-100 text-h6 font-bold" +
-          " bg-gr-black-1-l text-center"
+          "flex min-w-0 flex-col w-full h-full max-h-[100dvh]" +
+          " box-border bg-gr-black-1-b"
         }
       >
-        {community ? community.name : ""}
-      </h1>
-      <ul
-        data-testid="cmmnty-msgs-ulst"
-        ref={messageListRef}
-        className={
-          "relative scrollbar flex flex-col flex-auto overflow-x-auto" +
-          " max-h-full box-border p-[48px] gap-[64px]"
-        }
-      >
-        <div
-          ref={prevObserverRef}
-          className="absolute left-0 top-0 bg-purple-50"
-        ></div>
-        {messages &&
-          messages.map((message) => {
-            return (
-              <li key={message.id} className="flex gap-[32px] scroll-smooth">
-                <div>
-                  {" "}
-                  <figure
-                    className={
-                      "flex-grow-0 bg-black-200 " +
-                      " min-w-[48px] min-h-[48px] rounded-full"
-                    }
-                  >
-                    <Image
-                      data-testid="avatar"
-                      src={
-                        message?.author.avatar
-                          ? message.author?.avatar
-                          : "/images/avatar_icon.svg"
-                      }
-                      width={48}
-                      height={48}
+        <h1
+          className={
+            "bg-pink-50 p-[32px] text-white-100 text-h6 font-bold" +
+            " bg-gr-black-1-l text-center"
+          }
+        >
+          {community ? community.name : ""}
+        </h1>
+        <ul
+          data-testid="cmmnty-msgs-ulst"
+          ref={messageListRef}
+          className={
+            " relative scrollbar flex flex-col flex-auto overflow-x-auto" +
+            " max-h-full box-border p-[48px] gap-[64px]"
+          }
+        >
+          <div
+            ref={prevObserverRef}
+            className="absolute left-0 top-0 bg-purple-50"
+          ></div>
+          {messages &&
+            messages.map((message) => {
+              return (
+                <li key={message.id} className="flex gap-[32px] scroll-smooth">
+                  <div>
+                    <figure
                       className={
-                        "rounded-full min-w-[48px] min-h-[48x]" +
-                        " bg-white-200"
+                        "flex-grow-0 bg-black-200 " +
+                        " min-w-[48px] min-h-[48px] rounded-full"
                       }
-                      alt="User avatar"
-                    ></Image>
-                  </figure>
-                </div>
+                    >
+                      <Image
+                        data-testid="avatar"
+                        src={
+                          message?.author.avatar
+                            ? message.author?.avatar
+                            : "/images/avatar_icon.svg"
+                        }
+                        width={48}
+                        height={48}
+                        className={
+                          "rounded-full min-w-[48px] min-h-[48x]" +
+                          " bg-white-200"
+                        }
+                        alt="User avatar"
+                      ></Image>
+                    </figure>
+                  </div>
 
-                <div
-                  className={
-                    "flex flex-col gap-[8px] text-p bg-grey-100" +
-                    " p-[32px] rounded-tr-[8px] rounded-br-[8px]"
-                  }
-                >
-                  <p
+                  <div
                     className={
-                      "font-bold" +
-                      (user
-                        ? user.id === message.authorId
-                          ? " text-brand-3-d-1"
-                          : " text-white-100"
-                        : " text-white-100")
+                      "flex flex-col gap-[8px] text-p bg-grey-100" +
+                      " p-[32px] rounded-tr-[8px] rounded-br-[8px]"
                     }
                   >
-                    {message.author.displayName}
-                  </p>
-                  {message.content}
-                </div>
-              </li>
-            );
-          })}
-      </ul>
-      <MessageBox
-        path="message"
-        inboxId={community?.inbox.id || ""}
-        attachment={{
-          maxSize: 5000000,
-          limit: 10,
-          totalSize: 10000000,
-        }}
-      />
-    </section>
+                    <p
+                      className={
+                        "font-bold" +
+                        (user
+                          ? user.id === message.authorId
+                            ? " text-brand-3-d-1"
+                            : " text-white-100"
+                          : " text-white-100")
+                      }
+                    >
+                      {message.author.displayName}
+                    </p>
+                    <p> {message.content}</p>
+
+                    {message.attachments?.length ? (
+                      <AttachmentBox
+                        attachments={message.attachments}
+                        zoomImage={(attachment: Attachment) =>
+                          setZoomedImage(attachment)
+                        }
+                      />
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+        </ul>
+        <MessageBox
+          path="message"
+          inboxId={community?.inbox.id || ""}
+          attachment={{
+            maxSize: 5000000,
+            limit: 10,
+            totalSize: 10000000,
+          }}
+        />
+      </section>
+    </>
   );
 };
 

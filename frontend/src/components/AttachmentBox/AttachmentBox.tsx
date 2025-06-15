@@ -79,6 +79,7 @@ const AttachmentBox = ({
 }) => {
   return (
     <figure
+      data-testid="attchmnt-bx-cntnr"
       className={
         "box-border gap-1 rounded-[8px]" +
         AttachmentStyles[attachments.length - 1]?.container
@@ -87,6 +88,7 @@ const AttachmentBox = ({
       {attachments.map((attachment, index) => {
         return (
           <button
+            data-testid="attchmnt-bx-btn"
             onClick={() => {
               zoomImage(attachment);
             }}

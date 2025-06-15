@@ -29,7 +29,10 @@ const ZoomedImageModal = ({
   });
 
   return (
-    <div className="absolute box-border flex flex-col items-center justify-center left-0 top-0 h-[100dvh] w-[100dvw] z-20 backdrop-blur-md p-8">
+    <div
+      data-testid="zmd-img-mdl"
+      className="absolute box-border flex flex-col items-center justify-center left-0 top-0 h-[100dvh] w-[100dvw] z-20 backdrop-blur-md p-8"
+    >
       <button
         data-testid="zmd-img-mdl-cls-btn"
         className={
