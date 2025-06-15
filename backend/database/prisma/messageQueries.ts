@@ -125,6 +125,7 @@ const getMessages = async ({
       { id: "asc" },
     ],
     include: {
+      attachments: true,
       author: {
         select: {
           username: true,
