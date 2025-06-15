@@ -43,6 +43,17 @@ type CommunityResponseGET = {
   };
 };
 
+type Attachment = {
+  id: string;
+  messageId: string | null;
+  type: "IMAGE";
+  subType: "JPEG" | "PNG" | "GIF";
+  height: number;
+  width: number;
+  url: string;
+  thumbnailUrl: string;
+};
+
 type InboxMessageGET = {
   id: string;
   inboxId: string;
@@ -60,6 +71,7 @@ type InboxMessageGET = {
     displayName: string;
     avatar: null | string;
   };
+  attachments: Attachment[];
 };
 
 export type {
@@ -67,4 +79,5 @@ export type {
   CommunitiesResponseGET,
   CommunityResponseGET,
   InboxMessageGET,
+  Attachment,
 };
