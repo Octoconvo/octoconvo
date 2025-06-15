@@ -48,16 +48,16 @@ const MessageBox = ({
   const onSubmit: SubmitHandler<CommunityMessageForm> = async (
     data: CommunityMessageForm
   ) => {
-    setIsSubmitting(false);
+    setIsSubmitting(true);
 
     const formData = new FormData();
 
     formData.append("content", data.content);
     formData.append("inboxid", inboxId);
 
-    for (const attachment in attachments) {
-      formData.append("attachments", attachment);
-    }
+    attachments.forEach((file) => {
+      formData.append("attachments", file.file);
+    });
 
     const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
