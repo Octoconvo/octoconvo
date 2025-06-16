@@ -1,7 +1,7 @@
 import MessageBox from "@/components/MessageBox/MessageBox";
 import { validateFiles } from "@/utils/file";
 import "@testing-library/jest-dom";
-import { render, act, screen } from "@testing-library/react";
+import { render, act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 jest.mock("@/utils/file", () => ({
@@ -9,29 +9,43 @@ jest.mock("@/utils/file", () => ({
   validateFiles: jest.fn(() => {}),
 }));
 
-global.fetch = jest.fn().mockImplementationOnce(
-  jest.fn(
-    (
-      //eslint-disable-next-line
-      _url
-    ) =>
-      Promise.resolve().then(() => ({
-        status: 422,
-        json: () =>
-          Promise.resolve({
-            error: {
-              validationError: [
-                {
-                  field: "content",
-                  value: "",
-                  msg: "Message is required",
-                },
-              ],
-            },
-          }),
-      }))
+global.fetch = jest
+  .fn()
+  .mockImplementationOnce(
+    jest.fn(
+      (
+        //eslint-disable-next-line
+        _url
+      ) =>
+        Promise.resolve().then(() => ({
+          status: 422,
+          json: () =>
+            Promise.resolve({
+              error: {
+                validationError: [
+                  {
+                    field: "content",
+                    value: "",
+                    msg: "Message is required",
+                  },
+                ],
+              },
+            }),
+        }))
+    )
   )
-);
+  .mockImplementation(
+    jest.fn(
+      (
+        //eslint-disable-next-line
+        _url
+      ) =>
+        Promise.resolve().then(() => ({
+          status: 200,
+          json: () => Promise.resolve({}),
+        }))
+    )
+  );
 
 describe("Render MessageBox", () => {
   // Test attachment file selection
@@ -238,4 +252,53 @@ describe("Render MessageBox", () => {
     await user.type(contentTextarea, "testmessage2");
     expect(screen.queryByText("Message is required")).not.toBeInTheDocument();
   });
+
+  test(
+    "Reset inputs and attachments after successfully sending" + " a message",
+    async () => {
+      await act(async () => {
+        render(
+          <MessageBox
+            path="testpath1"
+            inboxId="testinboxid1"
+            attachment={{ limit: 2, maxSize: 5000000, totalSize: 5000000 }}
+          />
+        );
+      });
+
+      const button = screen.getByRole("button", { name: "Send" });
+      const contentTextarea = screen.getByTestId(
+        "msg-bx-txtr-cntnt"
+      ) as HTMLTemplateElement;
+
+      // Provide the required input
+      await user.type(contentTextarea, "testmessage1");
+      await user.click(button);
+
+      // Render attachments
+      const attachmentInput = screen.getByTestId(
+        "msg-box-attchmnt-input"
+      ) as HTMLInputElement;
+      expect(attachmentInput).toBeInTheDocument();
+
+      const file = new File(["testfile1"], "testfile1.png", {
+        type: "image/png",
+      });
+
+      await user.upload(attachmentInput, file);
+
+      const attachmentUList = screen.queryByTestId("msg-box-attchmnt-ulist");
+      expect(attachmentUList).toBeInTheDocument();
+
+      // Reset attachments
+      await user.click(button);
+
+      expect(contentTextarea.textContent).toBe("");
+      waitFor(() => {
+        expect(
+          screen.getByTestId("msg-box-attchmnt-ulist")
+        ).not.toBeInTheDocument();
+      });
+    }
+  );
 });
