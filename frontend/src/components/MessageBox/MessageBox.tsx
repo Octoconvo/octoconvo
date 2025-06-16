@@ -85,6 +85,7 @@ const MessageBox = ({
       // Handle success response
       if (response.status < 400) {
         reset();
+        setAttachments([]);
       }
     } catch (err) {
       console.log(err);
