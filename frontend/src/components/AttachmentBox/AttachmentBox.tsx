@@ -6,7 +6,7 @@ const AttachmentStyles = [
   {
     container: " grid h-[max(320px,29vh)]",
     img: " w-auto",
-    button: (index: number) => "",
+    button: (index: number) => " max-h-full",
   },
   {
     container: " grid grid-cols-2 w-[calc(15vw+240px)]",
