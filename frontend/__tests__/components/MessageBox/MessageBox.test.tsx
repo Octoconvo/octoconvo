@@ -75,7 +75,7 @@ describe("Render MessageBox", () => {
     });
 
     // Attchment UList shouldn't be rendered
-    const attachmentUList = screen.queryByTestId("fl-err-mdl");
+    const attachmentUList = screen.queryByTestId("msg-box-attchmnt-ulist");
     expect(attachmentUList).not.toBeInTheDocument();
 
     await user.upload(attachmentInput, file);
@@ -107,7 +107,7 @@ describe("Render MessageBox", () => {
     });
 
     // Attchment UList shouldn't be rendered
-    const attachmentUList = screen.queryByTestId("fl-err-mdl");
+    const attachmentUList = screen.queryByTestId("msg-box-attchmnt-ulist");
     expect(attachmentUList).not.toBeInTheDocument();
 
     await user.upload(attachmentInput, file);
@@ -139,7 +139,7 @@ describe("Render MessageBox", () => {
     });
 
     // Attchment UList shouldn't be rendered
-    const attachmentUList = screen.queryByTestId("fl-err-mdl");
+    const attachmentUList = screen.queryByTestId("msg-box-attchmnt-ulist");
     expect(attachmentUList).not.toBeInTheDocument();
 
     await user.upload(attachmentInput, file);
@@ -171,7 +171,7 @@ describe("Render MessageBox", () => {
     });
 
     // Attchment UList shouldn't be rendered
-    const attachmentUList = screen.queryByTestId("fl-err-mdl");
+    const attachmentUList = screen.queryByTestId("msg-box-attchmnt-ulist");
     expect(attachmentUList).not.toBeInTheDocument();
 
     await user.upload(attachmentInput, file);
