@@ -13,6 +13,7 @@ import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
 import AttachmentBox from "../AttachmentBox/AttachmentBox";
 import ZoomedImageModal from "../ZoomedImageModal/ZoomedImagedModal";
+import { unescapeString } from "@/utils/string";
 
 const Community = ({ id }: { id: string | null }) => {
   const [community, setCommunity] = useState<null | CommunityResponseGET>(null);
@@ -288,7 +289,7 @@ const Community = ({ id }: { id: string | null }) => {
                     >
                       {message.author.displayName}
                     </p>
-                    <p> {message.content}</p>
+                    <p> {unescapeString(message.content)}</p>
 
                     {message.attachments?.length ? (
                       <AttachmentBox
