@@ -18,11 +18,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="min-h-[100dvh]">
       <body className={`${inter.variable} font-sans flex h-full`}>
-        <SocketWrapper>
-          <UserProvider>
+        <UserProvider>
+          <SocketWrapper>
             <UserProfileProvider>{children}</UserProfileProvider>
-          </UserProvider>
-        </SocketWrapper>
+          </SocketWrapper>
+        </UserProvider>
       </body>
     </html>
   );

@@ -5,7 +5,7 @@ const URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
 const socket = io(URL, {
   withCredentials: true,
-  autoConnect: false,
+  autoConnect: true,
 });
 
 socket.on("connect", onConnect);
