@@ -6,7 +6,9 @@ import bcrypt from "bcrypt";
 const populateDB = async () => {
   console.log(`\x1b[36mPopulating database...`);
   try {
-    // Create Users
+    // Create 102 Users
+    /* The first two users are used for authorisation check so we'll exclude 
+     them from the communities join loop */
     const users: {
       username: string;
       displayName: string;
@@ -27,63 +29,138 @@ const populateDB = async () => {
       },
     ];
 
-    for (const user of users) {
-      const createUserData = async () => {
-        bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
-          if (err) {
-            console.error(err);
-          }
+    // Create another 100 users
+    const addUser = async () => {
+      const pushUser = new Promise(resolve => {
+        for (let i = 3; i < 103; i++) {
+          const user = {
+            username: `seeduser${i}`,
+            displayName: `seeduser${i}`,
+            password: `seed@user${i}`,
+            community: `seedcommunity${i}`,
+          };
 
-          const userData: User = await prisma.user.create({
-            data: {
-              username: user.username,
-              displayName: user.username,
-              password: hashedPassword,
-            },
-          });
+          users.push(user);
+        }
 
-          // Create communities
-          const community = await prisma.community.create({
-            data: {
-              name: user.community,
-              bio: user.community,
-              inbox: {
-                create: {
-                  inboxType: "COMMUNITY",
+        resolve(1);
+      });
+
+      return pushUser;
+    };
+
+    await addUser();
+
+    const createUserData = async () => {
+      const createData = users.map(user => {
+        return new Promise((resolve): void =>
+          bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
+            if (err) {
+              console.error(err);
+            }
+
+            const userData: User = await prisma.user.create({
+              data: {
+                username: user.username,
+                displayName: user.username,
+                password: hashedPassword,
+              },
+            });
+
+            console.log(`\x1b[36mCreated user ${user.username}...`);
+
+            // Create communities
+            const community = await prisma.community.create({
+              data: {
+                name: user.community,
+                bio: user.community,
+                inbox: {
+                  create: {
+                    inboxType: "COMMUNITY",
+                  },
+                },
+                participants: {
+                  create: {
+                    userId: userData.id,
+                    role: "OWNER",
+                    status: "ACTIVE",
+                    memberSince: new Date(),
+                  },
                 },
               },
-              participants: {
-                create: {
-                  userId: userData.id,
-                  role: "OWNER",
-                  status: "ACTIVE",
-                  memberSince: new Date(),
-                },
+              include: {
+                inbox: true,
               },
-            },
-            include: {
-              inbox: true,
-            },
-          });
+            });
 
-          if (community?.inbox) {
-            for (let i = 1; i <= 20; i++) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log(`\x1b[36mCreated community ${user.community}...`);
 
-              await prisma.message.create({
-                data: {
-                  content: `seedmessage${i}`,
-                  inboxId: community.inbox?.id,
-                  authorId: userData.id,
-                },
-              });
+            if (community?.inbox) {
+              for (let i = 1; i <= 20; i++) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                await prisma.message.create({
+                  data: {
+                    content: `seedmessage${i}`,
+                    inboxId: community.inbox?.id,
+                    authorId: userData.id,
+                  },
+                });
+              }
+            }
+
+            resolve(1);
+          }),
+        );
+      });
+
+      await Promise.all(createData);
+
+      const joinCommunity = async () => {
+        users.map(async (user, index) => {
+          if (index > 1) {
+            console.log(`\x1b[36mAdding participants to ${user.community}`);
+            const community = await prisma.community.findUnique({
+              where: {
+                name: user.community,
+              },
+            });
+
+            if (community) {
+              for (let i = 0; i < index - 2; i++) {
+                if (i !== index) {
+                  const userData = await prisma.user.findUnique({
+                    where: {
+                      username: users[i].username,
+                    },
+                  });
+
+                  if (userData) {
+                    console.log(
+                      `\x1b[36mAdding ${userData.username} as a ${community.name}'s` +
+                        " participant",
+                    );
+                    await prisma.participant.create({
+                      data: {
+                        role: "MEMBER",
+                        communityId: community?.id,
+                        userId: userData?.id,
+                      },
+                    });
+                  }
+                }
+              }
             }
           }
         });
       };
 
-      await createUserData();
-    }
+      // handle communities participants
+
+      await joinCommunity();
+    };
+
+    await createUserData();
   } catch (err) {
     console.error(err);
   } finally {
