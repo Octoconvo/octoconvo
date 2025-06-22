@@ -15,6 +15,7 @@ import profileRouter from "./routes/profile";
 import communityRouter from "./routes/community";
 import messageRouter from "./routes/message";
 import inboxRouter from "./routes/inbox";
+import exploreRouter from "./routes/explore";
 
 const app = express();
 app.use(logger("dev"));
@@ -47,6 +48,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use("/", indexRouter);
+app.use("/explore", exploreRouter);
 app.use("/users", userRouter);
 app.use("/account", accountRouter);
 app.use("/profile", profileRouter);
