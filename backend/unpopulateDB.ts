@@ -11,6 +11,24 @@ const unpopulateDB = async () => {
     },
   ];
 
+  const addUser = async () => {
+    const pushUser = new Promise(resolve => {
+      for (let i = 3; i < 103; i++) {
+        const user = {
+          username: `seeduser${i}`,
+        };
+
+        seedData.push(user);
+      }
+
+      resolve(1);
+    });
+
+    return pushUser;
+  };
+
+  await addUser();
+
   const deleteData = async ({ username }: { username: string }) => {
     console.log(`\x1b[31mDeleting ${username} with its associated data`);
     const user = await prisma.user.findUnique({
@@ -32,8 +50,6 @@ const unpopulateDB = async () => {
           inbox: true,
         },
       });
-
-      console.log(communities);
 
       // Delete communities and their related data
 
