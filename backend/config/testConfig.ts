@@ -58,6 +58,8 @@ app.post("/community", communityController.community_post);
 app.post("/message", messageController.message_post);
 app.get("/inbox/:inboxid/messages", messageController.messages_get);
 
+app.get("/explore/communities", communityController.communities_explore_get);
+
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
 

@@ -458,3 +458,290 @@ describe("Test community_get controller", () => {
       .expect(200, done);
   });
 });
+
+describe("Test communities_explore_get", () => {
+  type CommunityExplore = Community & {
+    _count: {
+      participants: number;
+    };
+  };
+
+  let community102: CommunityExplore | null = null;
+
+  beforeAll(async () => {
+    try {
+      community102 = await prisma.community.findUnique({
+        where: {
+          name: "seedcommunity102",
+        },
+        include: {
+          _count: {
+            select: {
+              participants: true,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "client_user_1",
+    password: "Client_password_1",
+  });
+
+  test("Failed to fetch communities if user is unauthenticated", done => {
+    request(app)
+      .get("/explore/communities")
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch communities",
+        error: {
+          message: "You are not authenticated",
+        },
+      })
+      .expect(401, done);
+  });
+
+  test(
+    "Return 422 HTTP error when the name query exceed" + " the maximum length",
+    done => {
+      agent
+        .get(`/explore/communities?name=${"a".repeat(129)}`)
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to fetch communities");
+          expect(
+            error.validationError.find(
+              (obj: { field: string; msg: string; value: string }) =>
+                obj.field === "name",
+            ).msg,
+          ).toBe("Community name must not exceed 128 characters");
+        })
+        .expect(422, done);
+    },
+  );
+
+  test("Return 422 HTTP error when the name memberCount cursor is invalid", done => {
+    const ISOString = community102?.createdAt
+      ? new Date(community102?.createdAt).toISOString()
+      : "";
+
+    agent
+      .get(`/explore/communities?cursor=testmembercount1_${ISOString}`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch communities");
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "cursor",
+          ).msg,
+        ).toBe("Cursor value is invalid");
+      })
+      .expect(422, done);
+  });
+
+  test("Return 422 HTTP error when the limit is a decimal value", done => {
+    agent
+      .get(`/explore/communities?limit=0.1`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch communities");
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "limit",
+          ).msg,
+        ).toBe("Limit must be an integer between 1 and 100");
+      })
+      .expect(422, done);
+  });
+
+  test("Return 422 HTTP error when the limit is less than 1", done => {
+    agent
+      .get(`/explore/communities?limit=0`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch communities");
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "limit",
+          ).msg,
+        ).toBe("Limit must be an integer between 1 and 100");
+      })
+      .expect(422, done);
+  });
+
+  test("Return 422 HTTP error when the limit is bigger than 100", done => {
+    agent
+      .get(`/explore/communities?limit=101`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch communities");
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "limit",
+          ).msg,
+        ).toBe("Limit must be an integer between 1 and 100");
+      })
+      .expect(422, done);
+  });
+
+  test("Return correct communities with the name query", done => {
+    agent
+      .get("/explore/communities?name=community")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const communities = res.body.communities;
+
+        expect(message).toBe("Successfully fetched communities");
+        expect(communities).toBeDefined();
+        for (const community of communities) {
+          expect(community.name).toContain("community");
+        }
+      })
+      .expect(200, done);
+  });
+
+  test(
+    "Return less or equal than 30 communities when no query is" + " provided",
+    done => {
+      agent
+        .get("/explore/communities")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const communities = res.body.communities;
+
+          expect(message).toBe("Successfully fetched communities");
+          expect(communities).toBeDefined();
+          expect(communities.length).toBeLessThanOrEqual(30);
+        })
+        .expect(200, done);
+    },
+  );
+
+  test("Return 3 communities when the limit is 3", done => {
+    agent
+      .get("/explore/communities?limit=3")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const communities = res.body.communities;
+
+        expect(message).toBe("Successfully fetched communities");
+        expect(communities).toBeDefined();
+        expect(communities.length).toBe(3);
+      })
+      .expect(200, done);
+  });
+
+  test("Return the correct communities with cursor", done => {
+    const ISOString = community102?.createdAt
+      ? new Date(community102?.createdAt).toISOString()
+      : "";
+    const cursor =
+      `${community102?._count.participants}` +
+      "_" +
+      `${community102?.id}` +
+      "_" +
+      ISOString;
+
+    agent
+      .get(`/explore/communities?limit=10&cursor=${cursor}`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const communities = res.body.communities;
+        const nextCursor = res.body.nextCursor;
+        const error = res.body.error;
+
+        expect(error).not.toBeDefined();
+        expect(message).toBe("Successfully fetched communities");
+        expect(communities).toBeDefined();
+        expect(communities.length).toBe(10);
+        expect(nextCursor).toBeDefined();
+
+        type CommunityData = Community & {
+          _count: {
+            participants: number;
+          };
+        };
+
+        communities.map((community: CommunityData) => {
+          if (community102) {
+            expect(Number(community._count.participants)).toBeLessThan(
+              Number(community102?._count.participants),
+            );
+
+            expect(
+              new Date(community.createdAt) < new Date(community102?.createdAt),
+            ).toBeTruthy();
+          }
+        });
+      })
+      .expect(200, done);
+  });
+
+  test("Return the correct nextCursor", done => {
+    const ISOString = community102?.createdAt
+      ? new Date(community102?.createdAt).toISOString()
+      : "";
+    const cursor =
+      `${community102?._count.participants}` +
+      "_" +
+      `${community102?.id}` +
+      "_" +
+      ISOString;
+
+    agent
+      .get(`/explore/communities?limit=10&cursor=${cursor}`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const communities = res.body.communities;
+        const nextCursor = res.body.nextCursor;
+
+        expect(message).toBe("Successfully fetched communities");
+        expect(nextCursor).toBeDefined();
+
+        const lastCommunity = communities[communities.length - 1];
+        const ISOString = lastCommunity.createdAt
+          ? new Date(lastCommunity.createdAt).toISOString()
+          : "";
+
+        const cursor =
+          `${lastCommunity?._count.participants}` +
+          "_" +
+          `${lastCommunity?.id}` +
+          "_" +
+          ISOString;
+
+        expect(nextCursor).toBe(cursor);
+      })
+      .expect(200, done);
+  });
+});
