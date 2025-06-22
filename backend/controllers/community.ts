@@ -1,20 +1,21 @@
 import asyncHandler from "express-async-handler";
 import { Request, Response } from "express";
 import { createAuthenticationHandler } from "../utils/authentication";
-import { body, check, validationResult } from "express-validator";
+import { body, check, query, validationResult } from "express-validator";
 import { createValidationErrObj } from "../utils/error";
 import {
   getCommunityById,
   getCommunityByName,
   createCommunity,
   getUserCommunities,
+  searchCommunities,
 } from "../database/prisma/communityQueries";
 import { convertFileName } from "../utils/file";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import sharp from "sharp";
 import { getPublicURL, uploadFile } from "../database/supabase/supabaseQueries";
 import multer from "multer";
-import { isUUID } from "../utils/validation";
+import { isUUID, isISOString } from "../utils/validation";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -35,6 +36,12 @@ const communityValidation = {
         throw new Error("Community name is already taken");
       }
     }),
+  name_query: query("name")
+    .trim()
+    .optional({ values: "falsy" })
+    .isLength({ max: 128 })
+    .withMessage("Community name must not exceed 128 characters")
+    .escape(),
   bio: body("bio")
     .trim()
     .isLength({ max: 255 })
@@ -83,6 +90,43 @@ const communityValidation = {
 
     return true;
   }),
+  limit: query("limit")
+    .optional({ values: "falsy" })
+    .bail()
+    .isInt({
+      min: 1,
+      max: 100,
+      allow_leading_zeroes: false,
+    })
+    .withMessage("Limit must be an integer between 1 and 100"),
+  cursor: query("cursor")
+    .trim()
+    .optional({
+      values: "falsy",
+    })
+    .bail()
+    .custom(
+      // eslint-disable-next-line
+      (value, { req }) => {
+        const cursor = value;
+        const memberCount = cursor ? cursor.split("_")[0] : null;
+        const id = cursor ? cursor.split("_")[1] : null;
+        const createdAt = cursor ? cursor.split("_")[2] : null;
+
+        // Validate cursor createdAt and id
+        if (
+          !(
+            Number.isInteger(Number(memberCount)) &&
+            isUUID(id) &&
+            isISOString(createdAt)
+          )
+        ) {
+          throw new Error("Cursor value is invalid");
+        }
+
+        return true;
+      },
+    ),
 };
 
 const community_get = [
@@ -263,4 +307,64 @@ const communities_get = [
   }),
 ];
 
-export { community_get, community_post, communities_get };
+const communities_explore_get = [
+  createAuthenticationHandler({
+    message: "Failed to fetch communities",
+    errMessage: "You are not authenticated",
+  }),
+  communityValidation.name_query,
+  communityValidation.limit,
+  communityValidation.cursor,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(errors, "Failed to fetch communities");
+
+      res.status(422).json(obj);
+      return;
+    }
+
+    const name = req.query?.name ? (req.query.name as string) : null;
+    const limit = req.query?.limit ? (Number(req.query.limit) as number) : 30;
+    const cursor = req.query?.cursor
+      ? (req.query.cursor as string).split("_")
+      : null;
+
+    const communities = await searchCommunities({
+      name,
+      limit,
+      cursor: cursor
+        ? {
+            memberCount: Number(cursor[0]),
+            id: cursor[1],
+            createdAt: cursor[2],
+          }
+        : cursor,
+    });
+
+    const lastCommunity = communities.length
+      ? communities[communities.length - 1]
+      : null;
+    const nextCursor = lastCommunity
+      ? `${lastCommunity._count.participants}` +
+        "_" +
+        `${lastCommunity.id}` +
+        "_" +
+        `${new Date(lastCommunity.createdAt).toISOString()}`
+      : null;
+
+    res.json({
+      message: "Successfully fetched communities",
+      communities,
+      nextCursor: nextCursor,
+    });
+  }),
+];
+
+export {
+  community_get,
+  community_post,
+  communities_get,
+  communities_explore_get,
+};
