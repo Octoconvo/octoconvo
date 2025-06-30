@@ -53,7 +53,7 @@ type CommunityExploreGET = {
   createdAt: string;
   updatedAt: string;
   _count: {
-    participants: string;
+    participants: number;
   };
 };
 
