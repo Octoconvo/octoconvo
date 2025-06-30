@@ -239,6 +239,22 @@
     animation: spinner 1s infinite linear;
   }
 
+  .search-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .search-icon::before {
+    content: " ";
+    width: 100%;
+    height: 100%;
+    background-image: url("/images/search-icon.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 100% auto;
+  }
+
   @keyframes spinner {
     to {
       transform: rotate(1turn);
