@@ -43,6 +43,20 @@ type CommunityResponseGET = {
   };
 };
 
+type CommunityExploreGET = {
+  id: string;
+  name: string;
+  bio: null | string;
+  avatar: null | string;
+  banner: null | string;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  _count: {
+    participants: string;
+  };
+};
+
 type Attachment = {
   id: string;
   messageId: string | null;
@@ -78,6 +92,7 @@ export type {
   CommunityResponsePOST,
   CommunitiesResponseGET,
   CommunityResponseGET,
+  CommunityExploreGET,
   InboxMessageGET,
   Attachment,
 };
