@@ -33,6 +33,10 @@ type CommunityMessageForm = {
   content: string;
 };
 
+type SearchBarForm = {
+  name: string;
+};
+
 export type {
   SignupForm,
   LoginForm,
@@ -40,4 +44,5 @@ export type {
   EditProfileForm,
   CreateCommunityForm,
   CommunityMessageForm,
+  SearchBarForm,
 };
