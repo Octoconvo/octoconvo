@@ -255,6 +255,36 @@
     background-size: 100% auto;
   }
 
+  .searchbar-input {
+    background-color: var(--grey-100);
+    width: 100%;
+    font-size: var(--p);
+  }
+
+  .searchbar-input::placeholder {
+    color: var(--white-200);
+  }
+
+  .searchbar-input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 50px var(--grey-100) inset !important; /* Change the color to your own background color */
+    -webkit-text-fill-color: var(--white-100);
+  }
+
+  .searchbar-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px var(--grey-100) inset !important; /*your box-shadow*/
+    -webkit-text-fill-color: var(--white-100);
+  }
+
+  .searchbar-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 50px var(--grey-100) inset !important; /*your box-shadow*/
+    -webkit-text-fill-color: var(--white-100);
+  }
+
+  .searchbar-input:-webkit-autofill:hover {
+    -webkit-box-shadow: 0 0 0 50px var(--grey-100) inset !important; /*your box-shadow*/
+    -webkit-text-fill-color: var(--white-100);
+  }
+
   @keyframes spinner {
     to {
       transform: rotate(1turn);
