@@ -94,6 +94,14 @@ const communityMessageValidation = {
   },
 };
 
+const searchBarNameValidation = {
+  required: "Query input is required",
+  maxLength: {
+    value: 128,
+    message: "Query input must not exceed 128 characters",
+  },
+};
+
 const createSignupOnSubmit = ({
   errorHandler,
   successHandler,
@@ -227,6 +235,7 @@ export {
   communityNameValidation,
   communityBioValidation,
   communityMessageValidation,
+  searchBarNameValidation,
   createSignupOnSubmit,
   createOnSubmit,
   getFormData,
