@@ -96,6 +96,7 @@ const CommunityBox = ({
   });
   return (
     <ul
+      data-testid="cmmnty-bx-ulst"
       className={
         "scrollbar gap-[32px] p-[16px] overflow-auto grid" +
         " grid-cols-[repeat(auto-fill,minmax(420px,1fr))] bg-gr-black-1-b" +
