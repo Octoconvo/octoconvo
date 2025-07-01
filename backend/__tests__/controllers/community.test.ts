@@ -467,12 +467,26 @@ describe("Test communities_explore_get", () => {
   };
 
   let community102: CommunityExplore | null = null;
+  let community10: CommunityExplore | null = null;
 
   beforeAll(async () => {
     try {
       community102 = await prisma.community.findUnique({
         where: {
           name: "seedcommunity102",
+        },
+        include: {
+          _count: {
+            select: {
+              participants: true,
+            },
+          },
+        },
+      });
+
+      community10 = await prisma.community.findUnique({
+        where: {
+          name: "seedcommunity10",
         },
         include: {
           _count: {
@@ -744,4 +758,34 @@ describe("Test communities_explore_get", () => {
       })
       .expect(200, done);
   });
+
+  test(
+    "NextCursor should be false when the returned communities is" +
+      " less than limit",
+    done => {
+      const ISOString = community10?.createdAt
+        ? new Date(community10?.createdAt).toISOString()
+        : "";
+      const cursor =
+        `${community10?._count.participants}` +
+        "_" +
+        `${community10?.id}` +
+        "_" +
+        ISOString;
+
+      agent
+        .get(`/explore/communities?limit=20&cursor=${cursor}`)
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const nextCursor = res.body.nextCursor;
+
+          expect(message).toBe("Successfully fetched communities");
+          expect(nextCursor).toBeDefined();
+
+          expect(nextCursor).toBe(false);
+        })
+        .expect(200, done);
+    },
+  );
 });
