@@ -357,7 +357,7 @@ const communities_explore_get = [
     res.json({
       message: "Successfully fetched communities",
       communities,
-      nextCursor: nextCursor,
+      nextCursor: communities.length < limit ? false : nextCursor,
     });
   }),
 ];
