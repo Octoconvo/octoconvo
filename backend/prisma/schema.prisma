@@ -15,21 +15,23 @@ model Session {
 }
 
 model User {
-  id             String        @id @default(uuid())
-  username       String        @unique @db.VarChar(32)
-  displayName    String        @db.VarChar(32)
-  password       String        @db.Text
-  avatar         String?       @db.Text
-  banner         String?       @db.Text
-  bio            String?       @db.VarChar(255)
-  isDeleted      Boolean       @default(false)
-  lastSeen       DateTime      @default(now()) @db.Timestamptz(3)
-  createdAt      DateTime      @default(now()) @db.Timestamptz(3)
-  updatedAt      DateTime      @default(now()) @db.Timestamptz(3)
-  friends        Friends[]     @relation("friendOf")
-  friendsOf      Friends[]     @relation("friend")
+  id             String         @id @default(uuid())
+  username       String         @unique @db.VarChar(32)
+  displayName    String         @db.VarChar(32)
+  password       String         @db.Text
+  avatar         String?        @db.Text
+  banner         String?        @db.Text
+  bio            String?        @db.VarChar(255)
+  isDeleted      Boolean        @default(false)
+  lastSeen       DateTime       @default(now()) @db.Timestamptz(3)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime       @default(now()) @db.Timestamptz(3)
+  friends        Friends[]      @relation("friendOf")
+  friendsOf      Friends[]      @relation("friend")
   participations Participant[]
   messages       Message[]
+  requests       Notification[] @relation("request")
+  notifications  Notification[] @relation("notification")
 }
 
 model Friends {
@@ -50,16 +52,17 @@ enum FriendsStatus {
 }
 
 model Community {
-  id           String        @id @default(uuid())
-  name         String        @unique @db.VarChar(128)
-  bio          String?       @db.VarChar(255)
-  avatar       String?       @db.Text
-  banner       String?       @db.Text
-  isDeleted    Boolean       @default(false)
-  createdAt    DateTime      @default(now()) @db.Timestamptz(3)
-  updatedAt    DateTime      @default(now()) @db.Timestamptz(3)
-  inbox        Inbox?
-  participants Participant[]
+  id            String         @id @default(uuid())
+  name          String         @unique @db.VarChar(128)
+  bio           String?        @db.VarChar(255)
+  avatar        String?        @db.Text
+  banner        String?        @db.Text
+  isDeleted     Boolean        @default(false)
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime       @default(now()) @db.Timestamptz(3)
+  inbox         Inbox?
+  participants  Participant[]
+  Notifications Notification[]
 }
 
 model DirectMessage {
@@ -140,6 +143,20 @@ model Attachment {
   thumbnailUrl String            @db.Text
 }
 
+model Notification {
+  id             String           @id @default(uuid())
+  triggeredBy    User             @relation("request", fields: [triggeredById], references: [id])
+  triggeredById  String
+  triggeredFor   User             @relation("notification", fields: [triggeredForId], references: [id])
+  triggeredForId String
+  isRead         Boolean
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+  type           NotificationType
+  payload        String
+  community      Community?       @relation(fields: [communityId], references: [id])
+  communityId    String?
+}
+
 enum AttachmentType {
   IMAGE
 }
@@ -148,4 +165,10 @@ enum AttachmentSubtype {
   JPEG
   PNG
   GIF
+}
+
+enum NotificationType {
+  FRIENDREQUEST
+  COMMUNITYREQUEST
+  REQUESTUPDATE
 }
