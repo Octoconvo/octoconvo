@@ -5,7 +5,12 @@ const CommunityItem = ({ community }: { community: CommunityExploreGET }) => {
   return (
     <li className="flex flex-col bg-black-100 h-[300px] rounded-[8px]">
       <figure className="bg-gr-black-2-r aspect-[3/1] rounded-[8px] rounded-b-none">
-        {community.banner && <img src={community.banner} />}
+        {community.banner && (
+          <img
+            className="object-center object-cover aspect-[3/1]"
+            src={community.banner}
+          />
+        )}
       </figure>
       <div className="relative p-[32px] pt-[36px] flex-auto">
         <figure className="top-[-28px] absolute rounded-[8px] p-[8px] bg-black-100 w-[min-content]">
