@@ -249,7 +249,10 @@ const community_post = [
         folder: communityName,
       });
 
-      const url = getPublicURL({ path: data.path, bucketName: "banner" });
+      const url = getPublicURL({
+        path: data.path,
+        bucketName: "community-banner",
+      });
 
       if (url) bannerURL = url.publicUrl;
     }
