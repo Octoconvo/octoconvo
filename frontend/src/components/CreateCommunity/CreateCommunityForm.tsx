@@ -178,6 +178,7 @@ const CreateCommunityForm = ({
             id="banner"
             accept="image/png, image/jpeg"
             className="hidden"
+            {...bannerRegister}
             ref={(e) => {
               bannerRegister.ref(e);
               bannerInputRef.current = e;
