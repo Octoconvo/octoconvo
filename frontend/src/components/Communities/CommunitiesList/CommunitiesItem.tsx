@@ -5,6 +5,7 @@ import { CommunitiesResponseGET } from "@/types/response";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { unescapeString } from "@/utils/string";
 
 const CommunitiesItem = ({
   community,
@@ -66,7 +67,7 @@ const CommunitiesItem = ({
           ref={linkRef}
           href={`/lobby/communities/${community.id}`}
         >
-          {community.name}
+          {unescapeString(community.name)}
         </Link>
       </button>
     </li>
