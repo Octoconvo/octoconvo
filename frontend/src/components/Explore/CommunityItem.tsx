@@ -21,11 +21,11 @@ const CommunityItem = ({ community }: { community: CommunityExploreGET }) => {
           </div>
         </figure>
         <article className="flex flex-col justify-between h-full">
-          <div className="overflow-hidden ">
-            <h1 className="text-p font-bold text-white-100 overflow-hidden text-ellipsis">
+          <div className="overflow-hidden]">
+            <h1 className="text-p font-bold text-white-100 overflow-hidden text-ellipsis text-nowrap">
               {unescapeString(community.name)}
             </h1>
-            <p className="text-p text-white-200 overflow-hidden text-ellipsis">
+            <p className="text-p text-white-200 overflow-hidden text-ellipsis text-nowrap">
               {community.bio && unescapeString(community.bio)}
             </p>
           </div>
