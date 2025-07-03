@@ -94,7 +94,7 @@ const LobbyNav = () => {
             href={`/lobby/explore`}
             className={
               "flex relative items-center justify-center h-12" +
-              " before:rounded-full transition-all hover:transition-all" +
+              " before:rounded-[8px] transition-all hover:transition-all" +
               " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px] " +
               (path && path.split("/").includes("explore")
                 ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
