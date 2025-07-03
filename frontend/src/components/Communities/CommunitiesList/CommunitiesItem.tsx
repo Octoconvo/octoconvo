@@ -63,7 +63,7 @@ const CommunitiesItem = ({
           )}
         </div>
         <Link
-          className="box-border max-w-full overflow-hidden text-ellipsis"
+          className="box-border max-w-full overflow-hidden text-ellipsis text-nowrap"
           ref={linkRef}
           href={`/lobby/communities/${community.id}`}
         >
