@@ -90,6 +90,39 @@ const createCommunity = async ({
   return community;
 };
 
+const updateCommunity = async ({
+  id,
+  name,
+  bio,
+  avatar,
+  banner,
+  includeParticipant,
+}: {
+  id: string;
+  name?: string;
+  bio?: string | null;
+  avatar?: string | null;
+  banner?: string | null;
+  includeParticipant?: boolean;
+}) => {
+  const community = await prisma.community.update({
+    where: {
+      id: id,
+    },
+    data: {
+      ...(name ? { name: name } : {}),
+      ...(bio ? { bio: bio } : {}),
+      ...(avatar ? { avatar: avatar } : {}),
+      ...(banner ? { banner: banner } : {}),
+    },
+    include: {
+      ...(includeParticipant ? { participants: true } : {}),
+    },
+  });
+
+  return community;
+};
+
 const getUserCommunities = async ({ userId }: { userId: string }) => {
   const communities = await prisma.community.findMany({
     where: {
@@ -210,4 +243,5 @@ export {
   getUserCommunities,
   getCommunityByIdAndParticipant,
   searchCommunities,
+  updateCommunity,
 };
