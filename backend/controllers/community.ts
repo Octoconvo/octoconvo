@@ -9,6 +9,7 @@ import {
   createCommunity,
   getUserCommunities,
   searchCommunities,
+  updateCommunity,
 } from "../database/prisma/communityQueries";
 import { convertFileName } from "../utils/file";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -210,53 +211,6 @@ const community_post = [
     let avatarURL: null | string = null;
     let bannerURL: null | string = null;
 
-    if (avatar) {
-      // Resize and compress image
-      const buffer = await sharp(avatar.buffer)
-        .jpeg({ quality: 80 })
-        .resize({ width: 320, height: 320, fit: "cover" })
-        .toBuffer();
-
-      avatar.buffer = buffer;
-
-      // upload image
-      const data = await uploadFile({
-        file: avatar,
-        bucketName: "community-avatar",
-        folder: communityName,
-      });
-
-      const url = getPublicURL({
-        path: data.path,
-        bucketName: "community-avatar",
-      });
-
-      if (url) avatarURL = url.publicUrl;
-    }
-
-    if (banner) {
-      // Resize and compress image
-      const buffer = await sharp(banner.buffer)
-        .jpeg({ quality: 80 })
-        .resize({ width: 1920, height: 1080, fit: "cover" })
-        .toBuffer();
-
-      banner.buffer = buffer;
-
-      const data = await uploadFile({
-        file: banner,
-        bucketName: "community-banner",
-        folder: communityName,
-      });
-
-      const url = getPublicURL({
-        path: data.path,
-        bucketName: "community-banner",
-      });
-
-      if (url) bannerURL = url.publicUrl;
-    }
-
     try {
       const community = await createCommunity({
         id: id,
@@ -266,11 +220,67 @@ const community_post = [
         banner: bannerURL,
       });
 
+      if (avatar) {
+        // Resize and compress image
+        const buffer = await sharp(avatar.buffer)
+          .jpeg({ quality: 80 })
+          .resize({ width: 320, height: 320, fit: "cover" })
+          .toBuffer();
+
+        avatar.buffer = buffer;
+
+        // upload image
+        const data = await uploadFile({
+          file: avatar,
+          bucketName: "community-avatar",
+          folder: community.id,
+        });
+
+        const url = getPublicURL({
+          path: data.path,
+          bucketName: "community-avatar",
+        });
+
+        if (url) avatarURL = url.publicUrl;
+      }
+
+      if (banner) {
+        // Resize and compress image
+        const buffer = await sharp(banner.buffer)
+          .jpeg({ quality: 80 })
+          .resize({ width: 1920, height: 1080, fit: "cover" })
+          .toBuffer();
+
+        banner.buffer = buffer;
+
+        const data = await uploadFile({
+          file: banner,
+          bucketName: "community-banner",
+          folder: community.id,
+        });
+
+        const url = getPublicURL({
+          path: data.path,
+          bucketName: "community-banner",
+        });
+
+        if (url) bannerURL = url.publicUrl;
+      }
+
+      const updatedCommunity = await updateCommunity({
+        id: community.id,
+        avatar: avatarURL,
+        banner: bannerURL,
+        includeParticipant: true,
+      });
+
+      console.log({ updatedCommunity });
+
       req.app.get("io").to(`communities:${id}`).emit("communitycreate");
 
       res.json({
         message: "Successfully created community",
-        community,
+        community: updatedCommunity,
       });
     } catch (err) {
       if (err instanceof PrismaClientKnownRequestError) {
