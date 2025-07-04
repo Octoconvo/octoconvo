@@ -222,14 +222,18 @@ const Community = ({ id }: { id: string | null }) => {
           " box-border bg-gr-black-1-b"
         }
       >
-        <h1
-          className={
-            "bg-pink-50 p-[32px] text-white-100 text-h6 font-bold" +
-            " bg-gr-black-1-l text-center"
-          }
-        >
-          {community ? unescapeString(community.name) : ""}
-        </h1>
+        <div>
+          <h1
+            className={
+              "bg-pink-50 p-[32px] text-white-100 text-h6 font-bold" +
+              " bg-gr-black-1-l text-center overflow-hidden text-ellipsis" +
+              " text-nowrap"
+            }
+          >
+            {community ? unescapeString(community.name) : ""}
+          </h1>
+        </div>
+
         <ul
           data-testid="cmmnty-msgs-ulst"
           ref={messageListRef}
