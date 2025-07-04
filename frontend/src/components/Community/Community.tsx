@@ -228,7 +228,7 @@ const Community = ({ id }: { id: string | null }) => {
             " bg-gr-black-1-l text-center"
           }
         >
-          {community ? community.name : ""}
+          {community ? unescapeString(community.name) : ""}
         </h1>
         <ul
           data-testid="cmmnty-msgs-ulst"
