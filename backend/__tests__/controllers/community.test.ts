@@ -774,7 +774,9 @@ describe("Test communities_explore_get", () => {
         ISOString;
 
       agent
-        .get(`/explore/communities?limit=20&cursor=${cursor}`)
+        .get(
+          `/explore/communities?name="seedcommunity"&limit=20&cursor=${cursor}`,
+        )
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
           const message = res.body.message;
