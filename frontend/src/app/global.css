@@ -323,6 +323,20 @@
       scale: 1;
     }
   }
+
+  @keyframes jumpy-zoom-in-s {
+    0% {
+      scale: 0.5;
+    }
+
+    90% {
+      scale: 1.05;
+    }
+
+    100% {
+      scale: 1;
+    }
+  }
 }
 
 :root {

@@ -70,6 +70,7 @@ export default {
       animation: {
         "slide-right": "300ms slide-right",
         "zoom-in": "300ms zoom-in",
+        "jumpy-zoom-in-s": "150ms jumpy-zoom-in-s",
       },
     },
   },
