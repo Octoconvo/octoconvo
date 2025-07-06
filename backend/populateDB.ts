@@ -36,7 +36,7 @@ const populateDB = async () => {
           const user = {
             username: `seeduser${i}`,
             displayName: `seeduser${i}`,
-            password: `seed@user${i}`,
+            password: `seed@User${i}`,
             community: `seedcommunity${i}`,
           };
 
