@@ -82,7 +82,7 @@ const communityValidation = {
 
     return true;
   }),
-  communityId: check("communityid").custom((val, { req }) => {
+  communityIdParam: check("communityid").custom((val, { req }) => {
     const communityId = req.params?.communityid;
 
     if (!isUUID(communityId)) {
@@ -135,7 +135,7 @@ const community_get = [
     message: "Failed to fetch community",
     errMessage: "You are not authenticated",
   }),
-  communityValidation.communityId,
+  communityValidation.communityIdParam,
   asyncHandler(async (req: Request, res: Response) => {
     const errors = validationResult(req);
 
