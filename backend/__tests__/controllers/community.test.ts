@@ -797,13 +797,19 @@ describe("Test communities_explore_get", () => {
 
         communities.map((community: CommunityData) => {
           if (community102) {
-            expect(Number(community._count.participants)).toBeLessThan(
+            expect(Number(community._count.participants)).toBeLessThanOrEqual(
               Number(community102?._count.participants),
             );
 
-            expect(
-              new Date(community.createdAt) < new Date(community102?.createdAt),
-            ).toBeTruthy();
+            if (
+              Number(community._count.participants) ===
+              Number(community102?._count.participants)
+            ) {
+              expect(
+                new Date(community.createdAt) <
+                  new Date(community102?.createdAt),
+              ).toBeTruthy();
+            }
           }
         });
       })
