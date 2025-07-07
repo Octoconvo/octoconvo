@@ -57,6 +57,7 @@ describe("Test message post controller", () => {
   };
   let community1: CommunityGET | null = null;
   let community2: CommunityGET | null = null;
+  let communityPending: CommunityGET | null = null;
 
   beforeAll(async () => {
     try {
@@ -77,6 +78,32 @@ describe("Test message post controller", () => {
           inbox: true,
         },
       })) as CommunityGET;
+
+      const pendingParticipant = await prisma.participant.findFirst({
+        where: {
+          user: {
+            username: "seeduser1",
+          },
+          status: "PENDING",
+          NOT: {
+            communityId: null,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      if (pendingParticipant && pendingParticipant.communityId) {
+        communityPending = (await prisma.community.findUnique({
+          where: {
+            id: pendingParticipant?.communityId,
+          },
+          include: {
+            inbox: true,
+          },
+        })) as CommunityGET;
+      }
     } catch (err) {
       console.error(err);
     }
@@ -345,6 +372,29 @@ describe("Test message post controller", () => {
       .expect(200)
       .end(done);
   });
+
+  test(
+    "Failed to create the message if the user participation status" +
+      " is still PENDING",
+    done => {
+      agent
+        .post("/message")
+        .set("Content-type", "multipart/form-data")
+        .accept("application/json")
+        .field("content", "testmessage1")
+        .field("inboxid", communityPending?.inbox.id || "")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to create message");
+          expect(error.message).toBe("You are not a member of this community");
+        })
+        .expect(403)
+        .end(done);
+    },
+  );
 });
 
 describe("Test messages get controller", () => {
