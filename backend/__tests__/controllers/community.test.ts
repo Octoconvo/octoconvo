@@ -333,12 +333,12 @@ describe("Test community post controller", () => {
   });
 });
 
-describe("Test Communities_get controller", () => {
+describe("Test Communities_get controller with seeduser1", () => {
   const agent = request.agent(app);
 
   login(agent, {
-    username: "client_user_1",
-    password: "Client_password_1",
+    username: "seeduser1",
+    password: "seed@User1",
   });
 
   test("Failed to fetch user's communities if user is unauthenticated", done => {
@@ -364,6 +364,96 @@ describe("Test Communities_get controller", () => {
 
         expect(message).toBe("Successfully fetched user's communities");
         expect(Array.isArray(communities)).toBeTruthy();
+      })
+      .expect(200, done);
+  });
+
+  test("The returned community list's length should be correct", done => {
+    agent
+      .get("/communities")
+      .expect("Content-Type", /json/)
+      .expect(async (res: Response) => {
+        const communities = res.body.communities;
+
+        const userActiveParticipation = await prisma.participant.findMany({
+          where: {
+            user: {
+              username: "seeduser1",
+            },
+            status: "ACTIVE",
+          },
+          include: {
+            user: true,
+          },
+        });
+
+        expect(communities.length).toBe(userActiveParticipation.length);
+      })
+      .expect(200, done);
+  });
+});
+
+describe("Test Communities_get controller with seeduser100", () => {
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser100",
+    password: "seed@User100",
+  });
+
+  test("The returned community list's length should be correct", done => {
+    agent
+      .get("/communities")
+      .expect("Content-Type", /json/)
+      .expect(async (res: Response) => {
+        const communities = res.body.communities;
+
+        const userActiveParticipation = await prisma.participant.findMany({
+          where: {
+            user: {
+              username: "seeduser100",
+            },
+            status: "ACTIVE",
+          },
+          include: {
+            user: true,
+          },
+        });
+
+        expect(communities.length).toBe(userActiveParticipation.length);
+      })
+      .expect(200, done);
+  });
+});
+
+describe("Test Communities_get controller with seeduser50", () => {
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser50",
+    password: "seed@User50",
+  });
+
+  test("The returned community list's length should be correct", done => {
+    agent
+      .get("/communities")
+      .expect("Content-Type", /json/)
+      .expect(async (res: Response) => {
+        const communities = res.body.communities;
+
+        const userActiveParticipation = await prisma.participant.findMany({
+          where: {
+            user: {
+              username: "seeduser50",
+            },
+            status: "ACTIVE",
+          },
+          include: {
+            user: true,
+          },
+        });
+
+        expect(communities.length).toBe(userActiveParticipation.length);
       })
       .expect(200, done);
   });
