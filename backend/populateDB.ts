@@ -136,14 +136,17 @@ const populateDB = async () => {
                   });
 
                   if (userData) {
+                    const status = (i + index) % 2 === 0 ? "PENDING" : "ACTIVE";
+
                     console.log(
                       `\x1b[36mAdding ${userData.username} as a ${community.name}'s` +
-                        " participant",
+                        ` ${status} participant`,
                     );
+
                     await prisma.participant.create({
                       data: {
                         role: "MEMBER",
-                        status: "ACTIVE",
+                        status: status,
                         communityId: community?.id,
                         userId: userData?.id,
                       },
