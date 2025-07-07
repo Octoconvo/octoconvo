@@ -56,7 +56,7 @@ const populateDB = async () => {
         return new Promise((resolve): void =>
           bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
             if (err) {
-              console.error(err);
+              if (err instanceof Error) console.log(err.message);
             }
 
             const userData: User = await prisma.user.create({
@@ -143,6 +143,7 @@ const populateDB = async () => {
                     await prisma.participant.create({
                       data: {
                         role: "MEMBER",
+                        status: "ACTIVE",
                         communityId: community?.id,
                         userId: userData?.id,
                       },
@@ -162,7 +163,7 @@ const populateDB = async () => {
 
     await createUserData();
   } catch (err) {
-    console.error(err);
+    if (err instanceof Error) console.log(err.message);
   } finally {
     console.log(`\x1b[36mFinished populating database...`);
   }
