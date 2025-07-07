@@ -171,6 +171,7 @@ const getCommunityByIdAndParticipant = async ({
       participants: {
         some: {
           userId: participantId,
+          status: "ACTIVE",
         },
       },
     },
