@@ -30,93 +30,113 @@ const unpopulateDB = async () => {
   await addUser();
 
   const deleteData = async ({ username }: { username: string }) => {
-    console.log(`\x1b[31mDeleting ${username} with its associated data`);
-    const user = await prisma.user.findUnique({
-      where: {
-        username: username,
-      },
-    });
-
-    if (user !== null) {
-      const communities = await prisma.community.findMany({
-        where: {
-          participants: {
-            some: {
-              AND: [{ userId: user?.id }, { role: "OWNER" }],
-            },
-          },
-        },
-        include: {
-          inbox: true,
-        },
-      });
-
-      // Delete communities and their related data
-
-      for (const community of communities) {
-        // eslint-disable-next-line
-        const cascadeDelete = async (community: any) => {
-          console.log(
-            `\x1b[31mDeleting ${community.name} and its related data`,
-          );
-
-          const deleteMessages = prisma.message.deleteMany({
-            where: {
-              inboxId: community.inbox?.id as string,
-            },
-          });
-
-          const deleteParticipants = prisma.participant.deleteMany({
-            where: {
-              communityId: community.id,
-            },
-          });
-
-          const deleteInbox = prisma.inbox.deleteMany({
-            where: {
-              communityId: community.id,
-            },
-          });
-
-          const deleteCommunity = prisma.community.deleteMany({
-            where: {
-              id: community.id,
-            },
-          });
-
-          await prisma.$transaction([
-            deleteMessages,
-            deleteParticipants,
-            deleteInbox,
-            deleteCommunity,
-          ]);
-        };
-
-        await cascadeDelete(community);
-        console.log(`\x1b[31mFinished deleting ${community.name}`);
-      }
-
-      // Delete user
-
-      console.log(`\x1b[31mDeleting ${username}`);
-
-      await prisma.user.delete({
+    try {
+      console.log(`\x1b[33mDeleting ${username}'s associated data`);
+      const user = await prisma.user.findUnique({
         where: {
           username: username,
         },
       });
 
-      console.log(`\x1b[31mFinished deleting ${username}`);
-    } else {
-      console.log(`\x1b[33m${username} doesn't exist`);
+      if (user !== null) {
+        const communities = await prisma.community.findMany({
+          where: {
+            participants: {
+              some: {
+                AND: [{ userId: user?.id }, { role: "OWNER" }],
+              },
+            },
+          },
+          include: {
+            inbox: true,
+          },
+        });
+
+        // Delete communities and their related data
+
+        for (const community of communities) {
+          // eslint-disable-next-line
+          const cascadeDelete = async (community: any) => {
+            console.log(
+              `\x1b[33mDeleting ${community.name} and its related data`,
+            );
+
+            const deleteMessages = prisma.message.deleteMany({
+              where: {
+                inboxId: community.inbox?.id as string,
+              },
+            });
+
+            const deleteParticipants = prisma.participant.deleteMany({
+              where: {
+                communityId: community.id,
+              },
+            });
+
+            const deleteInbox = prisma.inbox.deleteMany({
+              where: {
+                communityId: community.id,
+              },
+            });
+
+            const deleteCommunity = prisma.community.deleteMany({
+              where: {
+                id: community.id,
+              },
+            });
+
+            await prisma.$transaction([
+              deleteMessages,
+              deleteParticipants,
+              deleteInbox,
+              deleteCommunity,
+            ]);
+          };
+
+          await cascadeDelete(community);
+          console.log(
+            `\x1b[33mFinished deleting ${community.name}'s` +
+              " associated community",
+          );
+        }
+      } else {
+        console.log(`\x1b[31m${username} doesn't exist`);
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
     }
   };
 
-  for (const data of seedData) {
-    try {
-      await deleteData({ username: data.username });
-    } catch (err) {
-      console.error(err);
+  const deleteUser = async ({ username }: { username: string }) => {
+    console.log(`\x1b[31mDeleting user ${username}.`);
+
+    await prisma.user.delete({
+      where: {
+        username: username,
+      },
+    });
+  };
+
+  const deleteCommunityData = seedData.map(async data => {
+    return new Promise(resolve => {
+      (async () => {
+        await deleteData({ username: data.username });
+        resolve(1);
+      })();
+    });
+  });
+
+  try {
+    await Promise.all(deleteCommunityData);
+
+    for (const data of seedData) {
+      await deleteUser({ username: data.username });
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      console.log(err.message);
     }
   }
 };
