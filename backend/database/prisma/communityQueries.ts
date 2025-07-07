@@ -124,15 +124,33 @@ const updateCommunity = async ({
 };
 
 const getUserCommunities = async ({ userId }: { userId: string }) => {
+  const participants = await prisma.participant.findMany({
+    where: {
+      userId: userId,
+      status: "ACTIVE",
+    },
+  });
+
+  const communityQuery: { id: string }[] = [];
+
+  const createCommunityQuery = participants.map(participant => {
+    return new Promise(resolve => {
+      if (participant.communityId) {
+        communityQuery.push({ id: participant.communityId });
+      }
+
+      resolve(participant.communityId);
+    });
+  });
+
+  await Promise.all(createCommunityQuery);
+
   const communities = await prisma.community.findMany({
     where: {
-      participants: {
-        every: {
-          userId: userId,
-        },
-      },
+      OR: communityQuery,
     },
     include: {
+      participants: true,
       inbox: true,
     },
   });
