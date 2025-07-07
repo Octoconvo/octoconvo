@@ -403,6 +403,7 @@ describe("Test messages get controller", () => {
   };
   let community1: CommunityGET | null = null;
   let community2: CommunityGET | null = null;
+  let communityPending: CommunityGET | null = null;
   let messages1: Message[] = [];
 
   beforeAll(async () => {
@@ -431,6 +432,32 @@ describe("Test messages get controller", () => {
         },
         orderBy: [{ createdAt: "asc" }, { id: "asc" }],
       });
+
+      const pendingParticipant = await prisma.participant.findFirst({
+        where: {
+          user: {
+            username: "seeduser1",
+          },
+          status: "PENDING",
+          NOT: {
+            communityId: null,
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      if (pendingParticipant && pendingParticipant.communityId) {
+        communityPending = (await prisma.community.findUnique({
+          where: {
+            id: pendingParticipant?.communityId,
+          },
+          include: {
+            inbox: true,
+          },
+        })) as CommunityGET;
+      }
     } catch (err) {
       console.error(err);
     }
@@ -552,6 +579,21 @@ describe("Test messages get controller", () => {
   test("Return 403 error when user is not authorized to access the inbox", done => {
     agent
       .get(`/inbox/${community2?.inbox.id}/messages`)
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch messages",
+        error: {
+          message: "You are not a member of this community",
+        },
+      })
+      .expect(403)
+      .end(done);
+  });
+
+  test("Return 403 error when user participation status is PENDING", done => {
+    agent
+      .get(`/inbox/${communityPending?.inbox.id}/messages`)
       .type("form")
       .expect("Content-Type", /json/)
       .expect({
