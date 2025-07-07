@@ -208,6 +208,7 @@ const searchCommunities = async ({
       CAST((
         SELECT COUNT(*) FROM "Participant" 
         WHERE "Participant"."communityId" = "Community"."id"
+        AND "Participant"."status" = 'ACTIVE'
         ) AS INT
       ) AS participants
     FROM "Community" 
