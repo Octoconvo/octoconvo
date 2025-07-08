@@ -887,3 +887,156 @@ describe("Test communities_explore_get", () => {
     },
   );
 });
+
+describe("Test community_participation_status_get", () => {
+  type CommunityData = Community & {
+    inbox: Inbox;
+  };
+  let communityPending: CommunityData | null = null;
+  let communityActive: CommunityData | null = null;
+  let communityNone: CommunityData | null = null;
+
+  beforeAll(async () => {
+    try {
+      const participantPending = await prisma.participant.findFirst({
+        where: {
+          user: {
+            username: "seeduser1",
+          },
+          status: "PENDING",
+        },
+      });
+
+      const participantActive = await prisma.participant.findFirst({
+        where: {
+          user: {
+            username: "seeduser1",
+          },
+          status: "ACTIVE",
+        },
+      });
+
+      if (participantPending && participantPending.communityId) {
+        communityPending = (await prisma.community.findUnique({
+          where: {
+            id: participantPending.communityId,
+          },
+          include: {
+            inbox: true,
+          },
+        })) as CommunityData;
+      }
+
+      if (participantActive && participantActive.communityId) {
+        communityActive = (await prisma.community.findUnique({
+          where: {
+            id: participantActive.communityId,
+          },
+          include: {
+            inbox: true,
+          },
+        })) as CommunityData;
+      }
+
+      communityNone = (await prisma.community.findFirst({
+        where: {
+          participants: {
+            every: {
+              NOT: {
+                user: {
+                  username: "seeduser1",
+                },
+              },
+            },
+          },
+        },
+        include: {
+          inbox: true,
+        },
+      })) as CommunityData;
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser1",
+    password: "seed@User1",
+  });
+
+  test(
+    "Failed to fetch participation status if user is" + " unauthenticated",
+    done => {
+      request(app)
+        .get(`/community/${communityPending?.id}/participation-status`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to fetch your community participation status",
+          error: {
+            message: "You are not authenticated",
+          },
+        })
+        .expect(401, done);
+    },
+  );
+
+  test("Failed to fetch participation status if the community doesn't exist", done => {
+    agent
+      .get(`/community/${communityActive?.inbox.id}/participation-status`)
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch your community participation status",
+        error: {
+          message: "Community with that id doesn't exist",
+        },
+      })
+      .expect(404, done);
+  });
+
+  test(
+    "Return PENDING participation status when user is" +
+      " a PENDIND participant",
+    done => {
+      agent
+        .get(`/community/${communityPending?.id}/participation-status`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Successfully fetched your community participation status",
+          participationStatus: "PENDING",
+        })
+        .expect(200, done);
+    },
+  );
+
+  test(
+    "Return ACTIVE participation status when user is" +
+      " an ACTIVE participant",
+    done => {
+      agent
+        .get(`/community/${communityActive?.id}/participation-status`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Successfully fetched your community participation status",
+          participationStatus: "ACTIVE",
+        })
+        .expect(200, done);
+    },
+  );
+
+  test(
+    "Return NONE participation status when user is" +
+      " an is not a participant of the community",
+    done => {
+      agent
+        .get(`/community/${communityNone?.id}/participation-status`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Successfully fetched your community participation status",
+          participationStatus: "NONE",
+        })
+        .expect(200, done);
+    },
+  );
+});

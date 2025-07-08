@@ -54,6 +54,10 @@ app.post("/profile/:id", profileController.user_profile_post);
 app.get("/communities", communityController.communities_get);
 app.get("/community/:communityid", communityController.community_get);
 app.post("/community", communityController.community_post);
+app.get(
+  "/community/:communityid/participation-status",
+  communityController.community_participation_status_get,
+);
 
 app.post("/message", messageController.message_post);
 app.get("/inbox/:inboxid/messages", messageController.messages_get);
