@@ -17,6 +17,7 @@ import sharp from "sharp";
 import { getPublicURL, uploadFile } from "../database/supabase/supabaseQueries";
 import multer from "multer";
 import { isUUID, isISOString } from "../utils/validation";
+import { getCommunityParticipant } from "../database/prisma/participantQueries";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -375,9 +376,65 @@ const communities_explore_get = [
   }),
 ];
 
+const community_participation_status_get = [
+  createAuthenticationHandler({
+    message: "Failed to fetch your community participation status",
+    errMessage: "You are not authenticated",
+  }),
+  communityValidation.communityIdParam,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(
+        errors,
+        "Failed to fetch your community participation status",
+      );
+
+      res.status(422).json(obj);
+      return;
+    }
+
+    const userId = req.user?.id as string;
+    const communityId = req.params.communityid;
+
+    console.log({
+      communityId,
+    });
+
+    const community = await getCommunityById(communityId);
+
+    if (community === null) {
+      res.status(404).json({
+        message: "Failed to fetch your community participation status",
+        error: {
+          message: "Community with that id doesn't exist",
+        },
+      });
+
+      return;
+    }
+
+    // Check if user participant object already exists in the community
+
+    const participant = await getCommunityParticipant({
+      userId: userId,
+      communityId: communityId,
+    });
+
+    const participationStatus = participant ? participant.status : "NONE";
+
+    res.json({
+      message: "Successfully fetched your community participation status",
+      participationStatus: participationStatus,
+    });
+  }),
+];
+
 export {
   community_get,
   community_post,
   communities_get,
   communities_explore_get,
+  community_participation_status_get,
 };
