@@ -5,6 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { CommunityExploreGET } from "@/types/response";
 import CommunityBox from "./CommunityBox";
 import { SearchBarForm } from "@/types/form";
+import CommunityModal from "./CommunityModal";
+import { ActiveExploreCommunity } from "@/contexts/community";
 
 const ExplorePage = () => {
   const [featuredData, setFeaturedData] = useState<
@@ -16,6 +18,8 @@ const ExplorePage = () => {
   const [view, setView] = useState<"COMMUNITY" | "USER" | "DEFAULT">("DEFAULT");
   const [currentQuery, setCurrentQuery] = useState<string>("");
   const [nextCursor, setNextCursor] = useState<string | false>(false);
+  const [activeCommunity, setActiveCommunity] =
+    useState<null | CommunityExploreGET>(null);
 
   useEffect(() => {
     const fetchFeaturedData = async () => {
@@ -80,66 +84,74 @@ const ExplorePage = () => {
 
   return (
     <>
-      <SearchBar
-        onSubmitFn={(data: SearchBarForm) => {
-          setView("COMMUNITY");
-          setCurrentQuery(data.name);
-        }}
-        onSuccessFn={onSuccessFn}
-        onResetFn={() => {
-          setView("DEFAULT");
-          setCommunityData(null);
-          setCurrentQuery("");
-        }}
-      />
-      {view === "DEFAULT" && (
-        <CommunityBox infiniteScrollData={false} Communities={featuredData} />
-      )}
-      {view !== "DEFAULT" && (
-        <nav
-          data-testid="explr-pg-nav"
-          className="flex bg-gr-black-1-b self-start p-[8px] gap-[16px]"
-        >
-          <button
-            data-testid="explr-pg-cmmnty-btn"
-            onClick={() => {
-              setView("COMMUNITY");
-            }}
-            className={
-              "px-[16px] py-[8px] rounded-[4px]" +
-              (view === "COMMUNITY"
-                ? " bg-brand-1-2 hover:bg-brand-1"
-                : " bg-grey-100 hover:bg-black-500")
-            }
+      <ActiveExploreCommunity value={{ activeCommunity, setActiveCommunity }}>
+        <SearchBar
+          onSubmitFn={(data: SearchBarForm) => {
+            setView("COMMUNITY");
+            setCurrentQuery(data.name);
+          }}
+          onSuccessFn={onSuccessFn}
+          onResetFn={() => {
+            setView("DEFAULT");
+            setCommunityData(null);
+            setCurrentQuery("");
+          }}
+        />
+        {view === "DEFAULT" && (
+          <CommunityBox infiniteScrollData={false} Communities={featuredData} />
+        )}
+        {view !== "DEFAULT" && (
+          <nav
+            data-testid="explr-pg-nav"
+            className="flex bg-gr-black-1-b self-start p-[8px] gap-[16px]"
           >
-            Community
-          </button>
-          <button
-            data-testid="explr-pg-usr-btn"
-            onClick={() => {
-              setView("USER");
-            }}
-            className={
-              "px-[16px] py-[8px] rounded-[4px]" +
-              (view === "USER"
-                ? " bg-brand-1-2 hover:bg-brand-1"
-                : " bg-grey-100 hover:bg-black-500")
-            }
-          >
-            User
-          </button>
-        </nav>
-      )}
-      {view === "COMMUNITY" &&
-        communityData &&
-        (communityData.length > 0 ? (
-          <CommunityBox
-            Communities={communityData}
-            infiniteScrollData={{ nextCursor, currentQuery, updateData }}
+            <button
+              data-testid="explr-pg-cmmnty-btn"
+              onClick={() => {
+                setView("COMMUNITY");
+              }}
+              className={
+                "px-[16px] py-[8px] rounded-[4px]" +
+                (view === "COMMUNITY"
+                  ? " bg-brand-1-2 hover:bg-brand-1"
+                  : " bg-grey-100 hover:bg-black-500")
+              }
+            >
+              Community
+            </button>
+            <button
+              data-testid="explr-pg-usr-btn"
+              onClick={() => {
+                setView("USER");
+              }}
+              className={
+                "px-[16px] py-[8px] rounded-[4px]" +
+                (view === "USER"
+                  ? " bg-brand-1-2 hover:bg-brand-1"
+                  : " bg-grey-100 hover:bg-black-500")
+              }
+            >
+              User
+            </button>
+          </nav>
+        )}
+        {view === "COMMUNITY" &&
+          communityData &&
+          (communityData.length > 0 ? (
+            <CommunityBox
+              Communities={communityData}
+              infiniteScrollData={{ nextCursor, currentQuery, updateData }}
+            />
+          ) : (
+            "No Data found"
+          ))}
+        {activeCommunity && (
+          <CommunityModal
+            community={activeCommunity}
+            onCloseFn={() => setActiveCommunity(null)}
           />
-        ) : (
-          "No Data found"
-        ))}
+        )}
+      </ActiveExploreCommunity>
     </>
   );
 };
