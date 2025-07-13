@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CommunityExploreGET } from "@/types/response";
+import { ActiveExploreCommunity } from "@/contexts/community";
 
 const community1: CommunityExploreGET = {
   id: "testid1",
@@ -17,6 +18,8 @@ const community1: CommunityExploreGET = {
   createdAt: "testcreatedat1",
   updatedAt: "testupdatedat1",
 };
+
+const setActiveCommunityMock = jest.fn();
 
 describe("Render CommunityItem", () => {
   const user = userEvent.setup();
@@ -46,5 +49,31 @@ describe("Render CommunityItem", () => {
       "cmmnty-itm-prtcpnts"
     ) as HTMLParagraphElement;
     expect(participantInfo.textContent).toBe("2 members");
+  });
+
+  test("Call setActiveCommunity when clicking the community item", async () => {
+    render(
+      <ActiveExploreCommunity
+        value={{
+          activeCommunity: null,
+          setActiveCommunity: setActiveCommunityMock,
+        }}
+      >
+        <CommunityItem
+          community={{
+            ...community1,
+            _count: {
+              participants: 2,
+            },
+          }}
+        />
+      </ActiveExploreCommunity>
+    );
+
+    const communityItemBtn = screen.getByTestId("xplr-cmmnty-itm-btn");
+
+    await user.click(communityItemBtn);
+
+    expect(setActiveCommunityMock).toHaveBeenCalledTimes(1);
   });
 });
