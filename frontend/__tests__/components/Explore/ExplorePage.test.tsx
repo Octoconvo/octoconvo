@@ -14,8 +14,8 @@ const community1: CommunityExploreGET = {
   avatar: "testavatar1",
   banner: "testbanner1",
   isDeleted: false,
-  createdAt: "testcreatedat1",
-  updatedAt: "testupdatedat1",
+  createdAt: "2025-03-12T20:09:55.245Z",
+  updatedAt: "2025-03-12T20:09:55.245Z",
 };
 
 global.fetch = jest.fn().mockImplementation(
@@ -107,5 +107,46 @@ describe("Render ExplorePage", () => {
     const resetQueryBtn = screen.getByTestId("srchbr-rst-qry-btn");
     await user.click(resetQueryBtn);
     expect(screen.queryByTestId("explr-pg-cmmnty-btn")).not.toBeInTheDocument();
+  });
+
+  test("Don't render community modal when the active community is null", async () => {
+    const communityModalContainer = screen.queryByTestId(
+      "xplr-cmmnty-mdl-cntnr"
+    );
+
+    expect(communityModalContainer).not.toBeInTheDocument();
+  });
+
+  test("render community modal when the active community is not null", async () => {
+    const communityItemBtns = screen.getAllByTestId("xplr-cmmnty-itm-btn");
+
+    expect(communityItemBtns.length).toBeGreaterThan(0);
+
+    await user.click(communityItemBtns[0]);
+
+    const communityModalContainer = screen.queryByTestId(
+      "xplr-cmmnty-mdl-cntnr"
+    );
+
+    expect(communityModalContainer).toBeInTheDocument();
+  });
+
+  test("close community modal after clicking the Escape key", async () => {
+    const communityItemBtns = screen.getAllByTestId("xplr-cmmnty-itm-btn");
+
+    expect(communityItemBtns.length).toBeGreaterThan(0);
+
+    await user.click(communityItemBtns[0]);
+
+    const communityModalContainer = screen.queryByTestId(
+      "xplr-cmmnty-mdl-cntnr"
+    );
+
+    expect(communityModalContainer).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(
+      screen.queryByTestId("xplr-cmmnty-mdl-cntnr")
+    ).not.toBeInTheDocument();
   });
 });
