@@ -12,7 +12,8 @@
     "populate": "ts-node populateDB.ts",
     "unpopulate": "ts-node unpopulateDB.ts",
     "populateClient": "ts-node clientPopulateDB.ts",
-    "unpopulateClient": "ts-node clientUnpopulateDB.ts"
+    "unpopulateClient": "ts-node clientUnpopulateDB.ts",
+    "data-migration:add-community-participantsCount-column": "ts-node ./prisma/migrations/20250714160939_add_community_participants_count_column/data-migration.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.3.1",
