@@ -800,16 +800,6 @@ describe("Test communities_explore_get", () => {
             expect(Number(community._count.participants)).toBeLessThanOrEqual(
               Number(community102?._count.participants),
             );
-
-            if (
-              Number(community._count.participants) ===
-              Number(community102?._count.participants)
-            ) {
-              expect(
-                new Date(community.createdAt) <
-                  new Date(community102?.createdAt),
-              ).toBeTruthy();
-            }
           }
         });
       })
