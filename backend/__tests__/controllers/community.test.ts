@@ -106,8 +106,8 @@ describe("Test community post controller", () => {
   const agent = request.agent(app);
 
   login(agent, {
-    username: "client_user_1",
-    password: "Client_password_1",
+    username: "seeduser1",
+    password: "seed@User1",
   });
 
   test("Return 422 response when name field is empty", done => {
@@ -482,8 +482,8 @@ describe("Test community_get controller", () => {
   const agent = request.agent(app);
 
   login(agent, {
-    username: "client_user_1",
-    password: "Client_password_1",
+    username: "seeduser1",
+    password: "seed@User1",
   });
 
   test("Failed to fetch community if user is unauthenticated", done => {
@@ -594,8 +594,8 @@ describe("Test communities_explore_get", () => {
   const agent = request.agent(app);
 
   login(agent, {
-    username: "client_user_1",
-    password: "Client_password_1",
+    username: "seeduser1",
+    password: "seed@User1",
   });
 
   test("Failed to fetch communities if user is unauthenticated", done => {

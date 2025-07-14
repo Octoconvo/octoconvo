@@ -1,6 +1,8 @@
 import request, { Response } from "supertest";
 import app from "../../config/testConfig";
 import { login } from "../../utils/testUtils";
+import { User } from "@prisma/client";
+import prisma from "../../database/prisma/client";
 
 jest.mock("../../database/supabase/supabaseQueries", () => ({
   uploadFile: async ({
@@ -54,9 +56,19 @@ jest.mock("../../database/supabase/supabaseQueries", () => ({
 }));
 
 describe("Test user profile get controller", () => {
+  let seedUser1: null | User = null;
+
+  beforeAll(async () => {
+    seedUser1 = await prisma.user.findUnique({
+      where: {
+        username: "seeduser1",
+      },
+    });
+  });
+
   test("Return user profile date if user exists", done => {
     request(app)
-      .get("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
+      .get(`/profile/${seedUser1?.id}`)
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
@@ -64,7 +76,7 @@ describe("Test user profile get controller", () => {
 
         expect(message).toBe("Successfully retrieved user profile");
         expect(userProfile).toBeDefined();
-        expect(userProfile.id).toBe("513c920c-3921-48b2-88d7-5b8156b9e6b8");
+        expect(userProfile.id).toBe(seedUser1?.id);
       })
       .expect(200, done);
   });
@@ -84,9 +96,19 @@ describe("Test user profile get controller", () => {
 });
 
 describe("Test user profile post controller", () => {
+  let seedUser1: null | User = null;
+
+  beforeAll(async () => {
+    seedUser1 = await prisma.user.findUnique({
+      where: {
+        username: "seeduser1",
+      },
+    });
+  });
+
   test("Return 401 unauthorized if user tries to update profile without being unauthenticated", done => {
     request(app)
-      .post("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
+      .post(`/profile/${seedUser1?.id}`)
       .type("form")
       .send({
         username: "test_user_up",
@@ -106,8 +128,8 @@ describe("Test user profile post controller", () => {
   const agent = request.agent(app);
 
   login(agent, {
-    username: "client_user_1",
-    password: "Client_password_1",
+    username: "seeduser1",
+    password: "seed@User1",
   });
 
   test("Return 404 response if user doesn't exist", done => {
@@ -126,7 +148,7 @@ describe("Test user profile post controller", () => {
 
   test("Failed to update avatar if image mimetype is invalid", done => {
     agent
-      .post("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
+      .post(`/profile/${seedUser1?.id}`)
       .attach("avatar", __dirname + "/../assets/test-img-invalid-01.svg")
       .expect("Content-type", /json/)
       .expect((res: Response) => {
@@ -145,7 +167,7 @@ describe("Test user profile post controller", () => {
 
   test("Successfully update data when user is authorized to edit profile", done => {
     agent
-      .post("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
+      .post(`/profile/${seedUser1?.id}`)
       .send({
         displayname: "test_user_up",
         bio: "This is the new bio.",
@@ -166,7 +188,7 @@ describe("Test user profile post controller", () => {
 
   test("Successfully update displayname if user is authorized to edit profile", done => {
     agent
-      .post("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
+      .post(`/profile/${seedUser1?.id}`)
       .send({
         displayname: "test_user_1",
       })
@@ -185,7 +207,7 @@ describe("Test user profile post controller", () => {
 
   test("Successfully update avatar if image mimetype is valid", done => {
     agent
-      .post("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
+      .post(`/profile/${seedUser1?.id}`)
       .attach("avatar", __dirname + "/../assets/test-img-valid-01.jpg")
       .expect("Content-type", /json/)
       .expect((res: Response) => {
@@ -208,7 +230,7 @@ describe("Test user profile post controller", () => {
 
   test("Successfully update banner if image mimetype is valid", done => {
     agent
-      .post("/profile/513c920c-3921-48b2-88d7-5b8156b9e6b8")
+      .post(`/profile/${seedUser1?.id}`)
       .attach("banner", __dirname + "/../assets/test-img-valid-01.jpg")
       .expect("Content-type", /json/)
       .expect((res: Response) => {

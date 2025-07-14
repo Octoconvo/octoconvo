@@ -8,7 +8,7 @@ import { login } from "../../utils/testUtils";
 
 describe("Test user signup using local strategy", () => {
   afterAll(async () => {
-    await deleteUserByUsername("test_user_1");
+    await deleteUserByUsername("testuser1");
   });
 
   test("Successfully create an account if all fields passed the validation", done => {
@@ -16,15 +16,15 @@ describe("Test user signup using local strategy", () => {
       .post("/account/signup")
       .type("form")
       .send({
-        username: "test_user_1",
-        password: "test_A1_",
+        username: "testuser1",
+        password: "test@User1",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
         const user = res.body.user;
         const message = res.body.message;
 
-        expect(message).toEqual("Successfully signed up as test_user_1");
+        expect(message).toEqual("Successfully signed up as testuser1");
         expect(user.id).toBeTruthy();
       })
       .expect(200, done);
@@ -35,8 +35,8 @@ describe("Test user signup using local strategy", () => {
       .post("/account/signup")
       .type("form")
       .send({
-        username: "test_user_1",
-        password: "test_password_1",
+        username: "testuser1",
+        password: "test@User1",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
@@ -45,7 +45,7 @@ describe("Test user signup using local strategy", () => {
         expect(message).toEqual("Failed to create a new account");
         expect(error.validationError[0]).toStrictEqual({
           field: "username",
-          value: "test_user_1",
+          value: "testuser1",
           msg: "Username is already taken",
         });
       })
@@ -58,7 +58,7 @@ describe("Test user signup using local strategy", () => {
       .type("form")
       .send({
         username: "Thisisareallylongstringcharactertotestlongstringusername",
-        password: "test_password_1",
+        password: "test@User1",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
@@ -77,8 +77,8 @@ describe("Test user signup using local strategy", () => {
       .post("/account/signup")
       .type("form")
       .send({
-        username: "hi.hi",
-        password: "test_password_1",
+        username: "testuser.1",
+        password: "test@User1",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
@@ -97,7 +97,7 @@ describe("Test user signup using local strategy", () => {
       .post("/account/signup")
       .type("form")
       .send({
-        username: "test_user_2",
+        username: "testuser2",
         password: "123",
       })
       .expect("Content-Type", /json/)
@@ -120,8 +120,8 @@ describe("Test user signup using local strategy", () => {
         .post("/account/signup")
         .type("form")
         .send({
-          username: "test_user_2",
-          password: "Test_user",
+          username: "testuser2",
+          password: "Test@user",
         })
         .expect("Content-Type", /json/)
         .expect(res => {
@@ -158,8 +158,8 @@ describe("Test user login get", () => {
   const agent: TestAgent = request.agent(app);
 
   login(agent, {
-    username: "client_user_1",
-    password: "Client_password_1",
+    username: "seeduser1",
+    password: "seed@User1",
   });
 
   test("Return json object with user id if user is authenticated", done => {
@@ -184,8 +184,8 @@ describe("Test user login using local strategy", () => {
       .post("/account/login")
       .type("form")
       .send({
-        username: "failed.",
-        password: "Test_password_123",
+        username: "testuser1.",
+        password: "test@User1",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
@@ -206,7 +206,7 @@ describe("Test user login using local strategy", () => {
       .type("form")
       .send({
         username: "This_user_doesn_t_exist",
-        password: "Test_password_123",
+        password: "test@User1",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
@@ -224,8 +224,8 @@ describe("Test user login using local strategy", () => {
       .post("/account/login")
       .type("form")
       .send({
-        username: "client_user_1",
-        password: "Test_password_1",
+        username: "seeduser1",
+        password: "seed@User2",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
@@ -243,8 +243,8 @@ describe("Test user login using local strategy", () => {
       .post("/account/login")
       .type("form")
       .send({
-        username: "client_user_1",
-        password: "Client_password_1",
+        username: "seeduser1",
+        password: "seed@User1",
       })
       .expect("Content-Type", /json/)
       .expect(res => {
@@ -262,8 +262,8 @@ describe("Test logout get controller", () => {
   const agent = request.agent(app);
 
   login(agent, {
-    username: "client_user_1",
-    password: "Client_password_1",
+    username: "seeduser1",
+    password: "seed@User1",
   });
 
   test("Successfully logged out if user is authenticated", done => {
