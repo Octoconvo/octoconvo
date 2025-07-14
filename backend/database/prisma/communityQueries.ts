@@ -204,31 +204,27 @@ const searchCommunities = async ({
   };
 
   const communities: CommunityDataRaw[] = await prisma.$queryRaw`
-    SELECT * FROM (
-      SELECT *, 
-      CAST((
-        SELECT COUNT(*) FROM "Participant" 
-        WHERE "Participant"."communityId" = "Community"."id"
-        AND "Participant"."status" = 'ACTIVE'
-        ) AS INT
-      ) AS participants
-    FROM "Community" 
+    SELECT * FROM "Community" 
     WHERE
-      (CASE WHEN ${nameQuery} = '' THEN "Community"."id" = "Community"."id"
-      ELSE UPPER("Community"."name") LIKE UPPER(${nameQuery})
+      (
+        CASE WHEN ${nameQuery} = '' THEN "Community"."id" = "Community"."id"
+        ELSE UPPER("Community"."name") LIKE UPPER(${nameQuery})
+        END
+      ) 
+      AND
+      (
+        CASE WHEN ${cursorQuery} = 'FALSE' THEN "id" = "id"
+        ELSE
+        (
+          "participantsCount" <= CAST(${memberCountQuery} AS INT) 
+          AND "createdAt" >= CAST(${createdAtQuerry} AS Date) 
+          AND NOT "id" = ${idQuery}
+        )
       END) 
     ORDER BY 
-      participants DESC
+       "Community"."participantsCount" DESC
       , "Community"."createdAt" ASC
       , "Community"."id" DESC
-    )
-    WHERE 
-      (CASE WHEN ${cursorQuery} = 'FALSE' THEN "id" = "id"
-      ELSE (
-      "participants" <= CAST(${memberCountQuery} AS INT) 
-      AND "createdAt" >= CAST(${createdAtQuerry} AS Date) 
-      AND NOT "id" = ${idQuery})
-      END) 
     LIMIT ${limit}`;
 
   type CommunityData = Community & {
@@ -242,7 +238,7 @@ const searchCommunities = async ({
       const updatedCommunity = {
         ...community,
         _count: {
-          participants: community.participants as number,
+          participants: community.participantsCount as number,
         },
       };
       delete updatedCommunity["participants"];
