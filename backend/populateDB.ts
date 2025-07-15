@@ -14,25 +14,12 @@ const populateDB = async () => {
       displayName: string;
       password: string;
       community: string;
-    }[] = [
-      {
-        username: "seeduser1",
-        displayName: "seeduser1",
-        password: "seed@User1",
-        community: "seedcommunity1",
-      },
-      {
-        username: "seeduser2",
-        displayName: "seeduser2",
-        password: "seed@User2",
-        community: "seedcommunity2",
-      },
-    ];
+    }[] = [];
 
     // Create another 100 users
     const addUser = async () => {
       const pushUser = new Promise(resolve => {
-        for (let i = 3; i < 103; i++) {
+        for (let i = 1; i <= 1000; i++) {
           const user = {
             username: `seeduser${i}`,
             displayName: `seeduser${i}`,
@@ -118,7 +105,7 @@ const populateDB = async () => {
 
       const joinCommunity = async () => {
         users.map(async (user, index) => {
-          if (index > 1) {
+          if (index > 1 && index <= users.length / 2) {
             console.log(`\x1b[36mAdding participants to ${user.community}`);
             const community = await prisma.community.findUnique({
               where: {
@@ -143,7 +130,7 @@ const populateDB = async () => {
                         ` ${status} participant`,
                     );
 
-                    await prisma.participant.create({
+                    const addParticipant = prisma.participant.create({
                       data: {
                         role: "MEMBER",
                         status: status,
@@ -151,6 +138,22 @@ const populateDB = async () => {
                         userId: userData?.id,
                       },
                     });
+
+                    const incrementParticipantsCount = prisma.community.update({
+                      where: {
+                        id: community.id,
+                      },
+                      data: {
+                        participantsCount: {
+                          increment: status === "ACTIVE" ? 1 : 0,
+                        },
+                      },
+                    });
+
+                    prisma.$transaction([
+                      addParticipant,
+                      incrementParticipantsCount,
+                    ]);
                   }
                 }
               }

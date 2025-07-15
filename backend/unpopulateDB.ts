@@ -2,18 +2,13 @@
 import prisma from "./database/prisma/client";
 
 const unpopulateDB = async () => {
-  const seedData = [
-    {
-      username: "seeduser1",
-    },
-    {
-      username: "seeduser2",
-    },
-  ];
+  const seedData: {
+    username: string;
+  }[] = [];
 
   const addUser = async () => {
     const pushUser = new Promise(resolve => {
-      for (let i = 3; i < 103; i++) {
+      for (let i = 1; i <= 1000; i++) {
         const user = {
           username: `seeduser${i}`,
         };
