@@ -66,6 +66,7 @@ const populateDB = async () => {
                     inboxType: "COMMUNITY",
                   },
                 },
+                participantsCount: 1,
                 participants: {
                   create: {
                     userId: userData.id,
