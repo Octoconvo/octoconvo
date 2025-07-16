@@ -216,15 +216,29 @@ const searchCommunities = async ({
         CASE WHEN ${cursorQuery} = 'FALSE' THEN "id" = "id"
         ELSE
         (
-          "participantsCount" <= CAST(${memberCountQuery} AS INT) 
-          AND "createdAt" >= CAST(${createdAtQuerry} AS Date) 
-          AND NOT "id" = ${idQuery}
-        )
+          (
+              "participantsCount" < CAST(${memberCountQuery} AS INT) 
+            OR
+            (
+              "participantsCount" = CAST(${memberCountQuery} AS INT) 
+              AND
+              (
+                "createdAt" < CAST(${createdAtQuerry} AS Date)
+              OR 
+                (
+                  "createdAt" = CAST(${createdAtQuerry} AS Date)
+                    AND
+                  "id" < ${idQuery} 
+                )
+              )
+            )
+          )
+        ) 
       END) 
     ORDER BY 
-       "Community"."participantsCount" DESC
-      , "Community"."createdAt" ASC
-      , "Community"."id" DESC
+      "Community"."participantsCount" DESC
+      ,"Community"."createdAt" DESC
+      ,"Community"."id" DESC
     LIMIT ${limit}`;
 
   type CommunityData = Community & {
