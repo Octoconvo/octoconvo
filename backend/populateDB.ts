@@ -104,9 +104,15 @@ const populateDB = async () => {
 
       await Promise.all(createData);
 
-      const joinCommunity = async () => {
+      const joinCommunity = async ({
+        start,
+        end,
+      }: {
+        start: number;
+        end: number;
+      }) => {
         users.map(async (user, index) => {
-          if (index > 1 && index <= users.length / 2) {
+          if (index > start && index <= end) {
             console.log(`\x1b[36mAdding participants to ${user.community}`);
             const community = await prisma.community.findUnique({
               where: {
@@ -165,7 +171,16 @@ const populateDB = async () => {
 
       // handle communities participants
 
-      await joinCommunity();
+      /* 
+        Add participants to communities that are positioned in the middle of
+        the array to improve the cursor based testing.
+        This way we can test the fetching communities with equal participants
+        with communities created before and after our cursor's createdAt.
+      */
+      await joinCommunity({
+        start: 0 + users.length / 4,
+        end: users.length - users.length / 4,
+      });
     };
 
     await createUserData();
