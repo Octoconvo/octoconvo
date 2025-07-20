@@ -556,14 +556,28 @@ describe("Test communities_explore_get", () => {
     };
   };
 
-  let community102: CommunityExplore | null = null;
+  let seedCommunities: Community[] = [];
+  let communityMiddle: CommunityExplore | null = null;
   let community10: CommunityExplore | null = null;
 
   beforeAll(async () => {
     try {
-      community102 = await prisma.community.findUnique({
+      seedCommunities = await prisma.community.findMany({
         where: {
-          name: "seedcommunity102",
+          name: {
+            startsWith: "seedcommunity",
+          },
+        },
+      });
+
+      const middleCommunity =
+        seedCommunities.length % 2 === 0
+          ? seedCommunities.length / 2
+          : (seedCommunities.length - 1) / 2;
+
+      communityMiddle = await prisma.community.findUnique({
+        where: {
+          name: `seedcommunity${middleCommunity}`,
         },
         include: {
           _count: {
@@ -634,8 +648,8 @@ describe("Test communities_explore_get", () => {
   );
 
   test("Return 422 HTTP error when the name memberCount cursor is invalid", done => {
-    const ISOString = community102?.createdAt
-      ? new Date(community102?.createdAt).toISOString()
+    const ISOString = communityMiddle?.createdAt
+      ? new Date(communityMiddle?.createdAt).toISOString()
       : "";
 
     agent
@@ -764,13 +778,13 @@ describe("Test communities_explore_get", () => {
   });
 
   test("Return the correct communities with cursor", done => {
-    const ISOString = community102?.createdAt
-      ? new Date(community102?.createdAt).toISOString()
+    const ISOString = communityMiddle?.createdAt
+      ? new Date(communityMiddle?.createdAt).toISOString()
       : "";
     const cursor =
-      `${community102?._count.participants}` +
+      `${communityMiddle?._count.participants}` +
       "_" +
-      `${community102?.id}` +
+      `${communityMiddle?.id}` +
       "_" +
       ISOString;
 
@@ -796,9 +810,9 @@ describe("Test communities_explore_get", () => {
         };
 
         communities.map((community: CommunityData) => {
-          if (community102) {
+          if (communityMiddle) {
             expect(Number(community._count.participants)).toBeLessThanOrEqual(
-              Number(community102?._count.participants),
+              Number(communityMiddle?._count.participants),
             );
           }
         });
@@ -807,13 +821,13 @@ describe("Test communities_explore_get", () => {
   });
 
   test("Return the correct nextCursor", done => {
-    const ISOString = community102?.createdAt
-      ? new Date(community102?.createdAt).toISOString()
+    const ISOString = communityMiddle?.createdAt
+      ? new Date(communityMiddle?.createdAt).toISOString()
       : "";
     const cursor =
-      `${community102?._count.participants}` +
+      `${communityMiddle?._count.participants}` +
       "_" +
-      `${community102?.id}` +
+      `${communityMiddle?.id}` +
       "_" +
       ISOString;
 
