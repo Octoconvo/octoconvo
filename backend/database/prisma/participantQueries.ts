@@ -17,4 +17,15 @@ const getCommunityParticipant = async ({
   return participant;
 };
 
-export { getCommunityParticipant };
+const getCommunityOwner = async ({ communityId }: { communityId: string }) => {
+  const participant = await prisma.participant.findFirst({
+    where: {
+      communityId: communityId,
+      role: "OWNER",
+    },
+  });
+
+  return participant;
+};
+
+export { getCommunityParticipant, getCommunityOwner };
