@@ -10,6 +10,7 @@ import {
   getUserCommunities,
   searchCommunities,
   updateCommunity,
+  joinCommunity,
 } from "../database/prisma/communityQueries";
 import { convertFileName } from "../utils/file";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -17,7 +18,10 @@ import sharp from "sharp";
 import { getPublicURL, uploadFile } from "../database/supabase/supabaseQueries";
 import multer from "multer";
 import { isUUID, isISOString } from "../utils/validation";
-import { getCommunityParticipant } from "../database/prisma/participantQueries";
+import {
+  getCommunityOwner,
+  getCommunityParticipant,
+} from "../database/prisma/participantQueries";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -431,10 +435,88 @@ const community_participation_status_get = [
   }),
 ];
 
+const community_join_post = [
+  createAuthenticationHandler({
+    message: "Failed to send a join request to the community",
+    errMessage: "You are not authenticated",
+  }),
+  communityValidation.communityIdParam,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(
+        errors,
+        "Failed to send a join request to the community",
+      );
+
+      res.status(422).json(obj);
+      return;
+    }
+
+    const userId = req.user?.id as string;
+    const communityId = req.params.communityid;
+
+    const community = await getCommunityById(communityId);
+
+    console.log({ communityId, community });
+    if (community === null) {
+      console.log(`Is community === null?: ${community === null}`);
+      res.status(404).json({
+        message: "Failed to send a join request to the community",
+        error: {
+          message: "Community with that id doesn't exist",
+        },
+      });
+
+      return;
+    }
+
+    const owner = await getCommunityOwner({ communityId: communityId });
+
+    if (owner === null) {
+      throw new Error("Can't find the community's owner");
+    }
+
+    const currentParticipant = await getCommunityParticipant({
+      communityId: communityId,
+      userId: userId,
+    });
+
+    if (currentParticipant !== null) {
+      const message =
+        currentParticipant.status === "ACTIVE"
+          ? "You already joined the community"
+          : "You already sent a request to join the community";
+      res.status(409).json({
+        message: "Failed to send a join request to the community",
+        error: {
+          message: message,
+        },
+      });
+
+      return;
+    }
+
+    const { participant } = await joinCommunity({
+      communityId: communityId,
+      triggeredForIds: [owner.userId],
+      userId: userId,
+      payload: "requested to join",
+    });
+
+    res.json({
+      message: "Successfully sent a join request to the community",
+      participant,
+    });
+  }),
+];
+
 export {
   community_get,
   community_post,
   communities_get,
   communities_explore_get,
   community_participation_status_get,
+  community_join_post,
 };
