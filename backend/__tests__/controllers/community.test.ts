@@ -1122,10 +1122,28 @@ describe("Test community_join_post", () => {
         },
       });
 
+      const notifications = await prisma.notification.findMany({
+        where: {
+          type: "COMMUNITYREQUEST",
+          triggeredBy: {
+            username: "seeduser1",
+          },
+          communityId: communityNone.id,
+        },
+      });
+
       for (const participant of participants) {
         await prisma.participant.delete({
           where: {
             id: participant.id,
+          },
+        });
+      }
+
+      for (const notification of notifications) {
+        await prisma.notification.delete({
+          where: {
+            id: notification.id,
           },
         });
       }
