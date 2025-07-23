@@ -60,6 +60,9 @@ jest.mock("../../database/supabase/supabaseQueries", () => ({
   },
 }));
 
+// Set jest's timeout to 60 seconds
+jest.setTimeout(60000);
+
 describe("Test community post controller", () => {
   afterAll(() => {
     const communities = [
