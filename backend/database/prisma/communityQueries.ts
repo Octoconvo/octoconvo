@@ -1,5 +1,7 @@
 import { Community } from "@prisma/client";
 import prisma from "./client";
+import { createParticipantTransaction } from "./participantQueries";
+import { createNotificationsTransaction } from "./notificationQueries";
 
 const deleteCommunityById = async (id: string) => {
   const deleteCommunity = prisma.community.delete({
@@ -265,6 +267,46 @@ const searchCommunities = async ({
   return data;
 };
 
+const joinCommunity = async ({
+  userId,
+  communityId,
+  triggeredForIds,
+  payload,
+}: {
+  userId: string;
+  communityId: string;
+  triggeredForIds: string[];
+  payload: string;
+}) => {
+  const { participant, notifications } = await prisma.$transaction(async tx => {
+    const participant = await createParticipantTransaction({
+      tx: tx,
+      userId: userId,
+      status: "PENDING",
+      role: "MEMBER",
+      type: "COMMUNITY",
+      directMessageId: null,
+      communityId: communityId,
+    });
+
+    const notifications = await createNotificationsTransaction({
+      tx: tx,
+      type: "COMMUNITYREQUEST",
+      communityId: communityId,
+      triggeredForIds: triggeredForIds,
+      triggeredById: userId,
+      payload: payload,
+    });
+
+    return {
+      participant,
+      notifications,
+    };
+  });
+
+  return { participant, notifications };
+};
+
 export {
   getCommunityById,
   getCommunityByName,
@@ -274,4 +316,5 @@ export {
   getCommunityByIdAndParticipant,
   searchCommunities,
   updateCommunity,
+  joinCommunity,
 };
