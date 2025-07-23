@@ -58,6 +58,10 @@ app.get(
   "/community/:communityid/participation-status",
   communityController.community_participation_status_get,
 );
+app.post(
+  "/community/:communityid/join",
+  communityController.community_join_post,
+);
 
 app.post("/message", messageController.message_post);
 app.get("/inbox/:inboxid/messages", messageController.messages_get);

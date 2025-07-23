@@ -1044,3 +1044,199 @@ describe("Test community_participation_status_get", () => {
     },
   );
 });
+
+describe("Test community_join_post", () => {
+  type CommunityType = Community & {
+    inbox: Inbox;
+  };
+  let communityNone: CommunityType | null = null;
+  let communityActive: CommunityType | null = null;
+  let communityPending: CommunityType | null = null;
+
+  beforeAll(async () => {
+    try {
+      communityNone = (await prisma.community.findFirst({
+        where: {
+          participants: {
+            every: {
+              NOT: {
+                user: {
+                  username: "seeduser1",
+                },
+              },
+            },
+          },
+        },
+        include: {
+          inbox: true,
+        },
+      })) as CommunityType;
+
+      communityActive = (await prisma.community.findFirst({
+        where: {
+          participants: {
+            some: {
+              user: {
+                username: "seeduser1",
+              },
+              status: "ACTIVE",
+            },
+          },
+        },
+        include: {
+          inbox: true,
+        },
+      })) as CommunityType;
+
+      communityPending = (await prisma.community.findFirst({
+        where: {
+          participants: {
+            some: {
+              user: {
+                username: "seeduser1",
+              },
+              status: "PENDING",
+            },
+          },
+        },
+        include: {
+          inbox: true,
+        },
+      })) as CommunityType;
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  afterEach(async () => {
+    if (communityNone?.id) {
+      const participants = await prisma.participant.findMany({
+        where: {
+          user: {
+            username: "seeduser1",
+          },
+          communityId: communityNone.id,
+        },
+      });
+
+      for (const participant of participants) {
+        await prisma.participant.delete({
+          where: {
+            id: participant.id,
+          },
+        });
+      }
+    }
+  });
+
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser1",
+    password: "seed@User1",
+  });
+
+  test(
+    "Return 401 authentication error when trying to join a community" +
+      " while being unauthenticated",
+    done => {
+      request(app)
+        .post(`/community/${communityNone?.id}/join`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to send a join request to the community",
+          error: {
+            message: "You are not authenticated",
+          },
+        })
+        .expect(401, done);
+    },
+  );
+
+  test("Return 422 HTTP error when communityid param is invalid", done => {
+    agent
+      .post("/community/testcommunity1/join")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to send a join request to the community");
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "communityid",
+          ).msg,
+        ).toBe("Community id is invalid");
+      })
+      .expect(422, done);
+  });
+
+  test(
+    "Return 400 HTTP error when trying to join community that doesn't" +
+      " exist",
+    done => {
+      agent
+        .post(`/community/${communityNone?.inbox.id}/join`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to send a join request to the community",
+          error: {
+            message: "Community with that id doesn't exist",
+          },
+        })
+        .expect(404, done);
+    },
+  );
+
+  test(
+    "Return 409 HTTP error when trying to join a community when the user" +
+      " is a PENDING participant in the community",
+    done => {
+      agent
+        .post(`/community/${communityPending?.id}/join`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to send a join request to the community",
+          error: {
+            message: "You already sent a request to join the community",
+          },
+        })
+        .expect(409, done);
+    },
+  );
+
+  test(
+    "Return 409 HTTP error when trying to join a community when the user" +
+      " is already an ACTIVE participant in the community",
+    done => {
+      agent
+        .post(`/community/${communityActive?.id}/join`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to send a join request to the community",
+          error: {
+            message: "You already joined the community",
+          },
+        })
+        .expect(409, done);
+    },
+  );
+
+  test("Return 200 success if everything is valid", done => {
+    agent
+      .post(`/community/${communityNone?.id}/join`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const participant = res.body.participant;
+
+        expect(message).toBe(
+          "Successfully sent a join request to the community",
+        );
+        expect(participant).toBeDefined();
+        expect(participant?.status).toBe("PENDING");
+      })
+      .expect(200, done);
+  });
+});
