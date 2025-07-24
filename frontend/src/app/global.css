@@ -423,6 +423,11 @@
     var(--brand-1-2),
     var(--brand-3-d-1)
   );
+  --gradient-brand-1-2-1-3-d: linear-gradient(
+    to bottom,
+    var(--brand-1-2),
+    var(--brand-1-3)
+  );
 }
 
 body {
