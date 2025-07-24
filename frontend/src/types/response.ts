@@ -88,11 +88,24 @@ type InboxMessageGET = {
   attachments: Attachment[];
 };
 
+type CommunityJoinPOSTParticipant = {
+  id: string;
+  userId: string;
+  role: "MEMBER" | "OWNER";
+  status: "PENDING" | "ACTIVE";
+  communityId: null | string;
+  directMessageId: null | string;
+  createdAt: string;
+  updatedAt: string;
+  memberSince: null | string;
+};
+
 export type {
   CommunityResponsePOST,
   CommunitiesResponseGET,
   CommunityResponseGET,
   CommunityExploreGET,
+  CommunityJoinPOSTParticipant,
   InboxMessageGET,
   Attachment,
 };
