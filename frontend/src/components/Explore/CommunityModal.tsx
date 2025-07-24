@@ -1,13 +1,8 @@
 import { CommunityExploreGET } from "@/types/response";
 import { unescapeString } from "@/utils/string";
-import { useEffect, useContext, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { formatDateString } from "@/utils/date";
-
-const participationButton = {
-  NONE: "Join",
-  ACTIVE: "Joined",
-  PENDING: "Requested",
-};
+import CommunityParticipationButton from "./CommunityParticipationButton";
 
 const CommunityModal = ({
   community,
@@ -20,6 +15,7 @@ const CommunityModal = ({
   const [participationStatus, setParticipationStatus] = useState<
     "NONE" | "PENDING" | "ACTIVE" | null
   >(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchParticipationStatus = async () => {
@@ -53,6 +49,7 @@ const CommunityModal = ({
     if (participationStatus === null) {
       fetchParticipationStatus();
     }
+
     const closeOnEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onCloseFn();
@@ -123,17 +120,11 @@ const CommunityModal = ({
           </figure>
           <article className="flex flex-col justify-between h-full">
             <div className="flex w-full justify-end py-[16px]">
-              <button
-                data-testid="xplr-cmmnty-mdl-prtcptn-btn"
-                className={
-                  "bg-grey-100 py-[4px] px-[16px] rounded-[4px]" +
-                  " hover:bg-brand-1"
-                }
-              >
-                {participationStatus
-                  ? participationButton[participationStatus]
-                  : "Loading..."}
-              </button>
+              <CommunityParticipationButton
+                communityId={community.id}
+                participationStatus={participationStatus}
+                setParticipationStatus={setParticipationStatus}
+              />
             </div>
             <div className="flex flex-col gap-[16px]">
               <div className="flex flex-col gap-[16px] max-w-full">
