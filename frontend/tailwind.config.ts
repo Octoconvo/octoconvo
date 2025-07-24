@@ -15,6 +15,7 @@ export default {
         brand: {
           1: "var(--brand-1)",
           "1-2": "var(--brand-1-2)",
+          "1-3": "var(--brand-1-3",
           2: "var(--brand-2)",
           3: "var(--brand-3)",
           "3-d-1": "var(--brand-3-d-1)",
