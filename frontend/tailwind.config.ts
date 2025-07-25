@@ -40,6 +40,7 @@ export default {
           600: "var(--black-600)",
         },
         invalid: "var(--invalid)",
+        notification: "var(--notification)",
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
