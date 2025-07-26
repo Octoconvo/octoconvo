@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import prisma from "./client";
 
 const createNotificationsTransaction = async ({
   tx,
@@ -46,4 +47,19 @@ const createNotificationsTransaction = async ({
   });
 };
 
-export { createNotificationsTransaction };
+const getUserUnreadNotificationCount = async ({
+  userId,
+}: {
+  userId: string;
+}) => {
+  const unreadNotificationCount = await prisma.notification.count({
+    where: {
+      triggeredForId: userId,
+      isRead: false,
+    },
+  });
+
+  return unreadNotificationCount;
+};
+
+export { createNotificationsTransaction, getUserUnreadNotificationCount };
