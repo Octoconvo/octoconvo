@@ -4,6 +4,7 @@ import { inter } from "@/fonts";
 import SocketWrapper from "@/components/SocketWrapper";
 import UserProvider from "@/components/UserProvider";
 import UserProfileProvider from "@/components/UserProfileProvider";
+import NotificationProvider from "@/components/NotificationProvider";
 
 export const metadata: Metadata = {
   title: "Octoconvo",
@@ -20,7 +21,9 @@ export default function RootLayout({
       <body className={`${inter.variable} font-sans flex h-full`}>
         <UserProvider>
           <SocketWrapper>
-            <UserProfileProvider>{children}</UserProfileProvider>
+            <UserProfileProvider>
+              <NotificationProvider>{children}</NotificationProvider>
+            </UserProfileProvider>
           </SocketWrapper>
         </UserProvider>
       </body>
