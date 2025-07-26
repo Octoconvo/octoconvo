@@ -10,10 +10,10 @@ import {
   CreateCommunityModalContext,
 } from "@/contexts/modal";
 import { usePathname } from "next/navigation";
+import NotificationNav from "./NotificationNav";
 
 const LobbyNav = () => {
   const path = usePathname();
-  console.log({ path });
   const { userProfile } = useContext(UserProfileContext);
   const { userProfileModal } = useContext(UserProfileModalContext);
   const { createCommunityModal } = useContext(CreateCommunityModalContext);
@@ -130,28 +130,7 @@ const LobbyNav = () => {
         </div>
 
         <div className="flex flex-col gap-8">
-          <Link
-            data-testid="notification-l"
-            href={`/lobby/notification`}
-            className={
-              "flex relative items-center justify-center h-12 rounded-[8px]" +
-              " before:rounded-[8px] transition-all hover:transition-all" +
-              " before:bg-gr-brand-1-2-1-3-d w-[48px] h-[48px] before:h-full before:w-full" +
-              " before:hover:bg-gr-brand-1-2-1-d" +
-              (path && path.split("/").includes("notification")
-                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
-                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
-                : "")
-            }
-          >
-            <span
-              className={
-                "lobby-nav-icon" +
-                " after:bg-[url(/images/notification-icon.svg)]"
-              }
-            ></span>
-          </Link>
+          <NotificationNav />
           <button
             data-testid="profile-btn"
             className="rounded-full h-[3rem] w-[3rem] bg-white-200"
