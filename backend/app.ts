@@ -16,6 +16,7 @@ import communityRouter from "./routes/community";
 import messageRouter from "./routes/message";
 import inboxRouter from "./routes/inbox";
 import exploreRouter from "./routes/explore";
+import notificationRouter from "./routes/notification";
 
 const app = express();
 app.use(logger("dev"));
@@ -55,6 +56,7 @@ app.use("/profile", profileRouter);
 app.use("/community", communityRouter);
 app.use("/message", messageRouter);
 app.use("/inbox", inboxRouter);
+app.use("/notification", notificationRouter);
 
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
