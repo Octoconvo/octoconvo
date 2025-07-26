@@ -181,6 +181,62 @@ const populateDB = async () => {
         start: 0 + users.length / 4,
         end: users.length - users.length / 4,
       });
+
+      // Create 5 community request notification for seeduser1
+
+      const seeduser1 = await prisma.user.findUnique({
+        where: {
+          username: "seeduser1",
+        },
+      });
+      const seedusers = await prisma.user.findMany({
+        where: {
+          OR: [
+            { username: "seeduser2" },
+            { username: "seeduser3" },
+            { username: "seeduser4" },
+            { username: "seeduser5" },
+            { username: "seeduser6" },
+          ],
+        },
+      });
+      const seedcommunity1 = await prisma.community.findUnique({
+        where: {
+          name: "seedcommunity1",
+        },
+      });
+
+      const createCommunityReqNotifications = async ({
+        triggeredForId,
+        communityId,
+      }: {
+        triggeredForId: string;
+        communityId: string;
+      }) => {
+        seedusers.map(async user => {
+          await prisma.notification.create({
+            data: {
+              triggeredById: user.id,
+              triggeredForId: triggeredForId,
+              isRead: false,
+              payload: "requested to join",
+              type: "COMMUNITYREQUEST",
+              communityId: communityId,
+            },
+          });
+
+          console.log(
+            `\x1b[36mAdding notification triggered by ${user.username}`,
+          );
+        });
+      };
+
+      if (seeduser1 && seedcommunity1) {
+        await createCommunityReqNotifications({
+          triggeredForId: seeduser1.id,
+          communityId: seedcommunity1.id,
+        });
+      }
     };
 
     await createUserData();
