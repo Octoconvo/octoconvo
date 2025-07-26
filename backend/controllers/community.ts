@@ -505,6 +505,12 @@ const community_join_post = [
       payload: "requested to join",
     });
 
+    // trigger notification for the community's owner
+    req.app
+      .get("io")
+      .to(`notification:${owner.userId}`)
+      .emit("notificationupdate");
+
     res.json({
       message: "Successfully sent a join request to the community",
       participant,
