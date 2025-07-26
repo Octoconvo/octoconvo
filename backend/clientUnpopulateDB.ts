@@ -65,23 +65,30 @@ const unpopulateDB = async () => {
             },
           });
 
-          const deleteInbox = prisma.inbox.deleteMany({
+          const deleteInboxes = prisma.inbox.deleteMany({
             where: {
               communityId: community.id,
             },
           });
 
-          const deleteCommunity = prisma.community.deleteMany({
+          const deleteCommunities = prisma.community.deleteMany({
             where: {
               id: community.id,
+            },
+          });
+
+          const deleteNotifications = prisma.notification.deleteMany({
+            where: {
+              triggeredById: user.id,
             },
           });
 
           await prisma.$transaction([
             deleteMessages,
             deleteParticipants,
-            deleteInbox,
-            deleteCommunity,
+            deleteInboxes,
+            deleteCommunities,
+            deleteNotifications,
           ]);
         };
 
