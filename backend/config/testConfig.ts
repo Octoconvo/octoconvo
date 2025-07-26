@@ -11,6 +11,7 @@ import * as userController from "../controllers/user";
 import * as profileController from "../controllers/profile";
 import * as communityController from "../controllers/community";
 import * as messageController from "../controllers/message";
+import * as notificationController from "../controllers/notification";
 
 const app = express();
 
@@ -67,6 +68,11 @@ app.post("/message", messageController.message_post);
 app.get("/inbox/:inboxid/messages", messageController.messages_get);
 
 app.get("/explore/communities", communityController.communities_explore_get);
+
+app.get(
+  "/notification/unread-count",
+  notificationController.unread_notification_count_get,
+);
 
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);
