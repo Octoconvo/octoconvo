@@ -62,4 +62,59 @@ const getUserUnreadNotificationCount = async ({
   return unreadNotificationCount;
 };
 
-export { createNotificationsTransaction, getUserUnreadNotificationCount };
+const getUserNotifications = async ({
+  userId,
+  cursor,
+  limit,
+}: {
+  userId: string;
+  cursor: {
+    createdAt: string;
+    id: string;
+  } | null;
+  limit: number;
+}) => {
+  const notifications = await prisma.notification.findMany({
+    where: {
+      triggeredForId: userId,
+      ...(cursor
+        ? {
+            OR: [
+              {
+                AND: [
+                  {
+                    id: {
+                      lt: cursor.id,
+                    },
+                  },
+                  { createdAt: cursor.createdAt },
+                ],
+              },
+              {
+                createdAt: {
+                  lt: cursor.createdAt,
+                },
+              },
+            ],
+          }
+        : {}),
+    },
+    orderBy: [
+      {
+        createdAt: "desc",
+      },
+      {
+        id: "desc",
+      },
+    ],
+    ...(limit ? { take: limit } : {}),
+  });
+
+  return notifications;
+};
+
+export {
+  createNotificationsTransaction,
+  getUserUnreadNotificationCount,
+  getUserNotifications,
+};
