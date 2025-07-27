@@ -69,6 +69,7 @@ app.get("/inbox/:inboxid/messages", messageController.messages_get);
 
 app.get("/explore/communities", communityController.communities_explore_get);
 
+app.get("/notifications", notificationController.notifications_get);
 app.get(
   "/notification/unread-count",
   notificationController.unread_notification_count_get,
