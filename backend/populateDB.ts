@@ -191,14 +191,11 @@ const populateDB = async () => {
       });
       const seedusers = await prisma.user.findMany({
         where: {
-          OR: [
-            { username: "seeduser2" },
-            { username: "seeduser3" },
-            { username: "seeduser4" },
-            { username: "seeduser5" },
-            { username: "seeduser6" },
-          ],
+          username: {
+            startsWith: "seeduser",
+          },
         },
+        take: 100,
       });
       const seedcommunity1 = await prisma.community.findUnique({
         where: {
