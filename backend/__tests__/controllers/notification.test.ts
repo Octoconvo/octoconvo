@@ -8,6 +8,23 @@ import { isISOString } from "../../utils/validation";
 describe(
   "Test user's unread notification count get controller with" + " seeduser1",
   () => {
+    let notificationsCount: number = 0;
+
+    beforeAll(async () => {
+      try {
+        notificationsCount = await prisma.notification.count({
+          where: {
+            triggeredFor: {
+              username: "seeduser1",
+            },
+          },
+        });
+      } catch (err) {
+        if (err instanceof Error) {
+          console.error(err.message);
+        }
+      }
+    });
     test(
       "Return 401 unauthorized if user tries to get unread notification count" +
         " without being unauthenticated",
@@ -51,21 +68,19 @@ describe(
       },
     );
 
-    test(
-      "The returned unread notification should be 5 if the user is" +
-        " authenticated",
-      done => {
-        agent
-          .get("/notification/unread-count")
-          .expect("Content-Type", /json/)
-          .expect((res: Response) => {
-            const unreadNotificationCount = res.body.unreadNotificationCount;
+    test("The returned unread notification count should be correct", done => {
+      agent
+        .get("/notification/unread-count")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const unreadNotificationCount = res.body.unreadNotificationCount;
 
-            expect(unreadNotificationCount).toBe(5);
-          })
-          .expect(200, done);
-      },
-    );
+          expect(unreadNotificationCount).toBe(
+            notificationsCount < 100 ? notificationsCount : 100,
+          );
+        })
+        .expect(200, done);
+    });
   },
 );
 
@@ -79,7 +94,7 @@ describe(
     });
 
     test(
-      "The returned unread notification should be 0 if the user is" +
+      "The returned unread notification count should be 0 if the user is" +
         " authenticated",
       done => {
         agent
