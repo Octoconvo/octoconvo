@@ -1,106 +1,86 @@
 #!/usr/bin/env node
+import { User } from "@prisma/client";
 import prisma from "./database/prisma/client";
 
 const unpopulateDB = async () => {
-  const seedData: {
-    username: string;
-  }[] = [];
+  const seedData = await prisma.user.findMany({
+    where: {
+      username: {
+        startsWith: "seeduser",
+      },
+    },
+  });
 
-  const addUser = async () => {
-    const pushUser = new Promise(resolve => {
-      for (let i = 1; i <= 1000; i++) {
-        const user = {
-          username: `seeduser${i}`,
-        };
-
-        seedData.push(user);
-      }
-
-      resolve(1);
-    });
-
-    return pushUser;
-  };
-
-  await addUser();
-
-  const deleteData = async ({ username }: { username: string }) => {
+  const deleteData = async ({ user }: { user: User }) => {
     try {
-      console.log(`\x1b[33mDeleting ${username}'s associated data`);
-      const user = await prisma.user.findUnique({
+      console.log(`\x1b[33mDeleting ${user.username}'s associated data`);
+
+      const communities = await prisma.community.findMany({
         where: {
-          username: username,
+          participants: {
+            some: {
+              AND: [{ userId: user?.id }, { role: "OWNER" }],
+            },
+          },
+        },
+        include: {
+          inbox: true,
         },
       });
 
-      if (user !== null) {
-        const communities = await prisma.community.findMany({
-          where: {
-            participants: {
-              some: {
-                AND: [{ userId: user?.id }, { role: "OWNER" }],
-              },
-            },
-          },
-          include: {
-            inbox: true,
-          },
-        });
+      // Delete user's notifications
+      await prisma.notification.deleteMany({
+        where: {
+          OR: [{ triggeredById: user.id }, { triggeredForId: user.id }],
+        },
+      });
 
-        // Delete communities and their related data
+      // Delete communities and their related data
 
-        for (const community of communities) {
-          // eslint-disable-next-line
-          const cascadeDelete = async (community: any) => {
-            console.log(
-              `\x1b[33mDeleting ${community.name} and its related data`,
-            );
-
-            const deleteMessages = prisma.message.deleteMany({
-              where: {
-                inboxId: community.inbox?.id as string,
-              },
-            });
-
-            const deleteParticipants = prisma.participant.deleteMany({
-              where: {
-                communityId: community.id,
-              },
-            });
-
-            const deleteInboxes = prisma.inbox.deleteMany({
-              where: {
-                communityId: community.id,
-              },
-            });
-
-            const deleteCommunities = prisma.community.deleteMany({
-              where: {
-                id: community.id,
-              },
-            });
-
-            const deleteNotifications = prisma.notification.deleteMany({
-              where: { triggeredById: user.id },
-            });
-
-            await prisma.$transaction([
-              deleteMessages,
-              deleteParticipants,
-              deleteInboxes,
-              deleteCommunities,
-              deleteNotifications,
-            ]);
-          };
-
-          await cascadeDelete(community);
+      for (const community of communities) {
+        // eslint-disable-next-line
+        const cascadeDelete = async (community: any) => {
           console.log(
-            `\x1b[33mFinished deleting ${community.name}'s` +
-              " associated community",
+            `\x1b[33mDeleting ${community.name} and its related data`,
           );
-        }
-      } else {
-        console.log(`\x1b[31m${username} doesn't exist`);
+
+          const deleteMessages = prisma.message.deleteMany({
+            where: {
+              inboxId: community.inbox?.id as string,
+            },
+          });
+
+          const deleteParticipants = prisma.participant.deleteMany({
+            where: {
+              communityId: community.id,
+            },
+          });
+
+          const deleteInboxes = prisma.inbox.deleteMany({
+            where: {
+              communityId: community.id,
+            },
+          });
+
+          const deleteCommunities = prisma.community.deleteMany({
+            where: {
+              id: community.id,
+            },
+          });
+
+          await prisma.$transaction([
+            deleteMessages,
+            deleteParticipants,
+            deleteInboxes,
+            deleteCommunities,
+          ]);
+        };
+
+        await cascadeDelete(community);
+        console.log(
+          `\x1b[33mFinished deleting ${community.name}'s` +
+            " associated community",
+        );
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -119,10 +99,10 @@ const unpopulateDB = async () => {
     });
   };
 
-  const deleteCommunityData = seedData.map(async data => {
+  const deleteCommunityData = seedData.map(async user => {
     return new Promise(resolve => {
       (async () => {
-        await deleteData({ username: data.username });
+        await deleteData({ user });
         resolve(1);
       })();
     });
@@ -131,8 +111,8 @@ const unpopulateDB = async () => {
   try {
     await Promise.all(deleteCommunityData);
 
-    for (const data of seedData) {
-      await deleteUser({ username: data.username });
+    for (const user of seedData) {
+      await deleteUser({ username: user.username });
     }
   } catch (err) {
     if (err instanceof Error) {
