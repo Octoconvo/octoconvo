@@ -25,6 +25,7 @@ export default {
         white: {
           100: "var(--white-100)",
           200: "var(--white-200)",
+          "200-op-025": "var(--white-200-op-025)",
         },
         grey: {
           100: "var(--grey-100)",
