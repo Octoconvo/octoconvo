@@ -145,16 +145,17 @@ model Attachment {
 }
 
 model Notification {
-  id             String           @id @default(uuid())
-  triggeredBy    User             @relation("request", fields: [triggeredById], references: [id])
+  id             String                 @id @default(uuid())
+  triggeredBy    User                   @relation("request", fields: [triggeredById], references: [id])
   triggeredById  String
-  triggeredFor   User             @relation("notification", fields: [triggeredForId], references: [id])
+  triggeredFor   User                   @relation("notification", fields: [triggeredForId], references: [id])
   triggeredForId String
   isRead         Boolean
-  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+  createdAt      DateTime               @default(now()) @db.Timestamptz(3)
   type           NotificationType
+  status         NotificationStatusType @default(PENDING)
   payload        String
-  community      Community?       @relation(fields: [communityId], references: [id])
+  community      Community?             @relation(fields: [communityId], references: [id])
   communityId    String?
 }
 
@@ -172,4 +173,9 @@ enum NotificationType {
   FRIENDREQUEST
   COMMUNITYREQUEST
   REQUESTUPDATE
+}
+
+enum NotificationStatusType {
+  PENDING
+  COMPLETED
 }
