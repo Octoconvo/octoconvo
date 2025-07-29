@@ -2,6 +2,8 @@ import NotificationNav from "@/components/Lobby/NotificationNav";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { NotificationCountContext } from "@/contexts/notification";
+import { NotificationModalContext } from "@/contexts/modal";
+import userEvent from "@testing-library/user-event";
 
 jest.mock(
   "next/navigation",
@@ -13,7 +15,10 @@ jest.mock(
   }))
 );
 
+const toggleNotificationModalViewMock = jest.fn(() => {});
+
 describe("Render NotificationNav", () => {
+  const user = userEvent.setup();
   test(
     "Render the notification indicator if the notificaionCount context" +
       " is bigger than 0",
@@ -79,4 +84,32 @@ describe("Render NotificationNav", () => {
       expect(notificationCountIndicator).not.toBeInTheDocument();
     }
   );
+
+  test("Test NotificationNav button's onClick fn", async () => {
+    await act(async () =>
+      render(
+        <NotificationModalContext
+          value={{
+            notificationModal: null,
+            isNotificationModalAnimating: false,
+            isNotificationModalOpen: false,
+            toggleNotificationModalView: toggleNotificationModalViewMock,
+          }}
+        >
+          <NotificationCountContext
+            value={{ notificationCount: 0, setNotificationCount: jest.fn() }}
+          >
+            <NotificationNav />
+          </NotificationCountContext>
+        </NotificationModalContext>
+      )
+    );
+
+    expect(toggleNotificationModalViewMock).toHaveBeenCalledTimes(0);
+
+    const notificationNavBtn = screen.getByTestId("notification-l");
+    await user.click(notificationNavBtn);
+
+    expect(toggleNotificationModalViewMock).toHaveBeenCalledTimes(1);
+  });
 });
