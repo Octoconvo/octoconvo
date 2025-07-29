@@ -177,5 +177,7 @@ enum NotificationType {
 
 enum NotificationStatusType {
   PENDING
+  REJECTED
+  ACCEPTED
   COMPLETED
 }
