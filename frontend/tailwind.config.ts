@@ -74,6 +74,7 @@ export default {
       },
       animation: {
         "slide-right": "300ms slide-right",
+        "slide-left": "300ms slide-left",
         "zoom-in": "300ms zoom-in",
         "jumpy-zoom-in-s": "150ms jumpy-zoom-in-s",
         notification: "150ms notification",

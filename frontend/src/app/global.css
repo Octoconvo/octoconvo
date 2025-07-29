@@ -313,6 +313,18 @@
     }
   }
 
+  @keyframes slide-left {
+    from {
+      translate: 0 0;
+      opacity: 1;
+    }
+
+    to {
+      translate: -300% 0;
+      opacity: 50%;
+    }
+  }
+
   @keyframes zoom-in {
     from {
       opacity: 50%;
