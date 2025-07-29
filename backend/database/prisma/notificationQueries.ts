@@ -99,6 +99,23 @@ const getUserNotifications = async ({
           }
         : {}),
     },
+    include: {
+      triggeredBy: {
+        select: {
+          username: true,
+        },
+      },
+      triggeredFor: {
+        select: {
+          username: true,
+        },
+      },
+      community: {
+        select: {
+          name: true,
+        },
+      },
+    },
     orderBy: [
       {
         createdAt: "desc",
