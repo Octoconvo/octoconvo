@@ -37,9 +37,24 @@ const CreateCommunityModalContext = createContext<CreateCommunityModalContext>({
   createCommunityModal: null,
 });
 
+type NotificationModalContext = {
+  notificationModal: null | React.RefObject<null | HTMLDivElement>;
+  toggleNotificationModalView: () => void;
+  isNotificationModalOpen: boolean;
+  isNotificationModalAnimating: boolean;
+};
+
+const NotificationModalContext = createContext<NotificationModalContext>({
+  notificationModal: null,
+  toggleNotificationModalView: () => {},
+  isNotificationModalOpen: false,
+  isNotificationModalAnimating: false,
+});
+
 export {
   ActiveModalsContext,
   EditProfileModalContext,
   UserProfileModalContext,
   CreateCommunityModalContext,
+  NotificationModalContext,
 };
