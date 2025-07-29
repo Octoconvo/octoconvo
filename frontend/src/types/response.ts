@@ -100,6 +100,27 @@ type CommunityJoinPOSTParticipant = {
   memberSince: null | string;
 };
 
+type NotificationGET = {
+  id: string;
+  triggeredById: string;
+  triggeredBy: {
+    username: string;
+  };
+  triggeredForId: string;
+  triggeredFor: {
+    username: string;
+  };
+  isRead: boolean;
+  createdAt: string;
+  type: "COMMUNITYREQUEST" | "FRIENDREQUEST" | "REQUESTUPDATE";
+  status: "PENDING" | "REJECTED" | "ACCEPTED" | "COMPLETED";
+  payload: string;
+  communityId: null | string;
+  community: null | {
+    name: string;
+  };
+};
+
 export type {
   CommunityResponsePOST,
   CommunitiesResponseGET,
@@ -108,4 +129,5 @@ export type {
   CommunityJoinPOSTParticipant,
   InboxMessageGET,
   Attachment,
+  NotificationGET,
 };
