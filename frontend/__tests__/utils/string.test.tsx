@@ -1,5 +1,8 @@
-import { createHTMLNewLine, unescapeString } from "@/utils/string";
-import { el } from "date-fns/locale";
+import {
+  createHTMLNewLine,
+  unescapeString,
+  capitaliseStringFirstLetter,
+} from "@/utils/string";
 
 test("Test unescape input return value", () => {
   const string = unescapeString("&#39;&#60;&#62;");
@@ -33,4 +36,10 @@ test("Test createHTMLNewLine", async () => {
   await countNewLine();
 
   expect(newlinesCount).toBe(2);
+});
+
+test("Test capitaliseStringFirstLetter function", () => {
+  const string = capitaliseStringFirstLetter("ECONOMY");
+
+  expect(string).toBe("Economy");
 });
