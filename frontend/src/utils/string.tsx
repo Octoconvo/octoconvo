@@ -26,4 +26,13 @@ const createHTMLNewLine = (input: string) => {
   return <>{content}</>;
 };
 
-export { unescapeString, createHTMLNewLine };
+const capitaliseStringFirstLetter = (input: string) => {
+  return input
+    .toLowerCase()
+    .split("")
+    .map((char, index) => {
+      return index === 0 ? char.toUpperCase() : char;
+    })
+    .join("");
+};
+export { unescapeString, createHTMLNewLine, capitaliseStringFirstLetter };
