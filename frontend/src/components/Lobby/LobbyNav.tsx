@@ -23,7 +23,8 @@ const LobbyNav = () => {
     <>
       <nav
         className={
-          "flex flex-col justify-between h-full bg-black-100 py-12" + " px-4"
+          "flex flex-col justify-between h-full bg-black-100 py-12" +
+          " px-4 relative z-10"
         }
       >
         <div className="flex flex-col justify-between gap-8">
