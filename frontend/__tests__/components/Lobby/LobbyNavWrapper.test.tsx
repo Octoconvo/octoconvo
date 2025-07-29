@@ -21,6 +21,7 @@ const userProfile: UserProfile = {
 
 describe("Render LobbyNavWrapper", () => {
   const user = userEvent.setup();
+
   beforeEach(() => {
     render(
       <div data-testid="wrapper" className="w-full h-full">
@@ -43,5 +44,14 @@ describe("Render LobbyNavWrapper", () => {
     expect(profileButton).toBeInTheDocument();
     await user.click(profileButton);
     expect(useStateSpy).toHaveBeenCalled();
+  });
+
+  test("Test the toggleNotificationModalView", async () => {
+    const notificationModal = screen.getByTestId("ntfctn-mdl");
+    expect(notificationModal.classList).toContain("hidden");
+
+    const notificationNavBtn = screen.getByTestId("notification-l");
+    await user.click(notificationNavBtn);
+    expect(notificationModal.classList).not.toContain("hidden");
   });
 });
