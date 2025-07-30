@@ -498,7 +498,7 @@ const community_join_post = [
       return;
     }
 
-    const { participant } = await joinCommunity({
+    const { participant, notifications } = await joinCommunity({
       communityId: communityId,
       triggeredForIds: [owner.userId],
       userId: userId,
@@ -510,6 +510,17 @@ const community_join_post = [
       .get("io")
       .to(`notification:${owner.userId}`)
       .emit("notificationupdate");
+
+    // trigger notification creation for the community's owner
+
+    const ownerNotification = notifications.find(notification => {
+      return notification.triggeredForId === owner.userId;
+    });
+
+    req.app
+      .get("io")
+      .to(`notification:${owner.userId}`)
+      .emit("notificationcreate", ownerNotification);
 
     res.json({
       message: "Successfully sent a join request to the community",
