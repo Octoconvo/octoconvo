@@ -10,7 +10,7 @@ const NotificationRequestItem = ({
     <li
       data-testid="ntfctn-rqst-itm"
       className={
-        "flex flex-col p-[16px] rounded-[4px] w-full" +
+        "flex flex-col gap-[16px] p-[16px] rounded-[4px] w-full" +
         (notification.isRead ? " bg-gr-black-1-b" : " bg-brand-1-2")
       }
     >
