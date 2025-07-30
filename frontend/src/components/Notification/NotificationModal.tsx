@@ -4,6 +4,9 @@ import { NotificationModalContext } from "@/contexts/modal";
 import { useContext, useEffect, useState, useRef } from "react";
 import { NotificationGET } from "@/types/response";
 import NotificationRequestItem from "./NotificationRequestItem";
+import socket from "@/socket/socket";
+import { UserContext } from "@/contexts/user";
+import { connectToRoom } from "@/socket/eventHandler";
 
 const NotificationModal = () => {
   const {
@@ -16,6 +19,7 @@ const NotificationModal = () => {
   );
   const [nextCursor, setNextCursor] = useState<null | false | string>(null);
   const nextObserverRef = useRef<null | HTMLDivElement>(null);
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -88,6 +92,24 @@ const NotificationModal = () => {
       notificationModalCurrent.addEventListener("animationend", hideModal);
     }
 
+    const pushNewNotification = (notification: NotificationGET) => {
+      if (notifications !== null) {
+        setNotifications([notification, ...notifications]);
+      }
+    };
+
+    if (user) {
+      // Join the user's notification room
+      socket.emit("subscribe", `notification:${user.id}`);
+
+      // Listen to socket notification creation
+      socket.on("notificationcreate", pushNewNotification);
+      socket.on(
+        "initiate",
+        connectToRoom.bind(this, socket, `notification:${user.id}`)
+      );
+    }
+
     return () => {
       if (notificationModalCurrent) {
         notificationModalCurrent.removeEventListener("animationend", hideModal);
@@ -95,6 +117,18 @@ const NotificationModal = () => {
 
       if (nextObserver) {
         observer.unobserve(nextObserver);
+      }
+
+      if (user) {
+        // Leave the user's notification room
+        socket.emit("unsubscribe", `notification:${user.id}`);
+
+        // Stop listening to socket notification creation
+        socket.off("notificationcreate", pushNewNotification);
+        socket.off(
+          "initiate",
+          connectToRoom.bind(this, socket, `notification:${user.id}`)
+        );
       }
     };
   }, [isNotificationModalOpen, nextCursor, notifications]);
