@@ -59,6 +59,10 @@ const NotificationCountProvider = ({
       );
     }
 
+    if (user === false) {
+      setNotificationCount(null);
+    }
+
     return () => {
       if (user) {
         socket.off("initiate");
