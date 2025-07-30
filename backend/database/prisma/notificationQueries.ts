@@ -42,8 +42,25 @@ const createNotificationsTransaction = async ({
   const notifications: NotificationQuery[] =
     await Promise.all(createNotifications);
 
-  return tx.notification.createMany({
+  return tx.notification.createManyAndReturn({
     data: [...notifications],
+    include: {
+      triggeredBy: {
+        select: {
+          username: true,
+        },
+      },
+      triggeredFor: {
+        select: {
+          username: true,
+        },
+      },
+      community: {
+        select: {
+          name: true,
+        },
+      },
+    },
   });
 };
 
