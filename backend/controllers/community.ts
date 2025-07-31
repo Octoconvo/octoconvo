@@ -11,6 +11,7 @@ import {
   searchCommunities,
   updateCommunity,
   joinCommunity,
+  handleCommunityRequest,
 } from "../database/prisma/communityQueries";
 import { convertFileName } from "../utils/file";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
@@ -22,6 +23,7 @@ import {
   getCommunityOwner,
   getCommunityParticipant,
 } from "../database/prisma/participantQueries";
+import { getNotificationById } from "../database/prisma/notificationQueries";
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -133,6 +135,25 @@ const communityValidation = {
         return true;
       },
     ),
+  action: body("action").custom(val => {
+    const regex = new RegExp("^(REJECT|ACCEPT)$");
+
+    if (!regex.test(val)) {
+      throw new Error(
+        "Community request's action must either be REJECT or ACCEPT" +
+          " and must always be capitalised",
+      );
+    }
+
+    return true;
+  }),
+  notificationId: body("notificationid").custom(val => {
+    if (!isUUID(val)) {
+      throw new Error("Community notification id is invalid");
+    }
+
+    return true;
+  }),
 };
 
 const community_get = [
@@ -529,6 +550,156 @@ const community_join_post = [
   }),
 ];
 
+// This controller is used to accept or reject community join requests
+const community_request_POST = [
+  createAuthenticationHandler({
+    message: "Failed to trigger the action on the community request",
+    errMessage: "You are not authenticated",
+  }),
+  communityValidation.communityIdParam,
+  communityValidation.action,
+  communityValidation.notificationId,
+  asyncHandler(async (req: Request, res: Response) => {
+    console.log({ params: req.params });
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(
+        errors,
+        "Failed to trigger the action on the community request",
+      );
+
+      res.status(422).json(obj);
+
+      return;
+    }
+
+    const userId = req.user?.id as string;
+
+    const communityId = req.params.communityid;
+    const community = await getCommunityById(communityId);
+
+    if (community === null) {
+      res.status(404).json({
+        message: "Failed to trigger the action on the community request",
+        error: {
+          message: "Community with that id doesn't exist",
+        },
+      });
+
+      return;
+    }
+
+    const notificationId = req.body.notificationid;
+    const currentNotification = await getNotificationById(notificationId);
+
+    if (currentNotification === null) {
+      res.status(404).json({
+        message: "Failed to trigger the action on the community request",
+        error: {
+          message: "Notification with that id doesn't exist",
+        },
+      });
+
+      return;
+    }
+
+    if (currentNotification.type !== "COMMUNITYREQUEST") {
+      res.status(409).json({
+        message: "Failed to trigger the action on the community request",
+        error: {
+          message: "Can only perform action on a community request",
+        },
+      });
+
+      return;
+    }
+
+    if (currentNotification.status !== "PENDING") {
+      res.status(409).json({
+        message: "Failed to trigger the action on the community request",
+        error: {
+          message:
+            "Can only perform action on a community request with" +
+            " PENDING status",
+        },
+      });
+
+      return;
+    }
+
+    const currentParticipant = await getCommunityParticipant({
+      userId: currentNotification.triggeredById,
+      communityId: community.id,
+    });
+
+    if (currentParticipant === null) {
+      res.status(400).json({
+        message: "Failed to trigger the action on the community request",
+        error: {
+          message:
+            "Cannot find the corresponding notification's participant data",
+        },
+      });
+
+      return;
+    }
+
+    // Check whether the user is authorised to update the community's request
+    const owner = await getCommunityOwner({ communityId: communityId });
+
+    if (owner === null) {
+      throw new Error("Can't find the community's owner");
+    }
+
+    if (owner.userId !== userId) {
+      res.status(403).json({
+        message:
+          "You are not authorised to perform any actions on this community",
+        error: {
+          message: "You are not the owner of this community",
+        },
+      });
+
+      return;
+    }
+
+    const action = req.body.action;
+
+    if (action === "REJECT") {
+      const { notification, participant } = await handleCommunityRequest({
+        notificationId,
+        participantId: currentParticipant.id,
+        action: "REJECT",
+      });
+
+      res.json({
+        message: "Successfully rejected the community request",
+        notification,
+        participant,
+      });
+
+      return;
+    }
+
+    if (action === "ACCEPT") {
+      const { notification, participant } = await handleCommunityRequest({
+        notificationId,
+        participantId: currentParticipant.id,
+        action: "ACCEPT",
+      });
+
+      res.json({
+        message: "Successfully accepted the community request",
+        notification,
+        participant,
+      });
+
+      return;
+    }
+  }),
+];
+
 export {
   community_get,
   community_post,
@@ -536,4 +707,5 @@ export {
   communities_explore_get,
   community_participation_status_get,
   community_join_post,
+  community_request_POST,
 };
