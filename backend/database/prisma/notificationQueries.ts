@@ -147,8 +147,15 @@ const getUserNotifications = async ({
   return notifications;
 };
 
+const getNotificationById = async (id: string) => {
+  return await prisma.notification.findUnique({
+    where: { id: id },
+  });
+};
+
 export {
   createNotificationsTransaction,
   getUserUnreadNotificationCount,
   getUserNotifications,
+  getNotificationById,
 };
