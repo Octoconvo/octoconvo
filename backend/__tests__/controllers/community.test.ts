@@ -6,7 +6,7 @@ import {
   getCommunityByName,
 } from "../../database/prisma/communityQueries";
 import { CommunityPOST } from "../../@types/apiResponse";
-import { Community, Inbox } from "@prisma/client";
+import { Community, Inbox, Notification, Participant } from "@prisma/client";
 import prisma from "../../database/prisma/client";
 
 jest.mock("../../database/supabase/supabaseQueries", () => ({
@@ -1261,3 +1261,524 @@ describe("Test community_join_post", () => {
       .expect(200, done);
   });
 });
+
+describe(
+  "Test community_request_POST with seedcommunity" +
+    " while logged in as seeduser2",
+  () => {
+    let seedCommunity1: null | Community = null;
+    let testParticipant1: null | Participant = null;
+    let testNotification1: null | Notification = null;
+    let testParticipant2: null | Participant = null;
+    let testNotification2: null | Notification = null;
+    let testNotificationError: null | Notification = null;
+    let testNotificationCompleted: null | Notification = null;
+    let testParticipantCompleted: null | Participant = null;
+    let testNotificationNotRequest: null | Notification = null;
+
+    beforeAll(async () => {
+      const seedUser1 = await prisma.user.findUnique({
+        where: {
+          username: "seeduser1",
+        },
+      });
+      const seedUser2 = await prisma.user.findUnique({
+        where: {
+          username: "seeduser2",
+        },
+      });
+      const seedUser3 = await prisma.user.findUnique({
+        where: {
+          username: "seeduser3",
+        },
+      });
+      const seedUser4 = await prisma.user.findUnique({
+        where: { username: "seeduser4" },
+      });
+      const seedUser5 = await prisma.user.findUnique({
+        where: {
+          username: "seeduser5",
+        },
+      });
+
+      seedCommunity1 = await prisma.community.findUnique({
+        where: {
+          name: "seedcommunity1",
+        },
+      });
+
+      // Create community join request with seeduser2 to seedcommuntiy1
+      if (seedCommunity1 && seedUser2 && seedUser1) {
+        testParticipant1 = await prisma.participant.create({
+          data: {
+            role: "MEMBER",
+            communityId: seedCommunity1.id,
+            userId: seedUser2.id,
+            status: "PENDING",
+          },
+        });
+
+        testNotification1 = await prisma.notification.create({
+          data: {
+            payload: "requested to join",
+            type: "COMMUNITYREQUEST",
+            communityId: seedCommunity1.id,
+            triggeredById: seedUser2.id,
+            triggeredForId: seedUser1.id,
+            status: "PENDING",
+            isRead: false,
+          },
+        });
+
+        testNotificationNotRequest = await prisma.notification.create({
+          data: {
+            payload: "accepted your join request",
+            type: "REQUESTUPDATE",
+            communityId: seedCommunity1.id,
+            triggeredById: seedUser1.id,
+            triggeredForId: seedUser2.id,
+            status: "COMPLETED",
+            isRead: false,
+          },
+        });
+      }
+
+      if (seedCommunity1 && seedUser3 && seedUser1) {
+        testParticipant2 = await prisma.participant.create({
+          data: {
+            role: "MEMBER",
+            communityId: seedCommunity1.id,
+            userId: seedUser3.id,
+            status: "PENDING",
+          },
+        });
+
+        testNotification2 = await prisma.notification.create({
+          data: {
+            payload: "requested to join",
+            type: "COMMUNITYREQUEST",
+            communityId: seedCommunity1.id,
+            triggeredById: seedUser3.id,
+            triggeredForId: seedUser1.id,
+            status: "PENDING",
+            isRead: false,
+          },
+        });
+      }
+
+      if (seedCommunity1 && seedUser1 && seedUser4) {
+        testParticipantCompleted = await prisma.participant.create({
+          data: {
+            role: "MEMBER",
+            communityId: seedCommunity1.id,
+            userId: seedUser4.id,
+            status: "ACTIVE",
+          },
+        });
+
+        // Create a notification that is completed
+        testNotificationCompleted = await prisma.notification.create({
+          data: {
+            payload: "requested to join",
+            type: "COMMUNITYREQUEST",
+            triggeredById: seedUser4.id,
+            triggeredForId: seedUser1.id,
+            status: "COMPLETED",
+            isRead: true,
+          },
+        });
+      }
+
+      if (seedCommunity1 && seedUser1 && seedUser5) {
+        /* Create a notification for a community request without
+             a corresponfing participant */
+        testNotificationError = await prisma.notification.create({
+          data: {
+            payload: "requested to join",
+            type: "COMMUNITYREQUEST",
+            triggeredById: seedUser5.id,
+            triggeredForId: seedUser1.id,
+            status: "PENDING",
+            isRead: false,
+          },
+        });
+      }
+    });
+
+    afterAll(async () => {
+      try {
+        if (testParticipant1) {
+          await prisma.participant.delete({
+            where: {
+              id: testParticipant1.id,
+            },
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      try {
+        if (testParticipant2) {
+          await prisma.participant.delete({
+            where: {
+              id: testParticipant2.id,
+            },
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      try {
+        if (testParticipantCompleted) {
+          await prisma.participant.delete({
+            where: {
+              id: testParticipantCompleted.id,
+            },
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      try {
+        if (testNotification1) {
+          await prisma.notification.delete({
+            where: {
+              id: testNotification1.id,
+            },
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      try {
+        if (testNotification2) {
+          await prisma.notification.delete({
+            where: {
+              id: testNotification2.id,
+            },
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      try {
+        if (testNotificationNotRequest) {
+          await prisma.notification.delete({
+            where: {
+              id: testNotificationNotRequest.id,
+            },
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+
+      try {
+        if (testNotificationCompleted) {
+          await prisma.notification.delete({
+            where: {
+              id: testNotificationCompleted.id,
+            },
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+      try {
+        if (testNotificationError) {
+          await prisma.notification.delete({
+            where: {
+              id: testNotificationError.id,
+            },
+          });
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    });
+
+    test(
+      "Return 401 authentication error when trying to update community" +
+        " request while being unauthenticated",
+      done => {
+        request(app)
+          .post(`/community/${seedCommunity1?.id}/request`)
+          .send({
+            action: "REJECT",
+          })
+          .expect("Content-Type", /json/)
+          .expect({
+            message: "Failed to trigger the action on the community request",
+            error: {
+              message: "You are not authenticated",
+            },
+          })
+          .expect(401, done);
+      },
+    );
+
+    const agent = request.agent(app);
+
+    login(agent, {
+      username: "seeduser2",
+      password: "seed@User2",
+    });
+
+    test("Return 422 HTTP error when communityid param is invalid", done => {
+      agent
+        .post("/community/testcommunity1/request")
+        .send({
+          action: "REJECT",
+          notificationid: testNotification1?.id,
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe(
+            "Failed to trigger the action on the community request",
+          );
+          expect(
+            error.validationError.find(
+              (obj: { field: string; msg: string; value: string }) =>
+                obj.field === "communityid",
+            ).msg,
+          ).toBe("Community id is invalid");
+        })
+        .expect(422, done);
+    });
+
+    test("Return 422 HTTP error when notificationid param is invalid", done => {
+      agent
+        .post(`/community/${seedCommunity1?.id}/request`)
+        .send({
+          action: "REJECT",
+          notificationid: "testnotificationid1",
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe(
+            "Failed to trigger the action on the community request",
+          );
+          expect(
+            error.validationError.find(
+              (obj: { field: string; msg: string; value: string }) =>
+                obj.field === "notificationid",
+            ).msg,
+          ).toBe("Community notification id is invalid");
+        })
+        .expect(422, done);
+    });
+
+    test("Return 422 HTTP error when action param is invalid", done => {
+      agent
+        .post(`/community/${seedCommunity1?.id}/request`)
+        .send({
+          action: "reject",
+          notificationid: testNotification1?.id,
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe(
+            "Failed to trigger the action on the community request",
+          );
+          expect(
+            error.validationError.find(
+              (obj: { field: string; msg: string; value: string }) =>
+                obj.field === "action",
+            ).msg,
+          ).toBe(
+            "Community request's action must either be REJECT or ACCEPT" +
+              " and must always be capitalised",
+          );
+        })
+        .expect(422, done);
+    });
+
+    test(
+      "Return 404 error when trying to update community request on a" +
+        " community that doesn't exist",
+      done => {
+        agent
+          .post(`/community/${testParticipant1?.id}/request`)
+          .send({
+            action: "REJECT",
+            notificationid: testNotification1?.id,
+          })
+          .expect("Content-Type", /json/)
+          .expect({
+            message: "Failed to trigger the action on the community request",
+            error: {
+              message: "Community with that id doesn't exist",
+            },
+          })
+          .expect(404, done);
+      },
+    );
+
+    test(
+      "Return 404 error when trying to update community request with " +
+        " notification id that doesn't exist",
+      done => {
+        agent
+          .post(`/community/${seedCommunity1?.id}/request`)
+          .send({
+            action: "REJECT",
+            notificationid: testParticipant1?.id,
+          })
+          .expect("Content-Type", /json/)
+          .expect({
+            message: "Failed to trigger the action on the community request",
+            error: {
+              message: "Notification with that id doesn't exist",
+            },
+          })
+          .expect(404, done);
+      },
+    );
+
+    test(
+      "Return 400 error when trying to update community request with " +
+        " notification that has no corresponding participant",
+      done => {
+        agent
+          .post(`/community/${seedCommunity1?.id}/request`)
+          .send({
+            action: "REJECT",
+            notificationid: testNotificationError?.id,
+          })
+          .expect("Content-Type", /json/)
+          .expect({
+            message: "Failed to trigger the action on the community request",
+            error: {
+              message:
+                "Cannot find the corresponding notification's participant" +
+                " data",
+            },
+          })
+          .expect(400, done);
+      },
+    );
+
+    test(
+      "Return 409 error when trying to perform action on a notification " +
+        " that isn't a community request",
+      done => {
+        agent
+          .post(`/community/${seedCommunity1?.id}/request`)
+          .send({
+            action: "REJECT",
+            notificationid: testNotificationNotRequest?.id,
+          })
+          .expect("Content-Type", /json/)
+          .expect({
+            message: "Failed to trigger the action on the community request",
+            error: {
+              message: "Can only perform action on a community request",
+            },
+          })
+          .expect(409, done);
+      },
+    );
+
+    test(
+      "Return 409 error when trying to perform action on a completed" +
+        " notification request",
+      done => {
+        agent
+          .post(`/community/${seedCommunity1?.id}/request`)
+          .send({
+            action: "REJECT",
+            notificationid: testNotificationCompleted?.id,
+          })
+          .expect("Content-Type", /json/)
+          .expect({
+            message: "Failed to trigger the action on the community request",
+            error: {
+              message:
+                "Can only perform action on a community request" +
+                " with PENDING status",
+            },
+          })
+          .expect(409, done);
+      },
+    );
+
+    test(
+      "Return 403 error when trying to update community request" +
+        " when the user is not the owner of the community",
+      done => {
+        agent
+          .post(`/community/${seedCommunity1?.id}/request`)
+          .send({
+            action: "REJECT",
+            notificationid: testNotification1?.id,
+          })
+          .expect("Content-Type", /json/)
+          .expect({
+            message:
+              "You are not authorised to perform any actions on this community",
+            error: {
+              message: "You are not the owner of this community",
+            },
+          })
+          .expect(403, done);
+      },
+    );
+    const agent2 = request.agent(app);
+
+    login(agent2, { username: "seeduser1", password: "seed@User1" });
+
+    test("Successfully reject community request", done => {
+      agent2
+        .post(`/community/${seedCommunity1?.id}/request`)
+        .send({
+          action: "REJECT",
+          notificationid: testNotification1?.id,
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const notification = res.body.notification;
+          const participant = res.body.participant;
+          expect(message).toBe("Successfully rejected the community request");
+          expect(notification.status).toBe("REJECTED");
+          expect(notification.isRead).toBeTruthy();
+          expect(participant).toBeNull();
+        })
+        .expect(200, done);
+    });
+
+    test("Successfully accept community request", done => {
+      agent2
+        .post(`/community/${seedCommunity1?.id}/request`)
+        .send({
+          action: "ACCEPT",
+          notificationid: testNotification2?.id,
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const notification = res.body.notification;
+          const participant = res.body.participant;
+          expect(message).toBe("Successfully accepted the community request");
+          expect(notification.status).toBe("ACCEPTED");
+          expect(notification.isRead).toBeTruthy();
+          expect(participant.status).toBe("ACTIVE");
+        })
+        .expect(200, done);
+    });
+  },
+);

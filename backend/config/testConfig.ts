@@ -63,6 +63,10 @@ app.post(
   "/community/:communityid/join",
   communityController.community_join_post,
 );
+app.post(
+  "/community/:communityid/request",
+  communityController.community_request_POST,
+);
 
 app.post("/message", messageController.message_post);
 app.get("/inbox/:inboxid/messages", messageController.messages_get);
