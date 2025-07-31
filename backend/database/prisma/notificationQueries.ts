@@ -64,6 +64,62 @@ const createNotificationsTransaction = async ({
   });
 };
 
+const updateNotificationByIdTransaction = async ({
+  tx,
+  id,
+  type,
+  communityId,
+  triggeredById,
+  triggeredForId,
+  payload,
+  isRead,
+  status,
+}: {
+  tx: Prisma.TransactionClient;
+  id: string;
+  type?: "COMMUNITYREQUEST" | "FRIENDREQUEST" | "REQUESTUPDATE";
+  communityId?: string | null;
+  triggeredById?: string;
+  triggeredForId?: string;
+  payload?: string;
+  isRead: boolean;
+  status: "REJECTED" | "ACCEPTED" | "COMPLETED" | "PENDING" | null;
+}) => {
+  return tx.notification.update({
+    where: {
+      id: id,
+    },
+    data: {
+      ...(type !== null ? { type: type } : {}),
+      ...(communityId || communityId === null
+        ? { communityId: communityId }
+        : {}),
+      ...(triggeredById !== null ? { triggeredById: triggeredById } : {}),
+      ...(triggeredForId !== null ? { triggeredForId: triggeredForId } : {}),
+      ...(payload !== null ? { payload: payload } : {}),
+      ...(isRead !== null ? { isRead: isRead } : {}),
+      ...(status ? { status: status } : {}),
+    },
+    include: {
+      triggeredBy: {
+        select: {
+          username: true,
+        },
+      },
+      triggeredFor: {
+        select: {
+          username: true,
+        },
+      },
+      community: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+};
+
 const getUserUnreadNotificationCount = async ({
   userId,
 }: {
@@ -158,4 +214,5 @@ export {
   getUserUnreadNotificationCount,
   getUserNotifications,
   getNotificationById,
+  updateNotificationByIdTransaction,
 };
