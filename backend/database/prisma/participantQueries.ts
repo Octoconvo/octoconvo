@@ -78,9 +78,49 @@ const deleteParticipantByIdTransaction = async ({
   });
 };
 
+const updateParticipantByIdTransaction = async ({
+  tx,
+  id,
+  userId,
+  status,
+  role,
+  type,
+  communityId,
+  directMessageId,
+}: {
+  tx: Prisma.TransactionClient;
+  id: string;
+  userId?: string;
+  status?: "ACTIVE" | "PENDING";
+  role?: "MEMBER" | "OWNER";
+  type?: "COMMUNITY" | "DM";
+  communityId?: string;
+  directMessageId?: string;
+}) => {
+  return tx.participant.update({
+    where: { id: id },
+    data: {
+      ...(type === "COMMUNITY" && communityId
+        ? {
+            communityId: communityId,
+          }
+        : {}),
+      ...(type === "DM" && directMessageId
+        ? {
+            directMessageId: directMessageId,
+          }
+        : {}),
+      ...(role ? { role: role } : {}),
+      ...(userId ? { userId: userId } : {}),
+      ...(status ? { status: status } : {}),
+    },
+  });
+};
+
 export {
   getCommunityParticipant,
   createParticipantTransaction,
   getCommunityOwner,
   deleteParticipantByIdTransaction,
+  updateParticipantByIdTransaction,
 };
