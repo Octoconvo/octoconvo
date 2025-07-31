@@ -65,8 +65,22 @@ const createParticipantTransaction = async ({
   });
 };
 
+const deleteParticipantByIdTransaction = async ({
+  tx,
+  id,
+}: {
+  tx: Prisma.TransactionClient;
+  id: string;
+}) => {
+  console.log({ id }, "delete participant");
+  return tx.participant.delete({
+    where: { id: id },
+  });
+};
+
 export {
   getCommunityParticipant,
   createParticipantTransaction,
   getCommunityOwner,
+  deleteParticipantByIdTransaction,
 };
