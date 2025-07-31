@@ -1,7 +1,14 @@
-import { Community } from "@prisma/client";
+import { Community, Participant } from "@prisma/client";
 import prisma from "./client";
-import { createParticipantTransaction } from "./participantQueries";
-import { createNotificationsTransaction } from "./notificationQueries";
+import {
+  createParticipantTransaction,
+  deleteParticipantByIdTransaction,
+  updateParticipantByIdTransaction,
+} from "./participantQueries";
+import {
+  createNotificationsTransaction,
+  updateNotificationByIdTransaction,
+} from "./notificationQueries";
 
 const deleteCommunityById = async (id: string) => {
   const deleteCommunity = prisma.community.delete({
@@ -307,6 +314,53 @@ const joinCommunity = async ({
   return { participant, notifications };
 };
 
+const handleCommunityRequest = async ({
+  notificationId,
+  participantId,
+  action,
+}: {
+  notificationId: string;
+  participantId: string;
+  action: "REJECT" | "ACCEPT";
+}) => {
+  const { participant, notification } = await prisma.$transaction(async tx => {
+    let participant: null | Participant = null;
+
+    if (action === "REJECT") {
+      await deleteParticipantByIdTransaction({
+        tx,
+        id: participantId,
+      });
+    }
+
+    if (action === "ACCEPT") {
+      participant = await updateParticipantByIdTransaction({
+        tx,
+        id: participantId,
+        status: "ACTIVE",
+      });
+    }
+
+    const notification = await updateNotificationByIdTransaction({
+      tx: tx,
+      id: notificationId,
+      isRead: true,
+      status:
+        action === "ACCEPT"
+          ? "ACCEPTED"
+          : action === "REJECT"
+            ? "REJECTED"
+            : null,
+    });
+
+    return {
+      participant,
+      notification,
+    };
+  });
+
+  return { participant, notification };
+};
 export {
   getCommunityById,
   getCommunityByName,
@@ -317,4 +371,5 @@ export {
   searchCommunities,
   updateCommunity,
   joinCommunity,
+  handleCommunityRequest,
 };
