@@ -1,5 +1,5 @@
 import { NotificationGET } from "@/types/response";
-import { capitaliseStringFirstLetter } from "@/utils/string";
+import { unescapeString, capitaliseStringFirstLetter } from "@/utils/string";
 
 const NotificationRequestItem = ({
   notification,
@@ -36,7 +36,7 @@ const NotificationRequestItem = ({
         >
           {notification.type === "COMMUNITYREQUEST" &&
             notification.community &&
-            notification.community.name}
+            unescapeString(notification.community.name)}
         </span>
       </p>
       {(notification.status === "REJECTED" ||
