@@ -15,7 +15,7 @@ const CommunityItem = ({ community }: { community: CommunityExploreGET }) => {
         <figure className="bg-gr-black-2-r aspect-[3/1] rounded-[8px] rounded-b-none">
           {community.banner && (
             <img
-              className="object-center object-cover aspect-[3/1]"
+              className="object-center object-cover w-full aspect-[3/1] max-h-full"
               src={community.banner}
             />
           )}
