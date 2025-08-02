@@ -90,6 +90,7 @@ const createCommunity = async ({
           memberSince: new Date(),
         },
       },
+      participantsCount: 1,
     },
     include: {
       participants: true,
