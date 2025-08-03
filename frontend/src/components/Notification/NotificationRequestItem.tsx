@@ -1,11 +1,54 @@
+"use client";
+
 import { NotificationGET } from "@/types/response";
 import { unescapeString, capitaliseStringFirstLetter } from "@/utils/string";
+import RequestActionBtn from "./RequestActionBtn";
+import { useCallback } from "react";
 
 const NotificationRequestItem = ({
   notification,
+  updateNotification,
 }: {
   notification: NotificationGET;
+  updateNotification: (notification: NotificationGET) => void;
 }) => {
+  const communityId = notification.communityId ? notification.communityId : " ";
+  const notificationId = notification.id;
+  // Perform ACCEPT or REJECT action on community request
+  const communityActionOnSubmit = useCallback(
+    async (action: "ACCEPT" | "REJECT") => {
+      const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
+
+      try {
+        const formData = new URLSearchParams();
+        formData.append("communityid", communityId),
+          formData.append("notificationid", notificationId),
+          formData.append("action", action);
+
+        const response = await fetch(
+          `${domainURL}/community/${communityId}/request`,
+          {
+            method: "POST",
+            mode: "cors",
+            credentials: "include",
+            body: formData,
+          }
+        );
+
+        const responseData = await response.json();
+
+        if (response.status < 400) {
+          updateNotification(responseData.notification);
+        }
+      } catch (err) {
+        if (err instanceof Error) {
+          console.log(err.message);
+        }
+      }
+    },
+    []
+  );
+
   return (
     <li
       data-testid="ntfctn-rqst-itm"
@@ -50,26 +93,16 @@ const NotificationRequestItem = ({
           data-testid="ntfctn-rqst-itm-btn-lst"
           className="flex gap-[16px] self-end"
         >
-          <button
-            className={
-              "px-[16px] py-[4px] font-regular rounded-[4px] text-p" +
-              " hover:bg-brand-4" +
-              (notification.isRead
-                ? " bg-grey-100 hover:text-grey-100"
-                : " bg-black-500 hover:text-black-500")
-            }
-          >
-            Accept
-          </button>
-          <button
-            className={
-              "px-[16px] py-[4px] font-regular rounded-[4px] text-p" +
-              " hover:bg-invalid" +
-              (notification.isRead ? " bg-grey-100" : " bg-black-500")
-            }
-          >
-            Reject
-          </button>
+          <RequestActionBtn
+            isRead={notification.isRead}
+            action="ACCEPT"
+            onSubmit={communityActionOnSubmit}
+          />
+          <RequestActionBtn
+            isRead={notification.isRead}
+            action="REJECT"
+            onSubmit={communityActionOnSubmit}
+          />
         </div>
       )}
     </li>
