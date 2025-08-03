@@ -175,6 +175,24 @@ const NotificationModal = () => {
                   <NotificationRequestItem
                     key={notification.id}
                     notification={notification}
+                    updateNotification={(
+                      updatedNotification: NotificationGET
+                    ) => {
+                      console.log({ updatedNotification, notifications });
+
+                      if (updatedNotification === undefined) throw Error("OOO");
+                      if (notifications !== null) {
+                        const updatedNotifications = notifications.map(
+                          (notification): NotificationGET => {
+                            return notification.id === updatedNotification.id
+                              ? updatedNotification
+                              : notification;
+                          }
+                        );
+
+                        setNotifications([...updatedNotifications]);
+                      }
+                    }}
                   />
                 );
               }
