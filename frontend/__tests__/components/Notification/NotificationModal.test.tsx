@@ -26,6 +26,8 @@ const notification: NotificationGET = {
   },
 };
 
+const updatedPayload = "YOU UPDATED THIS NOTIFICATION";
+
 global.fetch = jest
   .fn()
   .mockImplementationOnce(
@@ -41,74 +43,40 @@ global.fetch = jest
     )
   )
   .mockImplementation(
-    jest.fn(() =>
-      Promise.resolve().then(() => ({
-        status: 200,
-        json: () =>
-          Promise.resolve({
-            message: "Successfully fetched user's notifications",
+    jest.fn((_url: string) => {
+      const data = _url.split("/").includes("request")
+        ? {
+            notification: { ...notification, payload: updatedPayload },
+          }
+        : {
             notifications: [
               notification,
               { ...notification, id: "testnotification2" },
               { ...notification, id: "testnotification3" },
             ],
             nextCursor: false,
+          };
+      return Promise.resolve().then(() => ({
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            message: "Successfully fetched user's notifications",
+            ...data,
           }),
-      }))
-    )
+      }));
+    })
   );
 
-describe("Render NotficationModal with true isNotificationModalOpen context", () => {
-  beforeEach(async () => {
-    await act(async () =>
-      render(
-        <NotificationModalContext
-          value={{
-            notificationModal: null,
-            isNotificationModalOpen: true,
-            isNotificationModalAnimating: false,
-            toggleNotificationModalView: () => {},
-          }}
-        >
-          <NotificationModal />
-        </NotificationModalContext>
-      )
-    );
-  });
-
-  test(
-    "Show empty notifications messaage if the notifications's" + " length is 0",
-    () => {
-      const emptyNotificationMsg = screen.getByText("No notifications yet");
-
-      expect(emptyNotificationMsg).toBeInTheDocument();
-    }
-  );
-
-  test(
-    "The initial notificications should be fetched and rendered if" +
-      " the notification modal is open",
-    async () => {
-      const uList = screen.getByTestId("ntfctn-mdl-ulst");
-      let count = 0;
-      for (const child of uList.children) {
-        if (child.nodeName === "LI") count += 1;
-      }
-      expect(count).toBe(3);
-    }
-  );
-});
-
-describe("Render NotficationModal with false isNotificationModalOpen context", () => {
-  test(
-    "Show empty notifications messaage if the notifications's" + " length is 0",
-    async () => {
+describe(
+  "Render NotficationModal with true isNotificationModalOpen" + " context",
+  () => {
+    beforeEach(async () => {
       await act(async () =>
         render(
           <NotificationModalContext
             value={{
               notificationModal: null,
-              isNotificationModalOpen: false,
+              isNotificationModalOpen: true,
               isNotificationModalAnimating: false,
               toggleNotificationModalView: () => {},
             }}
@@ -117,10 +85,80 @@ describe("Render NotficationModal with false isNotificationModalOpen context", (
           </NotificationModalContext>
         )
       );
+    });
 
-      const notificationModal = screen.getByTestId("ntfctn-mdl");
+    const user = userEvent.setup();
 
-      expect(notificationModal.classList).toContain("hidden");
-    }
-  );
-});
+    test(
+      "Show empty notifications messaage if the notifications's" +
+        " length is 0",
+      () => {
+        const emptyNotificationMsg = screen.getByText("No notifications yet");
+
+        expect(emptyNotificationMsg).toBeInTheDocument();
+      }
+    );
+
+    test(
+      "The initial notificications should be fetched and rendered if" +
+        " the notification modal is open",
+      async () => {
+        const uList = screen.getByTestId("ntfctn-mdl-ulst");
+        let count = 0;
+        for (const child of uList.children) {
+          if (child.nodeName === "LI") count += 1;
+        }
+        expect(count).toBe(3);
+      }
+    );
+
+    test(
+      "Test updateNotification fn on clicking the accept or reject button" +
+        " on a community request",
+      async () => {
+        const requestItems = screen.getAllByTestId("ntfctn-rqst-itm");
+
+        const btn = requestItems[0].querySelector(
+          "[data-testid='ntfctn-rqst-actn-btn']"
+        ) as HTMLButtonElement;
+        await user.click(btn);
+        const payloadSpan = requestItems[0].querySelector(
+          "[data-testid='ntfctn-rqst-itm-msg-pyld']"
+        );
+
+        expect(payloadSpan).toBeInTheDocument();
+        expect(payloadSpan?.textContent).toBe(" " + updatedPayload + " ");
+      }
+    );
+  }
+);
+
+describe(
+  "Render NotficationModal with false isNotificationModalOpen" + " context",
+  () => {
+    test(
+      "Show empty notifications messaage if the notifications's" +
+        " length is 0",
+      async () => {
+        await act(async () =>
+          render(
+            <NotificationModalContext
+              value={{
+                notificationModal: null,
+                isNotificationModalOpen: false,
+                isNotificationModalAnimating: false,
+                toggleNotificationModalView: () => {},
+              }}
+            >
+              <NotificationModal />
+            </NotificationModalContext>
+          )
+        );
+
+        const notificationModal = screen.getByTestId("ntfctn-mdl");
+
+        expect(notificationModal.classList).toContain("hidden");
+      }
+    );
+  }
+);
