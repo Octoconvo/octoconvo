@@ -668,6 +668,7 @@ const community_request_POST = [
 
     let notificationRes;
     let participantRes;
+    let newNotificationsRes;
 
     if (action === "REJECT") {
       const { notification, participant } = await handleCommunityRequest({
@@ -693,6 +694,7 @@ const community_request_POST = [
         });
 
       notificationRes = notification;
+      newNotificationsRes = newNotifications;
       participantRes = participant;
 
       // trigger notification update and create for the accepted user
@@ -719,6 +721,7 @@ const community_request_POST = [
     res.json({
       message: `Successfully ${actionRes} the community request`,
       notification: notificationRes,
+      newNotifications: newNotificationsRes,
       participant: participantRes,
     });
   }),
