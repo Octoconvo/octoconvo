@@ -1773,10 +1773,18 @@ describe(
           const message = res.body.message;
           const notification = res.body.notification;
           const participant = res.body.participant;
+          const newNotifications = res.body.newNotifications as Notification[];
+
           expect(message).toBe("Successfully accepted the community request");
           expect(notification.status).toBe("ACCEPTED");
           expect(notification.isRead).toBeTruthy();
           expect(participant.status).toBe("ACTIVE");
+          expect(newNotifications).toBeDefined();
+
+          newNotifications.forEach(newNotification => {
+            expect(newNotification.type).toBe("REQUESTUPDATE");
+            expect(newNotification.status).toBe("COMPLETED");
+          });
         })
         .expect(200, done);
     });
