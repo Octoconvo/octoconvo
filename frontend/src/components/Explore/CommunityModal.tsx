@@ -128,10 +128,10 @@ const CommunityModal = ({
             </div>
             <div className="flex flex-col gap-[16px]">
               <div className="flex flex-col gap-[16px] max-w-full">
-                <h1 className="break-all text-h6 font-bold text-white-100">
+                <h1 className="break-words text-h6 font-bold text-white-100">
                   {unescapeString(community.name)}
                 </h1>
-                <p className="break-all text-p text-white-200 max-w-full">
+                <p className="break-words text-p text-white-200 max-w-full">
                   {community.bio && unescapeString(community.bio)}
                 </p>
               </div>
