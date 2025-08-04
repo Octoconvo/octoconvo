@@ -316,51 +316,67 @@ const joinCommunity = async ({
 };
 
 const handleCommunityRequest = async ({
+  communityId,
+  triggeredById,
   notificationId,
   participantId,
   action,
 }: {
+  communityId: string;
+  triggeredById: string;
   notificationId: string;
   participantId: string;
   action: "REJECT" | "ACCEPT";
 }) => {
-  const { participant, notification } = await prisma.$transaction(async tx => {
-    let participant: null | Participant = null;
+  const { participant, notification, newNotifications } =
+    await prisma.$transaction(async tx => {
+      let participant: null | Participant = null;
+      let newNotifications = null;
 
-    if (action === "REJECT") {
-      await deleteParticipantByIdTransaction({
-        tx,
-        id: participantId,
+      if (action === "REJECT") {
+        await deleteParticipantByIdTransaction({
+          tx,
+          id: participantId,
+        });
+      }
+
+      if (action === "ACCEPT") {
+        participant = await updateParticipantByIdTransaction({
+          tx,
+          id: participantId,
+          status: "ACTIVE",
+        });
+
+        newNotifications = await createNotificationsTransaction({
+          tx,
+          type: "REQUESTUPDATE",
+          communityId: communityId,
+          triggeredById: triggeredById,
+          triggeredForIds: [participant.userId],
+          payload: "accepted your join request",
+        });
+      }
+
+      const notification = await updateNotificationByIdTransaction({
+        tx: tx,
+        id: notificationId,
+        isRead: true,
+        status:
+          action === "ACCEPT"
+            ? "ACCEPTED"
+            : action === "REJECT"
+              ? "REJECTED"
+              : null,
       });
-    }
 
-    if (action === "ACCEPT") {
-      participant = await updateParticipantByIdTransaction({
-        tx,
-        id: participantId,
-        status: "ACTIVE",
-      });
-    }
-
-    const notification = await updateNotificationByIdTransaction({
-      tx: tx,
-      id: notificationId,
-      isRead: true,
-      status:
-        action === "ACCEPT"
-          ? "ACCEPTED"
-          : action === "REJECT"
-            ? "REJECTED"
-            : null,
+      return {
+        participant,
+        notification,
+        newNotifications,
+      };
     });
 
-    return {
-      participant,
-      notification,
-    };
-  });
-
-  return { participant, notification };
+  return { participant, notification, newNotifications };
 };
 export {
   getCommunityById,
