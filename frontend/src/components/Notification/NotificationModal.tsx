@@ -167,35 +167,29 @@ const NotificationModal = () => {
         >
           {notifications && notifications?.length > 0 ? (
             notifications.map((notification) => {
-              if (
-                notification.type === "COMMUNITYREQUEST" ||
-                notification.type === "FRIENDREQUEST"
-              ) {
-                return (
-                  <NotificationRequestItem
-                    key={notification.id}
-                    notification={notification}
-                    updateNotification={(
-                      updatedNotification: NotificationGET
-                    ) => {
-                      console.log({ updatedNotification, notifications });
+              return (
+                <NotificationRequestItem
+                  key={notification.id}
+                  notification={notification}
+                  updateNotification={(
+                    updatedNotification: NotificationGET
+                  ) => {
+                    console.log({ updatedNotification, notifications });
 
-                      if (updatedNotification === undefined) throw Error("OOO");
-                      if (notifications !== null) {
-                        const updatedNotifications = notifications.map(
-                          (notification): NotificationGET => {
-                            return notification.id === updatedNotification.id
-                              ? updatedNotification
-                              : notification;
-                          }
-                        );
+                    if (notifications !== null) {
+                      const updatedNotifications = notifications.map(
+                        (notification): NotificationGET => {
+                          return notification.id === updatedNotification.id
+                            ? updatedNotification
+                            : notification;
+                        }
+                      );
 
-                        setNotifications([...updatedNotifications]);
-                      }
-                    }}
-                  />
-                );
-              }
+                      setNotifications([...updatedNotifications]);
+                    }
+                  }}
+                />
+              );
             })
           ) : (
             <li>No notifications yet</li>
