@@ -84,7 +84,12 @@ const NotificationRequestItem = ({
       </p>
       {(notification.status === "REJECTED" ||
         notification.status === "ACCEPTED") && (
-        <p data-testid="ntfctn-rqst-itm-sts-updt">
+        <p
+          data-testid="ntfctn-rqst-itm-sts-updt"
+          className={
+            notification.status === "REJECTED" ? "text-invalid" : "text-brand-4"
+          }
+        >
           {capitaliseStringFirstLetter(notification.status)}
         </p>
       )}
