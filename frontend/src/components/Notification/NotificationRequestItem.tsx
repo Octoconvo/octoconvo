@@ -1,9 +1,10 @@
 "use client";
 
 import { NotificationGET } from "@/types/response";
-import { unescapeString, capitaliseStringFirstLetter } from "@/utils/string";
+import { capitaliseStringFirstLetter } from "@/utils/string";
 import RequestActionBtn from "./RequestActionBtn";
 import { useCallback } from "react";
+import Payload from "./Payload";
 
 const NotificationRequestItem = ({
   notification,
@@ -57,31 +58,21 @@ const NotificationRequestItem = ({
         (notification.isRead ? " bg-gr-black-1-b" : " bg-brand-1-2")
       }
     >
-      <p
-        data-testid="ntfctn-rqst-itm-msg"
-        className=" max-w-full text-p font-regular"
-      >
-        <span
-          data-testid="ntfctn-rqst-itm-msg-usr-usrnm"
-          className="break-words font-bold text-white-100"
-        >
-          {notification.triggeredBy.username}
-        </span>
-        <span
-          data-testid="ntfctn-rqst-itm-msg-pyld"
-          className="font-regular text-white-200 "
-        >
-          {" " + notification.payload + " "}
-        </span>
-        <span
-          data-testid="ntfctn-rqst-itm-msg-cmmnty-nm"
-          className="break-words font-bold text-white-100"
-        >
-          {notification.type === "COMMUNITYREQUEST" &&
-            notification.community &&
-            unescapeString(notification.community.name)}
-        </span>
-      </p>
+      {notification.type === "COMMUNITYREQUEST" && notification.communityId && (
+        <Payload
+          triggeredBy={notification.triggeredBy.username}
+          triggeredFor={notification.community?.name || null}
+          payload={notification.payload}
+        />
+      )}
+      {notification.type === "REQUESTUPDATE" && (
+        <Payload
+          triggeredBy={notification.community?.name || ""}
+          triggeredFor={null}
+          payload={notification.payload}
+        />
+      )}
+
       {(notification.status === "REJECTED" ||
         notification.status === "ACCEPTED") && (
         <p
