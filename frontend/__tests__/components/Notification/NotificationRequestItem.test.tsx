@@ -51,9 +51,9 @@ describe("Render NotificationRequestIem", () => {
       )
     );
 
-    const userUsername = screen.getByTestId("ntfctn-rqst-itm-msg-usr-usrnm");
+    const userUsername = screen.getByTestId("ntfctn-rqst-itm-msg-trggrdby");
     const payload = screen.getByTestId("ntfctn-rqst-itm-msg-pyld");
-    const communityName = screen.getByTestId("ntfctn-rqst-itm-msg-cmmnty-nm");
+    const communityName = screen.getByTestId("ntfctn-rqst-itm-msg-trggrdfr");
 
     expect(userUsername.textContent).toBe(notification.triggeredBy.username);
     expect(payload.textContent).toBe(" " + notification.payload + " ");
