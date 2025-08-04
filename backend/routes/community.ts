@@ -12,6 +12,11 @@ router.get(
 
 router.post("/:communityid/join", communityController.community_join_post);
 
+router.post(
+  "/:communityid/request",
+  communityController.community_request_POST,
+);
+
 router.post("", communityController.community_post);
 
 export default router;
