@@ -8,6 +8,7 @@ const createNotificationsTransaction = async ({
   triggeredById,
   triggeredForIds,
   payload,
+  status,
 }: {
   tx: Prisma.TransactionClient;
   type: "COMMUNITYREQUEST" | "FRIENDREQUEST" | "REQUESTUPDATE";
@@ -15,6 +16,7 @@ const createNotificationsTransaction = async ({
   triggeredById: string;
   triggeredForIds: string[];
   payload: string;
+  status: "PENDING" | "COMPLETED" | "REJECTED" | "ACCEPTED";
 }) => {
   type NotificationQuery = {
     type: "COMMUNITYREQUEST" | "FRIENDREQUEST" | "REQUESTUPDATE";
@@ -23,6 +25,7 @@ const createNotificationsTransaction = async ({
     triggeredForId: string;
     payload: string;
     isRead: boolean;
+    status: "PENDING" | "COMPLETED" | "REJECTED" | "ACCEPTED";
   };
 
   const createNotifications = triggeredForIds.map(
@@ -35,6 +38,7 @@ const createNotificationsTransaction = async ({
           triggeredForId: triggeredForId,
           payload: payload,
           isRead: false,
+          status: status,
         });
       }),
   );
