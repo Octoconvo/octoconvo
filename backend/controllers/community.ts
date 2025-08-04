@@ -560,7 +560,6 @@ const community_request_POST = [
   communityValidation.action,
   communityValidation.notificationId,
   asyncHandler(async (req: Request, res: Response) => {
-    console.log({ params: req.params });
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
@@ -665,38 +664,63 @@ const community_request_POST = [
     }
 
     const action = req.body.action;
+    const actionRes = req.body.action === "ACCEPT" ? "accepted" : "rejected";
+
+    let notificationRes;
+    let participantRes;
 
     if (action === "REJECT") {
       const { notification, participant } = await handleCommunityRequest({
+        communityId,
+        triggeredById: owner.userId,
         notificationId,
         participantId: currentParticipant.id,
         action: "REJECT",
       });
 
-      res.json({
-        message: "Successfully rejected the community request",
-        notification,
-        participant,
-      });
-
-      return;
+      notificationRes = notification;
+      participantRes = participant;
     }
 
     if (action === "ACCEPT") {
-      const { notification, participant } = await handleCommunityRequest({
-        notificationId,
-        participantId: currentParticipant.id,
-        action: "ACCEPT",
-      });
+      const { notification, participant, newNotifications } =
+        await handleCommunityRequest({
+          communityId,
+          triggeredById: owner.userId,
+          notificationId,
+          participantId: currentParticipant.id,
+          action: "ACCEPT",
+        });
 
-      res.json({
-        message: "Successfully accepted the community request",
-        notification,
-        participant,
-      });
+      notificationRes = notification;
+      participantRes = participant;
 
-      return;
+      // trigger notification update and create for the accepted user
+      if (newNotifications)
+        newNotifications.forEach(notification => {
+          req.app
+            .get("io")
+            .to(`notification:${notification.triggeredForId}`)
+            .emit(`notificationupdate`);
+
+          req.app
+            .get("io")
+            .to(`notification:${notification.triggeredForId}`)
+            .emit(`notificationcreate`, notification);
+        });
     }
+
+    // trigger notification for the community's owner
+    req.app
+      .get("io")
+      .to(`notification:${owner.userId}`)
+      .emit("notificationupdate");
+
+    res.json({
+      message: `Successfully ${actionRes} the community request`,
+      notification: notificationRes,
+      participant: participantRes,
+    });
   }),
 ];
 
