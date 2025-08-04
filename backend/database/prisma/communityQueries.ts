@@ -304,6 +304,7 @@ const joinCommunity = async ({
       triggeredForIds: triggeredForIds,
       triggeredById: userId,
       payload: payload,
+      status: "PENDING",
     });
 
     return {
@@ -354,6 +355,7 @@ const handleCommunityRequest = async ({
           triggeredById: triggeredById,
           triggeredForIds: [participant.userId],
           payload: "accepted your join request",
+          status: "COMPLETED",
         });
       }
 
