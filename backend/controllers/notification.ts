@@ -4,8 +4,9 @@ import { createAuthenticationHandler } from "../utils/authentication";
 import {
   getUserUnreadNotificationCount,
   getUserNotifications,
+  updateNotificationsReadStatus,
 } from "../database/prisma/notificationQueries";
-import { query, validationResult } from "express-validator";
+import { query, body, validationResult } from "express-validator";
 import { isUUID, isISOString } from "../utils/validation";
 import { createValidationErrObj } from "../utils/error";
 
@@ -38,6 +39,42 @@ const notificationValidation = {
           cursor,
         });
         throw new Error("Cursor value is invalid");
+      }
+
+      return true;
+    }),
+  startDate: body("startdate")
+    .trim()
+    .isLength({
+      min: 1,
+    })
+    .withMessage("The starting date cannot be empty")
+    .custom(value => {
+      if (!isISOString(value)) {
+        throw new Error("The starting date is invalid");
+      }
+
+      return true;
+    }),
+  endDate: body("enddate")
+    .trim()
+    .optional({
+      values: "falsy",
+    })
+    .custom(value => {
+      if (!isISOString(value)) {
+        throw new Error("The end date is invalid");
+      }
+
+      return true;
+    }),
+  updateMode: query("mode")
+    .trim()
+    .custom(value => {
+      const regex = new RegExp(/^(SILENT|ALERT)$/);
+
+      if (!regex.test(value)) {
+        throw new Error("Mode must either be SILENT or ALERT");
       }
 
       return true;
@@ -115,4 +152,62 @@ const notifications_get = [
   }),
 ];
 
-export { unread_notification_count_get, notifications_get };
+const notifications_update_read_status_post = [
+  createAuthenticationHandler({
+    message: "Failed to update user's notifications' read statuses",
+    errMessage: "You are not authenticated",
+  }),
+  notificationValidation.updateMode,
+  notificationValidation.startDate,
+  notificationValidation.endDate,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(
+        errors,
+        "Failed to update user's notifications' read statuses",
+      );
+
+      res.status(422).json(obj);
+
+      return;
+    }
+
+    const userId = req.user?.id as string;
+    const startDate = req.body.startdate;
+    const endDate = req.body.enddate;
+
+    const notifications = await updateNotificationsReadStatus({
+      userId,
+      startDate,
+      endDate,
+    });
+
+    const mode = req.query.mode;
+
+    if (mode === "ALERT") {
+      req.app.get("io").to(`notification:${userId}`).emit("notificationupdate");
+    }
+
+    if (mode === "SILENT") {
+      req.app
+        .get("io")
+        .to(`notification:${userId}`)
+        .emit("notificationupdate--silent");
+    }
+
+    res.json({
+      message:
+        "Successfully updated user's notifications' read statuses" +
+        ` in ${mode} mode`,
+      notifications,
+    });
+  }),
+];
+
+export {
+  unread_notification_count_get,
+  notifications_get,
+  notifications_update_read_status_post,
+};
