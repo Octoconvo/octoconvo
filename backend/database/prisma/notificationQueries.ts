@@ -213,10 +213,43 @@ const getNotificationById = async (id: string) => {
   });
 };
 
+const updateNotificationsReadStatus = async ({
+  userId,
+  startDate,
+  endDate,
+}: {
+  userId: string;
+  startDate: string;
+  endDate: string;
+}) => {
+  const notifications = await prisma.notification.updateManyAndReturn({
+    where: {
+      AND: [
+        {
+          triggeredForId: userId,
+        },
+        {
+          createdAt: { lte: new Date(startDate) },
+        },
+        {
+          createdAt: { gte: new Date(endDate) },
+        },
+        { isRead: false },
+      ],
+    },
+    data: {
+      isRead: true,
+    },
+  });
+
+  return notifications;
+};
+
 export {
   createNotificationsTransaction,
   getUserUnreadNotificationCount,
   getUserNotifications,
   getNotificationById,
   updateNotificationByIdTransaction,
+  updateNotificationsReadStatus,
 };
