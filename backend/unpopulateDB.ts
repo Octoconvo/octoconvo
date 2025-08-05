@@ -28,13 +28,6 @@ const unpopulateDB = async () => {
         },
       });
 
-      // Delete user's notifications
-      await prisma.notification.deleteMany({
-        where: {
-          OR: [{ triggeredById: user.id }, { triggeredForId: user.id }],
-        },
-      });
-
       // Delete communities and their related data
 
       for (const community of communities) {
@@ -43,6 +36,17 @@ const unpopulateDB = async () => {
           console.log(
             `\x1b[33mDeleting ${community.name} and its related data`,
           );
+
+          // Delete user's notifications and community's notifications
+          const deleteNotifications = prisma.notification.deleteMany({
+            where: {
+              OR: [
+                { triggeredById: user.id },
+                { triggeredForId: user.id },
+                { communityId: community.id },
+              ],
+            },
+          });
 
           const deleteMessages = prisma.message.deleteMany({
             where: {
@@ -69,6 +73,7 @@ const unpopulateDB = async () => {
           });
 
           await prisma.$transaction([
+            deleteNotifications,
             deleteMessages,
             deleteParticipants,
             deleteInboxes,
@@ -99,17 +104,10 @@ const unpopulateDB = async () => {
     });
   };
 
-  const deleteCommunityData = seedData.map(async user => {
-    return new Promise(resolve => {
-      (async () => {
-        await deleteData({ user });
-        resolve(1);
-      })();
-    });
-  });
-
   try {
-    await Promise.all(deleteCommunityData);
+    for (const user of seedData) {
+      await deleteData({ user });
+    }
 
     for (const user of seedData) {
       await deleteUser({ username: user.username });
