@@ -78,6 +78,10 @@ app.get(
   "/notification/unread-count",
   notificationController.unread_notification_count_get,
 );
+app.post(
+  "/notifications/update-read-status",
+  notificationController.notifications_update_read_status_post,
+);
 
 app.use(expr404ErrorHandler);
 app.use(exprErrorHandler);

@@ -2,7 +2,7 @@ import request, { Response } from "supertest";
 import app from "../../config/testConfig";
 import { login } from "../../utils/testUtils";
 import prisma from "../../database/prisma/client";
-import { Notification } from "@prisma/client";
+import { Notification, User } from "@prisma/client";
 import { isISOString } from "../../utils/validation";
 
 describe(
@@ -344,4 +344,283 @@ describe("Test notifications GET controller", () => {
         .expect(200, done);
     },
   );
+});
+
+describe("Test notification_update_read_status POST controller", () => {
+  let seedUser1: User | null = null;
+  let notifications: Notification[] = [];
+
+  beforeAll(async () => {
+    try {
+      seedUser1 = await prisma.user.findUnique({
+        where: {
+          username: "seeduser1",
+        },
+      });
+
+      if (seedUser1) {
+        notifications = await prisma.notification.findMany({
+          where: {
+            triggeredForId: seedUser1.id,
+          },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+        });
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
+    }
+  });
+
+  afterEach(async () => {
+    // Reset all updated notifications' read statuses to false
+    if (seedUser1) {
+      await prisma.notification.updateMany({
+        where: {
+          triggeredForId: seedUser1.id,
+        },
+        data: {
+          isRead: false,
+        },
+      });
+    }
+  });
+
+  test(
+    "Return 401 authentication error when trying to udate notifications'" +
+      " read statuses when the user is not authenticated",
+    done => {
+      request(app)
+        .post("/notifications/update-read-status?mode=ALERT")
+        .send({
+          startdate: notifications[0]?.createdAt,
+          enddate: notifications[0]?.createdAt,
+        })
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to update user's notifications' read statuses",
+          error: {
+            message: "You are not authenticated",
+          },
+        })
+        .expect(401, done);
+    },
+  );
+
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser1",
+    password: "seed@User1",
+  });
+
+  test("Return 422 HTTP error when the startdate field is empty", done => {
+    agent
+      .post("/notifications/update-read-status?mode=ALERT")
+      .send({
+        startdate: "",
+        enddate: notifications[0]?.createdAt,
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe(
+          "Failed to update user's notifications' read statuses",
+        );
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "startdate",
+          ).msg,
+        ).toBe("The starting date cannot be empty");
+      })
+      .expect(422, done);
+  });
+
+  test(
+    "Return 422 HTTP error when the startdate field is not an ISO" + " string",
+    done => {
+      agent
+        .post("/notifications/update-read-status?mode=ALERT")
+        .send({
+          startdate: "teststartdate1",
+          enddate: notifications[0]?.createdAt,
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe(
+            "Failed to update user's notifications' read statuses",
+          );
+          expect(
+            error.validationError.find(
+              (obj: { field: string; msg: string; value: string }) =>
+                obj.field === "startdate",
+            ).msg,
+          ).toBe("The starting date is invalid");
+        })
+        .expect(422, done);
+    },
+  );
+
+  test(
+    "Return 422 HTTP error when the enddate field is not an ISO" + " string",
+    done => {
+      agent
+        .post("/notifications/update-read-status?mode=ALERT")
+        .send({
+          startdate: "teststartdate1",
+          enddate: "testenddate1",
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe(
+            "Failed to update user's notifications' read statuses",
+          );
+
+          expect(
+            error.validationError.find(
+              (obj: { field: string; msg: string; value: string }) =>
+                obj.field === "enddate",
+            ).msg,
+          ).toBe("The end date is invalid");
+        })
+        .expect(422, done);
+    },
+  );
+
+  test("Return 422 HTTP error when the mode is neither ALERT or SILENT", done => {
+    agent
+      .post("/notifications/update-read-status?mode=testmode1")
+      .send({
+        startdate: notifications[0].createdAt,
+        enddate: notifications[0]?.createdAt,
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe(
+          "Failed to update user's notifications' read statuses",
+        );
+        expect(
+          error.validationError.find(
+            (obj: { field: string; msg: string; value: string }) =>
+              obj.field === "mode",
+          ).msg,
+        ).toBe("Mode must either be SILENT or ALERT");
+      })
+      .expect(422, done);
+  });
+
+  test("Return 200 success if everything is valid in SILENT mode", done => {
+    agent
+      .post("/notifications/update-read-status?mode=SILENT")
+      .send({
+        startdate: notifications[0].createdAt,
+        enddate: notifications[0]?.createdAt,
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+
+        expect(message).toBe(
+          "Successfully updated user's notifications' read statuses" +
+            " in SILENT mode",
+        );
+      })
+      .expect(200, done);
+  });
+
+  test("Return 200 success if everything is valid in ALERT mode", done => {
+    agent
+      .post("/notifications/update-read-status?mode=ALERT")
+      .send({
+        startdate: notifications[0].createdAt,
+        enddate: notifications[0]?.createdAt,
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        expect(message).toBe(
+          "Successfully updated user's notifications' read statuses" +
+            " in ALERT mode",
+        );
+      })
+      .expect(200, done);
+  });
+
+  test(
+    "Update the correct notifications which createAt fields are less than" +
+      " or equal the startdate and greater than or equal the enddate value",
+    done => {
+      const startDate = notifications[0].createdAt;
+      const endDate = notifications[9].createdAt;
+
+      agent
+        .post("/notifications/update-read-status?mode=ALERT")
+        .send({
+          startdate: startDate,
+          enddate: endDate,
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const updatedNotifications = res.body.notifications;
+
+          expect(message).toBe(
+            "Successfully updated user's notifications' read statuses" +
+              " in ALERT mode",
+          );
+
+          expect(updatedNotifications.length).toBe(10);
+          for (const updatedNotification of updatedNotifications) {
+            expect(
+              new Date(updatedNotification.createdAt) >= new Date(endDate),
+            ).toBeTruthy();
+            expect(
+              new Date(updatedNotification.createdAt) <= new Date(startDate),
+            ).toBeTruthy();
+          }
+        })
+        .expect(200, done);
+    },
+  );
+
+  test("Check that all notifications' isRead fields are true", done => {
+    const startDate = notifications[0].createdAt;
+    const endDate = notifications[9].createdAt;
+
+    agent
+      .post("/notifications/update-read-status?mode=ALERT")
+      .send({
+        startdate: startDate,
+        enddate: endDate,
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const updatedNotifications = res.body.notifications;
+
+        expect(message).toBe(
+          "Successfully updated user's notifications' read statuses" +
+            " in ALERT mode",
+        );
+
+        expect(updatedNotifications.length).toBeTruthy();
+        for (const updatedNotification of updatedNotifications) {
+          expect(updatedNotification.isRead).toBeTruthy();
+        }
+      })
+      .expect(200, done);
+  });
 });
