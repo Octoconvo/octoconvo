@@ -3,6 +3,7 @@ import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 import ProtectedRouteWrapper from "@/components/ProtectedRouteWrapper";
 import EditProfileModalProvider from "@/components/EditProfile/EditProfileModalProvider";
 import CreateCommunityModalProvider from "@/components/CreateCommunity/CreateCommunityModalProvider";
+import NotificationProvider from "@/components/NotificationProvider";
 
 export default async function Layout({
   children,
@@ -15,8 +16,10 @@ export default async function Layout({
         <ActiveModalProvider>
           <EditProfileModalProvider>
             <CreateCommunityModalProvider>
-              <LobbyNavWrapper />
-              {children}
+              <NotificationProvider>
+                <LobbyNavWrapper />
+                {children}
+              </NotificationProvider>
             </CreateCommunityModalProvider>
           </EditProfileModalProvider>
         </ActiveModalProvider>
