@@ -210,7 +210,9 @@ const populateDB = async () => {
         triggeredForId: string;
         communityId: string;
       }) => {
-        seedusers.map(async user => {
+        for (const user of seedusers) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
           await prisma.notification.create({
             data: {
               triggeredById: user.id,
@@ -221,11 +223,7 @@ const populateDB = async () => {
               communityId: communityId,
             },
           });
-
-          console.log(
-            `\x1b[36mAdding notification triggered by ${user.username}`,
-          );
-        });
+        }
       };
 
       if (seeduser1 && seedcommunity1) {
