@@ -21,7 +21,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/fonts": ["./src/styles/fonts.ts"],
-      "@/components": ["./src/components/*"]
+      "@/components": ["./src/components/*"],
+      "@/api": ["./src/api/*"]
     },
     "types": ["jest"]
   },
