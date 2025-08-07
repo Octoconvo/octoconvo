@@ -188,7 +188,7 @@ const NotificationModal = () => {
                 />
               );
             })
-          ) : (
+          ) : notifications === null ? null : (
             <li>No notifications yet</li>
           )}
           <div ref={nextObserverRef}></div>
