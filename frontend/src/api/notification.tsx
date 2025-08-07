@@ -1,5 +1,33 @@
 import { NotificationGET } from "@/types/response";
 
+const notificationCountGET = async ({
+  successHandler,
+}: {
+  successHandler: ({ data }: { data: number }) => void;
+}) => {
+  const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
+
+  try {
+    const res = await fetch(`${domainURL}/notification/unread-count`, {
+      credentials: "include",
+      mode: "cors",
+      method: "GET",
+    });
+
+    const resData = await res.json();
+
+    if (res.status >= 400) {
+      console.log(resData.message);
+    }
+
+    if (res.status >= 200 && res.status <= 300) {
+      successHandler({ data: resData.unreadNotificationCount });
+    }
+  } catch (err) {
+    if (err instanceof Error) console.log(err.message);
+  }
+};
+
 const notificationsReadStatusPOST = async ({
   notifications,
   onSuccess,
@@ -44,4 +72,4 @@ const notificationsReadStatusPOST = async ({
   }
 };
 
-export { notificationsReadStatusPOST };
+export { notificationCountGET, notificationsReadStatusPOST };
