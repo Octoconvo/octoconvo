@@ -1,57 +1,46 @@
 "use client";
 
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { UserContext } from "@/contexts/user";
-import { NotificationCountContext } from "@/contexts/notification";
+import {
+  NotificationContext,
+  NotificationCountContext,
+} from "@/contexts/notification";
 import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
+import { NotificationGET } from "@/types/response";
+import { NotificationModalContext } from "@/contexts/modal";
+import { notificationCountGET } from "@/api/notification";
 
-const NotificationCountProvider = ({
-  children,
-}: {
-  children: React.ReactNode;
-}) => {
+const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useContext(UserContext);
   const [notificationCount, setNotificationCount] = useState<null | number>(
     null
   );
+  const [notifications, setNotifications] = useState<null | NotificationGET[]>(
+    null
+  );
+  const [bufferedNotifications, setBufferedNotifications] = useState<
+    NotificationGET[]
+  >([]);
+  const notificationModal = useRef<null | HTMLDivElement>(null);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] =
+    useState<boolean>(false);
+  const [isNotificationModalAnimating, setIsNotificationModalAnimating] =
+    useState<boolean>(false);
 
   useEffect(() => {
-    const fetchNotificationCount = async (id: string) => {
-      const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
-
-      try {
-        const res = await fetch(`${domainURL}/notification/unread-count`, {
-          credentials: "include",
-          mode: "cors",
-          method: "GET",
-        });
-
-        const resData = await res.json();
-
-        if (res.status >= 400) {
-          console.log(resData.message);
-        }
-
-        if (res.status >= 200 && res.status <= 300) {
-          console.log({
-            unreadNotificatioCount: resData.unreadNotificationCount,
-          });
-          setNotificationCount(resData.unreadNotificationCount);
-        }
-      } catch (err) {
-        if (err instanceof Error) console.log(err.message);
-      }
-    };
-
+    // Fetch initial unread notification count
     if (user && notificationCount === null) {
-      fetchNotificationCount(user.id);
+      notificationCountGET({
+        successHandler: ({ data }: { data: number }) => {
+          setNotificationCount(data);
+        },
+      });
 
+      // Listen to notification update
       socket.emit("subscribe", `notification:${user.id}`);
-      socket.on(
-        "notificationupdate",
-        fetchNotificationCount.bind(this, user.id)
-      );
+      socket.on("notificationupdate", notificationCountGET);
 
       socket.on(
         "initiate",
@@ -63,25 +52,69 @@ const NotificationCountProvider = ({
       setNotificationCount(null);
     }
 
+    // Push bufferedNotifications to notifications
+
+    if (
+      notifications &&
+      bufferedNotifications.length &&
+      !isNotificationModalOpen
+    ) {
+      const updatedNotifications = notifications.map((notif) => {
+        const index = bufferedNotifications.findIndex(
+          (buffer) => buffer.id === notif.id
+        );
+        return index > -1 ? bufferedNotifications[index] : notif;
+      });
+
+      setBufferedNotifications([]);
+      setNotifications([...updatedNotifications]);
+    }
+
+    // Update notificationCount when bufferedNotifications is not empty
+    if (bufferedNotifications.length > 0 && !isNotificationModalOpen) {
+      notificationCountGET({
+        successHandler: ({ data }: { data: number }) =>
+          setNotificationCount(data),
+      });
+    }
+
     return () => {
       if (user) {
         socket.off("initiate");
-        socket.off(
-          "notificationupdate",
-          fetchNotificationCount.bind(this, user.id)
-        );
+        socket.off("notificationupdate", notificationCountGET);
         socket.emit("unsubscribe", `notification:${user.id}`);
       }
     };
-  }, [user, notificationCount]);
+  }, [user, notifications, bufferedNotifications, isNotificationModalOpen]);
 
   return (
-    <NotificationCountContext
-      value={{ notificationCount, setNotificationCount }}
+    <NotificationModalContext
+      value={{
+        notificationModal,
+        toggleNotificationModalView: () => {
+          setIsNotificationModalAnimating(true);
+          setIsNotificationModalOpen(!isNotificationModalOpen);
+        },
+        isNotificationModalOpen,
+        isNotificationModalAnimating,
+      }}
     >
-      {children}
-    </NotificationCountContext>
+      <NotificationContext
+        value={{
+          notifications,
+          setNotifications,
+          bufferedNotifications,
+          setBufferedNotifications,
+        }}
+      >
+        <NotificationCountContext
+          value={{ notificationCount, setNotificationCount }}
+        >
+          {children}
+        </NotificationCountContext>
+      </NotificationContext>
+    </NotificationModalContext>
   );
 };
 
-export default NotificationCountProvider;
+export default NotificationProvider;
