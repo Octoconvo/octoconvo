@@ -1,15 +1,24 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useContext, useState } from "react";
-import { NotificationCountContext } from "@/contexts/notification";
-import NotificationModal from "@/components/Notification/NotificationModal";
+import { useContext } from "react";
+import {
+  NotificationContext,
+  NotificationCountContext,
+} from "@/contexts/notification";
 import { NotificationModalContext } from "@/contexts/modal";
+import { notificationsReadStatusPOST } from "@/api/notification";
+import { NotificationGET } from "@/types/response";
 
 const NotificationNav = () => {
   const path = usePathname();
   const { notificationCount } = useContext(NotificationCountContext);
-  const { toggleNotificationModalView } = useContext(NotificationModalContext);
+  const { bufferedNotifications, notifications, setBufferedNotifications } =
+    useContext(NotificationContext);
+  const { toggleNotificationModalView, isNotificationModalOpen } = useContext(
+    NotificationModalContext
+  );
+
   return (
     <>
       <div className="relative">
@@ -17,6 +26,26 @@ const NotificationNav = () => {
           data-testid="notification-l"
           onClick={() => {
             toggleNotificationModalView();
+
+            if (notifications) {
+              /* Only trigger notifications read status update if the
+              notifications contains unread notifications */
+              const containsUnreadNotifications = notifications.some(
+                (notification) => notification.isRead === false
+              );
+
+              if (containsUnreadNotifications && isNotificationModalOpen) {
+                notificationsReadStatusPOST({
+                  notifications,
+                  onSuccess: ({ data }: { data: NotificationGET[] }) => {
+                    setBufferedNotifications([
+                      ...bufferedNotifications,
+                      ...data,
+                    ]);
+                  },
+                });
+              }
+            }
           }}
           className={
             "flex relative items-center justify-center h-12 rounded-[8px]" +
@@ -46,7 +75,9 @@ const NotificationNav = () => {
               " translate-y-[-50%] translate-x-[50%] animate-notification"
             }
           >
-            <p className="text-white-100">{notificationCount}</p>
+            <p data-testid="ntfctn-cnt-indicator" className="text-white-100">
+              {notificationCount}
+            </p>
           </div>
         ) : null}
       </div>
