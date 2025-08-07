@@ -7,6 +7,7 @@ import NotificationRequestItem from "./NotificationRequestItem";
 import socket from "@/socket/socket";
 import { UserContext } from "@/contexts/user";
 import { connectToRoom } from "@/socket/eventHandler";
+import { NotificationContext } from "@/contexts/notification";
 
 const NotificationModal = () => {
   const {
@@ -14,9 +15,8 @@ const NotificationModal = () => {
     isNotificationModalOpen,
     isNotificationModalAnimating,
   } = useContext(NotificationModalContext);
-  const [notifications, setNotifications] = useState<null | NotificationGET[]>(
-    null
-  );
+
+  const { notifications, setNotifications } = useContext(NotificationContext);
   const [nextCursor, setNextCursor] = useState<null | false | string>(null);
   const nextObserverRef = useRef<null | HTMLDivElement>(null);
   const { user } = useContext(UserContext);
@@ -41,7 +41,7 @@ const NotificationModal = () => {
         if (res.status >= 400) {
           console.log(resData.message);
         }
-        console.log({ notifications: resData.notifications });
+
         if (res.status >= 200 && res.status <= 300) {
           if (notifications === null) {
             setNotifications(resData.notifications);
@@ -56,7 +56,6 @@ const NotificationModal = () => {
       }
     };
 
-    console.log({ notifications, isNotificationModalOpen });
     // fetch initial notifications if the notifications is null
     if (notifications === null && isNotificationModalOpen) {
       fetchNotifications();
@@ -174,8 +173,6 @@ const NotificationModal = () => {
                   updateNotification={(
                     updatedNotification: NotificationGET
                   ) => {
-                    console.log({ updatedNotification, notifications });
-
                     if (notifications !== null) {
                       const updatedNotifications = notifications.map(
                         (notification): NotificationGET => {
