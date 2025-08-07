@@ -4,6 +4,11 @@ import { screen, render, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NotificationGET } from "@/types/response";
 import { NotificationModalContext } from "@/contexts/modal";
+import NotificationProvider from "@/components/NotificationProvider";
+import {
+  NotificationContext,
+  NotificationCountContext,
+} from "@/contexts/notification";
 
 const notification: NotificationGET = {
   id: "testnotification1",
@@ -73,16 +78,18 @@ describe(
     beforeEach(async () => {
       await act(async () =>
         render(
-          <NotificationModalContext
-            value={{
-              notificationModal: null,
-              isNotificationModalOpen: true,
-              isNotificationModalAnimating: false,
-              toggleNotificationModalView: () => {},
-            }}
-          >
-            <NotificationModal />
-          </NotificationModalContext>
+          <NotificationProvider>
+            <NotificationModalContext
+              value={{
+                notificationModal: null,
+                isNotificationModalOpen: true,
+                isNotificationModalAnimating: false,
+                toggleNotificationModalView: () => {},
+              }}
+            >
+              <NotificationModal />
+            </NotificationModalContext>
+          </NotificationProvider>
         )
       );
     });
@@ -92,7 +99,38 @@ describe(
     test(
       "Show empty notifications messaage if the notifications's" +
         " length is 0",
-      () => {
+      async () => {
+        await act(async () =>
+          render(
+            <NotificationContext
+              value={{
+                notifications: [],
+                setNotifications: jest.fn(),
+                bufferedNotifications: [],
+                setBufferedNotifications: jest.fn(),
+              }}
+            >
+              <NotificationModalContext
+                value={{
+                  notificationModal: null,
+                  isNotificationModalOpen: true,
+                  isNotificationModalAnimating: false,
+                  toggleNotificationModalView: () => {},
+                }}
+              >
+                <NotificationCountContext
+                  value={{
+                    notificationCount: 0,
+                    setNotificationCount: jest.fn(),
+                  }}
+                >
+                  <NotificationModal />
+                </NotificationCountContext>
+              </NotificationModalContext>
+            </NotificationContext>
+          )
+        );
+
         const emptyNotificationMsg = screen.getByText("No notifications yet");
 
         expect(emptyNotificationMsg).toBeInTheDocument();
@@ -100,7 +138,7 @@ describe(
     );
 
     test(
-      "The initial notificications should be fetched and rendered if" +
+      "The initial notifications should be fetched and rendered if" +
         " the notification modal is open",
       async () => {
         const uList = screen.getByTestId("ntfctn-mdl-ulst");
@@ -136,29 +174,25 @@ describe(
 describe(
   "Render NotficationModal with false isNotificationModalOpen" + " context",
   () => {
-    test(
-      "Show empty notifications messaage if the notifications's" +
-        " length is 0",
-      async () => {
-        await act(async () =>
-          render(
-            <NotificationModalContext
-              value={{
-                notificationModal: null,
-                isNotificationModalOpen: false,
-                isNotificationModalAnimating: false,
-                toggleNotificationModalView: () => {},
-              }}
-            >
-              <NotificationModal />
-            </NotificationModalContext>
-          )
-        );
+    test("Modal should be hidden", async () => {
+      await act(async () =>
+        render(
+          <NotificationModalContext
+            value={{
+              notificationModal: null,
+              isNotificationModalOpen: false,
+              isNotificationModalAnimating: false,
+              toggleNotificationModalView: () => {},
+            }}
+          >
+            <NotificationModal />
+          </NotificationModalContext>
+        )
+      );
 
-        const notificationModal = screen.getByTestId("ntfctn-mdl");
+      const notificationModal = screen.getByTestId("ntfctn-mdl");
 
-        expect(notificationModal.classList).toContain("hidden");
-      }
-    );
+      expect(notificationModal.classList).toContain("hidden");
+    });
   }
 );
