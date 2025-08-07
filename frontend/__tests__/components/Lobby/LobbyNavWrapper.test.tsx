@@ -6,6 +6,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import ActiveModalProvider from "@/components/ActiveModalProvider";
+import NotificationProvider from "@/components/NotificationProvider";
 
 const userProfile: UserProfile = {
   id: "513c920c-3921-48b2-88d7-5b8156b9e6b8",
@@ -29,7 +30,9 @@ describe("Render LobbyNavWrapper", () => {
           value={{ userProfile, setUserProfile: jest.fn(() => {}) }}
         >
           <ActiveModalProvider>
-            <LobbyNavWrapper />
+            <NotificationProvider>
+              <LobbyNavWrapper />
+            </NotificationProvider>
           </ActiveModalProvider>
         </UserProfileContext.Provider>
       </div>
