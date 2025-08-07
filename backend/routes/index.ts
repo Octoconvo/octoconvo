@@ -13,4 +13,9 @@ router.get("/communities", communityController.communities_get);
 
 router.get("/notifications", notificationController.notifications_get);
 
+router.post(
+  "/notifications/update-read-status",
+  notificationController.notifications_update_read_status_post,
+);
+
 export default router;
