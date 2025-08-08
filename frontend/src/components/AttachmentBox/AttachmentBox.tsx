@@ -4,7 +4,7 @@ import { Attachment } from "@/types/response";
 
 const AttachmentStyles = [
   {
-    container: " grid h-[max(320px,29vh)]",
+    container: " flex h-[max(320px,29vh)]",
     img: " w-auto",
     button: (index: number) => " max-h-full",
   },
