@@ -4,6 +4,7 @@ import { login } from "../../utils/testUtils";
 import prisma from "../../database/prisma/client";
 import { Notification, User } from "@prisma/client";
 import { isISOString } from "../../utils/validation";
+import { NotificationRes } from "../../@types/apiResponse";
 
 describe(
   "Test user's unread notification count get controller with" + " seeduser1",
@@ -620,6 +621,89 @@ describe("Test notification_update_read_status POST controller", () => {
         for (const updatedNotification of updatedNotifications) {
           expect(updatedNotification.isRead).toBeTruthy();
         }
+      })
+      .expect(200, done);
+  });
+
+  test("Ensure the notifications returned contains triggeredBy's username", done => {
+    const startDate = notifications[0].createdAt;
+    const endDate = notifications[9].createdAt;
+
+    agent
+      .post("/notifications/update-read-status?mode=ALERT")
+      .send({
+        startdate: startDate,
+        enddate: endDate,
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const updatedNotifications: NotificationRes[] = res.body.notifications;
+
+        expect(message).toBe(
+          "Successfully updated user's notifications' read statuses" +
+            " in ALERT mode",
+        );
+
+        updatedNotifications.forEach((notif: NotificationRes) => {
+          expect(notif.triggeredBy.username).toBeTruthy();
+        });
+      })
+      .expect(200, done);
+  });
+
+  test("Ensure the notifications returned contains triggeredFor's username", done => {
+    const startDate = notifications[0].createdAt;
+    const endDate = notifications[9].createdAt;
+
+    agent
+      .post("/notifications/update-read-status?mode=ALERT")
+      .send({
+        startdate: startDate,
+        enddate: endDate,
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const updatedNotifications: NotificationRes[] = res.body.notifications;
+
+        expect(message).toBe(
+          "Successfully updated user's notifications' read statuses" +
+            " in ALERT mode",
+        );
+
+        updatedNotifications.forEach((notif: NotificationRes) => {
+          expect(notif.triggeredFor.username).toBeTruthy();
+        });
+      })
+      .expect(200, done);
+  });
+
+  test("Ensure the notifications returned contains community's name", done => {
+    const startDate = notifications[0].createdAt;
+    const endDate = notifications[9].createdAt;
+
+    agent
+      .post("/notifications/update-read-status?mode=ALERT")
+      .send({
+        startdate: startDate,
+        enddate: endDate,
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const updatedNotifications: NotificationRes[] = res.body.notifications;
+
+        expect(message).toBe(
+          "Successfully updated user's notifications' read statuses" +
+            " in ALERT mode",
+        );
+
+        updatedNotifications.forEach((notif: NotificationRes) => {
+          expect(
+            notif.community === null || notif.community?.name.length > 0,
+          ).toBeTruthy();
+        });
       })
       .expect(200, done);
   });
