@@ -11,6 +11,7 @@ import { connectToRoom } from "@/socket/eventHandler";
 import { NotificationGET } from "@/types/response";
 import { NotificationModalContext } from "@/contexts/modal";
 import { notificationCountGET } from "@/api/notification";
+import { pushBufferedNotifications } from "@/utils/notification";
 
 const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useContext(UserContext);
@@ -59,11 +60,9 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
       bufferedNotifications.length &&
       !isNotificationModalOpen
     ) {
-      const updatedNotifications = notifications.map((notif) => {
-        const index = bufferedNotifications.findIndex(
-          (buffer) => buffer.id === notif.id
-        );
-        return index > -1 ? bufferedNotifications[index] : notif;
+      const updatedNotifications = pushBufferedNotifications({
+        notifications,
+        bufferedNotifications,
       });
 
       setBufferedNotifications([]);
