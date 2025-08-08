@@ -240,6 +240,23 @@ const updateNotificationsReadStatus = async ({
     data: {
       isRead: true,
     },
+    include: {
+      triggeredBy: {
+        select: {
+          username: true,
+        },
+      },
+      triggeredFor: {
+        select: {
+          username: true,
+        },
+      },
+      community: {
+        select: {
+          name: true,
+        },
+      },
+    },
   });
 
   return notifications;
