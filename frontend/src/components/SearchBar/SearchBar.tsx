@@ -111,7 +111,12 @@ const SearchBar = ({
           </form>
 
           {errors.name && (
-            <div className="absolute w-full left-0 bottom-[-100%] text-invalid text-p p-[8px] bg-gr-black-100 z-20 rounded-b-[4px]">
+            <div
+              className={
+                "absolute w-full left-0 bottom-[-100%] text-invalid" +
+                " text-p p-[8px] bg-gr-black-100 rounded-b-[4px]"
+              }
+            >
               {errors.name.message}
             </div>
           )}
