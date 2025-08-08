@@ -32,16 +32,26 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Fetch initial unread notification count
+    const notificationCountGETSuccessHandler = ({ data }: { data: number }) => {
+      console.log("UPDATING NOTIFICATION COUNT");
+      console.log({ data });
+      setNotificationCount(data);
+    };
     if (user && notificationCount === null) {
       notificationCountGET({
-        successHandler: ({ data }: { data: number }) => {
-          setNotificationCount(data);
-        },
+        successHandler: notificationCountGETSuccessHandler,
       });
+    }
 
+    if (user) {
       // Listen to notification update
       socket.emit("subscribe", `notification:${user.id}`);
-      socket.on("notificationupdate", notificationCountGET);
+      socket.on(
+        "notificationupdate",
+        notificationCountGET.bind(this, {
+          successHandler: notificationCountGETSuccessHandler,
+        })
+      );
 
       socket.on(
         "initiate",
@@ -72,19 +82,29 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
     // Update notificationCount when bufferedNotifications is not empty
     if (bufferedNotifications.length > 0 && !isNotificationModalOpen) {
       notificationCountGET({
-        successHandler: ({ data }: { data: number }) =>
-          setNotificationCount(data),
+        successHandler: notificationCountGETSuccessHandler,
       });
     }
 
     return () => {
       if (user) {
         socket.off("initiate");
-        socket.off("notificationupdate", notificationCountGET);
+        socket.off(
+          "notificationupdate",
+          notificationCountGET.bind(this, {
+            successHandler: notificationCountGETSuccessHandler,
+          })
+        );
         socket.emit("unsubscribe", `notification:${user.id}`);
       }
     };
-  }, [user, notifications, bufferedNotifications, isNotificationModalOpen]);
+  }, [
+    user,
+    notifications,
+    bufferedNotifications,
+    isNotificationModalOpen,
+    notificationCount,
+  ]);
 
   return (
     <NotificationModalContext
