@@ -26,7 +26,7 @@ const CommunitiesItem = ({
         setIsHovered(false);
       }}
       className={
-        "flex box-border w-full max-w-full border-b-[1px]" +
+        "flex box-border w-full max-w-full border-b-[1px] flex-shrink-0" +
         " border-[#80fffb1a] overflow-hidden min-h-[min-content]"
       }
     >
