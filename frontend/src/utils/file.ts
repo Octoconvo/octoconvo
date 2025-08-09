@@ -109,7 +109,7 @@ const validateFiles = ({
 }: {
   e: React.FormEvent<HTMLInputElement>;
   mimetype: RegExp | string[];
-  maxSize: number;
+  maxSize?: number;
 }): FileList | null => {
   const fileInput = e.target as HTMLInputElement;
   const files = fileInput.files ? fileInput.files : null;
@@ -130,7 +130,7 @@ const validateFiles = ({
         }
       }
 
-      if (file.size > maxSize) {
+      if (maxSize && file.size > maxSize) {
         throw new Error("File size is too big");
       }
     }
