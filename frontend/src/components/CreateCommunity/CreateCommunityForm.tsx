@@ -18,7 +18,12 @@ import {
   ActiveModalsContext,
   CreateCommunityModalContext,
 } from "@/contexts/modal";
-import { previewFile, selectFile } from "@/utils/file";
+import {
+  previewFile,
+  previewImage,
+  selectFile,
+  validateFiles,
+} from "@/utils/file";
 import { triggerInputClick } from "@/utils/controller";
 import ValidationError from "@/components/ValidationError";
 
@@ -53,24 +58,6 @@ const CreateCommunityForm = ({
   const bannerRegister = register("banner", bannerValidation);
 
   useEffect(() => {
-    const previewFiles = async () => {
-      if (bannerFile) {
-        const bannerPreview = await previewFile({ file: bannerFile });
-
-        if (bannerPreview) {
-          setBanner(bannerPreview);
-        }
-      }
-
-      if (avatarFile) {
-        const avatarPreview = await previewFile({ file: avatarFile });
-
-        if (avatarPreview) {
-          setAvatar(avatarPreview);
-        }
-      }
-    };
-
     const resetFileInput = () => {
       if (
         activeModals.length < 1 ||
@@ -85,7 +72,6 @@ const CreateCommunityForm = ({
       }
     };
 
-    previewFiles();
     resetFileInput();
   }, [
     activeModals,
@@ -109,16 +95,23 @@ const CreateCommunityForm = ({
             data-testid="crt-cmmnty-banner-btn"
             type="button"
             className={
-              "add-image-icon before:h-[64px] before:w-[64px] w-full" +
+              "flex justify-center items-center w-full relative" +
               " bg-gr-brand-dark-d relative rounded-t-[inherit] aspect-[7/2]"
             }
             onClick={() => {
               triggerInputClick(bannerInputRef);
             }}
           >
+            {!banner && (
+              <span
+                className={
+                  "add-image-icon before:h-[64px]" + " before:w-[64px]"
+                }
+              ></span>
+            )}
             {banner && (
               <Image
-                data-testid="crt-cmmnty-banner-btn"
+                data-testid="crt-cmmnty-banner-img"
                 src={banner}
                 alt="Community banner"
                 width={1920}
@@ -168,8 +161,22 @@ const CreateCommunityForm = ({
               avatarRegister.ref(e);
               avatarInputRef.current = e;
             }}
-            onInput={(e) => {
-              selectFile(e, setAvatarFile, ["image/png", "image/jpeg"]);
+            onInput={async (e) => {
+              // selectFile(e, setAvatarFile, ["image/png", "image/jpeg"]);
+
+              const images = validateFiles({
+                e,
+                mimetype: ["image/jpeg", "image/png"],
+              });
+
+              if (images) {
+                const preview = await previewImage({
+                  file: images[0],
+                  maxHeight: 320,
+                });
+
+                setAvatar(preview);
+              }
             }}
           />
           <input
@@ -183,8 +190,22 @@ const CreateCommunityForm = ({
               bannerRegister.ref(e);
               bannerInputRef.current = e;
             }}
-            onInput={(e) => {
-              selectFile(e, setBannerFile, ["image/png", "image/jpeg"]);
+            onInput={async (e) => {
+              // selectFile(e, setBannerFile, ["image/png", "image/jpeg"]);
+
+              const images = validateFiles({
+                e,
+                mimetype: ["image/jpeg", "image/png"],
+              });
+
+              if (images) {
+                const preview = await previewImage({
+                  file: images[0],
+                  maxWidth: 1080,
+                });
+
+                setBanner(preview);
+              }
             }}
           />
           {errors.avatar && (
