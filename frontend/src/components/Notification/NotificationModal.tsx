@@ -13,7 +13,9 @@ const NotificationModal = () => {
   const {
     notificationModal,
     isNotificationModalOpen,
+    setIsNotificationModalOpen,
     isNotificationModalAnimating,
+    setIsNotificationModalAnimating,
   } = useContext(NotificationModalContext);
 
   const { notifications, setNotifications } = useContext(NotificationContext);
@@ -109,6 +111,19 @@ const NotificationModal = () => {
       );
     }
 
+    const closeModal = () => {
+      setIsNotificationModalOpen(false);
+      setIsNotificationModalAnimating(true);
+    };
+
+    const closeOnEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        closeModal();
+      }
+    };
+
+    window.addEventListener("keydown", closeOnEsc);
+
     return () => {
       if (notificationModalCurrent) {
         notificationModalCurrent.removeEventListener("animationend", hideModal);
@@ -129,72 +144,97 @@ const NotificationModal = () => {
           connectToRoom.bind(this, socket, `notification:${user.id}`)
         );
       }
+
+      window.removeEventListener("keydown", closeOnEsc);
     };
   }, [isNotificationModalOpen, nextCursor, notifications]);
 
   return (
-    <div
-      data-testid="ntfctn-mdl"
-      ref={notificationModal}
-      className={
-        "absolute z-0 rounded-br-[16px] rounded-tr-[16px] border-r-[1px]" +
-        " overflow-hidden top-0 left-[100%] border-r-white-200-op-025" +
-        (isNotificationModalOpen
-          ? " animate-slide-right"
-          : " animate-slide-left") +
-        (!isNotificationModalOpen && !isNotificationModalAnimating
-          ? " hidden"
-          : "")
-      }
-    >
-      <article
+    <>
+      <div
+        data-testid="ntfctn-mdl-cntr"
         className={
-          "min-w-[480px] max-w-[480px] bg-gr-black-1-b p-[32px]" +
-          " pt-0 min-h-[100dvh] font-bold text-white-100" +
-          "  max-h-[100dvh] overflow-auto scrollbar"
+          "absolute z-10 top-0 left-0" +
+          (isNotificationModalOpen ? " w-[100dvw] h-[100dvh]" : " w-0 h-0")
+        }
+        onClick={(e) => {
+          console.log("HI");
+          if (notificationModal?.current) {
+            const isChildren = notificationModal.current?.contains(
+              e.target as HTMLElement
+            );
+
+            if (!isChildren && notificationModal.current !== e.target) {
+              setIsNotificationModalOpen(false);
+              setIsNotificationModalAnimating(true);
+            }
+          }
+        }}
+      ></div>
+      <div
+        data-testid="ntfctn-mdl"
+        ref={notificationModal}
+        className={
+          "absolute rounded-br-[16px] rounded-tr-[16px] border-r-[1px]" +
+          " overflow-hidden top-0 left-[100%] border-r-white-200-op-025" +
+          (isNotificationModalOpen
+            ? " animate-slide-right"
+            : " animate-slide-left") +
+          (!isNotificationModalOpen && !isNotificationModalAnimating
+            ? " hidden"
+            : "") +
+          (isNotificationModalAnimating ? " z-0" : " z-10")
         }
       >
-        <h1 className="text-h6 sticky top-0 bg-black-200 pt-[32px]">
-          Notifications
-        </h1>
-        <ul
-          data-testid="ntfctn-mdl-ulst"
+        <article
           className={
-            "flex flex-col gap-[12px] box-border scrollbar" +
-            " bg-black-400 w-full max-h-full p-[16px] rounded-[4px]"
+            "min-w-[480px] max-w-[480px] bg-gr-black-1-b p-[32px]" +
+            " pt-0 min-h-[100dvh] font-bold text-white-100" +
+            "  max-h-[100dvh] overflow-auto scrollbar"
           }
         >
-          {notifications && notifications?.length > 0 ? (
-            notifications.map((notification) => {
-              return (
-                <NotificationRequestItem
-                  key={notification.id}
-                  notification={notification}
-                  updateNotification={(
-                    updatedNotification: NotificationGET
-                  ) => {
-                    if (notifications !== null) {
-                      const updatedNotifications = notifications.map(
-                        (notification): NotificationGET => {
-                          return notification.id === updatedNotification.id
-                            ? updatedNotification
-                            : notification;
-                        }
-                      );
+          <h1 className="text-h6 sticky top-0 bg-black-200 pt-[32px]">
+            Notifications
+          </h1>
+          <ul
+            data-testid="ntfctn-mdl-ulst"
+            className={
+              "flex flex-col gap-[12px] box-border scrollbar" +
+              " bg-black-400 w-full max-h-full p-[16px] rounded-[4px]"
+            }
+          >
+            {notifications && notifications?.length > 0 ? (
+              notifications.map((notification) => {
+                return (
+                  <NotificationRequestItem
+                    key={notification.id}
+                    notification={notification}
+                    updateNotification={(
+                      updatedNotification: NotificationGET
+                    ) => {
+                      if (notifications !== null) {
+                        const updatedNotifications = notifications.map(
+                          (notification): NotificationGET => {
+                            return notification.id === updatedNotification.id
+                              ? updatedNotification
+                              : notification;
+                          }
+                        );
 
-                      setNotifications([...updatedNotifications]);
-                    }
-                  }}
-                />
-              );
-            })
-          ) : notifications === null ? null : (
-            <li>No notifications yet</li>
-          )}
-          <div ref={nextObserverRef}></div>
-        </ul>
-      </article>
-    </div>
+                        setNotifications([...updatedNotifications]);
+                      }
+                    }}
+                  />
+                );
+              })
+            ) : notifications === null ? null : (
+              <li>No notifications yet</li>
+            )}
+            <div ref={nextObserverRef}></div>
+          </ul>
+        </article>
+      </div>
+    </>
   );
 };
 
