@@ -33,10 +33,12 @@ const previewFile = async ({
 // Preview image with specified max height for better performance
 const previewImage = async ({
   file,
-  maxHeight = 320,
+  maxHeight,
+  maxWidth,
 }: {
   file: File;
-  maxHeight: number;
+  maxHeight?: number;
+  maxWidth?: number;
 }): Promise<string | null> => {
   try {
     const image = await createImageBitmap(file);
@@ -45,12 +47,15 @@ const previewImage = async ({
 
     if (context) {
       // Scale down image
-      const ratio = maxHeight / image.height;
+      const ratio = maxHeight
+        ? maxHeight / image.height
+        : maxWidth
+        ? maxWidth / image.width
+        : 1;
 
       const width = image.width * ratio;
       const height = image.height * ratio;
 
-      console.log({ ratio });
       canvas.width = width;
       canvas.height = height;
 
