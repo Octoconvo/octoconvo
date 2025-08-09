@@ -41,14 +41,20 @@ type NotificationModalContext = {
   notificationModal: null | React.RefObject<null | HTMLDivElement>;
   toggleNotificationModalView: () => void;
   isNotificationModalOpen: boolean;
+  setIsNotificationModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isNotificationModalAnimating: boolean;
+  setIsNotificationModalAnimating: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
 };
 
 const NotificationModalContext = createContext<NotificationModalContext>({
   notificationModal: null,
   toggleNotificationModalView: () => {},
   isNotificationModalOpen: false,
+  setIsNotificationModalOpen: () => {},
   isNotificationModalAnimating: false,
+  setIsNotificationModalAnimating: () => {},
 });
 
 export {

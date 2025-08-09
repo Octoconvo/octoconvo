@@ -114,8 +114,11 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
           setIsNotificationModalAnimating(true);
           setIsNotificationModalOpen(!isNotificationModalOpen);
         },
+
         isNotificationModalOpen,
+        setIsNotificationModalOpen,
         isNotificationModalAnimating,
+        setIsNotificationModalAnimating,
       }}
     >
       <NotificationContext

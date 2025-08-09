@@ -33,6 +33,9 @@ const notification: NotificationGET = {
 
 const updatedPayload = "YOU UPDATED THIS NOTIFICATION";
 
+const setIsNotificationModalAnimatingMock = jest.fn();
+const setIsNotificationModalOpenMock = jest.fn();
+
 global.fetch = jest
   .fn()
   .mockImplementationOnce(
@@ -84,6 +87,8 @@ describe(
                 notificationModal: null,
                 isNotificationModalOpen: true,
                 isNotificationModalAnimating: false,
+                setIsNotificationModalOpen: jest.fn(),
+                setIsNotificationModalAnimating: jest.fn(),
                 toggleNotificationModalView: () => {},
               }}
             >
@@ -115,6 +120,8 @@ describe(
                   notificationModal: null,
                   isNotificationModalOpen: true,
                   isNotificationModalAnimating: false,
+                  setIsNotificationModalOpen: jest.fn(),
+                  setIsNotificationModalAnimating: jest.fn(),
                   toggleNotificationModalView: () => {},
                 }}
               >
@@ -181,6 +188,8 @@ describe(
             value={{
               notificationModal: null,
               isNotificationModalOpen: false,
+              setIsNotificationModalOpen: jest.fn(),
+              setIsNotificationModalAnimating: jest.fn(),
               isNotificationModalAnimating: false,
               toggleNotificationModalView: () => {},
             }}
