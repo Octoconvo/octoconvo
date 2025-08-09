@@ -83,8 +83,10 @@ const NotificationModal = () => {
 
     // Handle notification modal animation and view state
     const hideModal = () => {
-      if (!isNotificationModalOpen)
+      if (!isNotificationModalOpen) {
         notificationModal?.current?.classList.add("hidden");
+      }
+      setIsNotificationModalAnimating(false);
     };
 
     const notificationModalCurrent = notificationModal?.current;
@@ -158,7 +160,6 @@ const NotificationModal = () => {
           (isNotificationModalOpen ? " w-[100dvw] h-[100dvh]" : " w-0 h-0")
         }
         onClick={(e) => {
-          console.log("HI");
           if (notificationModal?.current) {
             const isChildren = notificationModal.current?.contains(
               e.target as HTMLElement
