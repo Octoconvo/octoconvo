@@ -3,9 +3,10 @@ import { Request, Response } from "express";
 import {
   getUserProfileById,
   updateUserProfileById,
+  searchProfiles,
 } from "../database/prisma/profileQueries";
 import { createAuthenticationHandler } from "../utils/authentication";
-import { body, check, validationResult } from "express-validator";
+import { query, body, check, validationResult } from "express-validator";
 import { createValidationErrObj } from "../utils/error";
 import multer from "multer";
 import { convertFileName } from "../utils/file";
@@ -63,6 +64,40 @@ const profileValidation = {
 
     return true;
   }),
+  name_query: query("name")
+    .trim()
+    .optional({ values: "falsy" })
+    .isLength({ max: 128 })
+    .withMessage("Name query must not exceed 128 characters")
+    .escape(),
+  limit: query("limit")
+    .optional({ values: "falsy" })
+    .bail()
+    .isInt({
+      min: 1,
+      max: 100,
+      allow_leading_zeroes: false,
+    })
+    .withMessage("Limit must be an integer and between 1 and 100"),
+  cursor: query("cursor")
+    .trim()
+    .optional({ values: "falsy" })
+    .bail()
+    .custom(value => {
+      const cursor = value;
+
+      const username = cursor ? cursor.split("_")[0] : null;
+      const name = cursor ? cursor.split("_")[1] : null;
+
+      const usernameRegex = new RegExp("^[a-zA-Z0-9_]+$");
+      const isUsername = usernameRegex.test(username);
+
+      if (!isUsername || !name) {
+        throw new Error("Cursor value is invalid");
+      }
+
+      return true;
+    }),
 };
 
 const user_profile_get = asyncHandler(async (req: Request, res: Response) => {
@@ -217,4 +252,44 @@ const user_profile_post = [
   }),
 ];
 
-export { user_profile_get, user_profile_post };
+const profiles_explore_get = [
+  createAuthenticationHandler({
+    message: "Failed to fetch profiles",
+    errMessage: "You are not authenticated",
+  }),
+  profileValidation.name_query,
+  profileValidation.limit,
+  profileValidation.cursor,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(errors, "Failed to fetch profiles");
+
+      res.status(422).json(obj);
+      return;
+    }
+
+    const name = req.query?.name ? req.query.name.toString() : "";
+    const limit = req.query?.limit ? Number(req.query.limit) : 30;
+    const cursor = req.query?.cursor
+      ? (req.query?.cursor as string).split("_")
+      : null;
+
+    const profiles = await searchProfiles({
+      name,
+      limit,
+      cursor: cursor ? { username: cursor[0], displayName: cursor[1] } : cursor,
+    });
+
+    const lastProfile = profiles.length ? profiles[profiles.length - 1] : null;
+    const nextCursor = lastProfile ? `${lastProfile.id}` : null;
+    res.json({
+      message: "Successfully fetched profiles",
+      profiles,
+      cursor: profiles.length < limit ? false : nextCursor,
+    });
+  }),
+];
+
+export { user_profile_get, user_profile_post, profiles_explore_get };
