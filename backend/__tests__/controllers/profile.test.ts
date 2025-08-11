@@ -1,8 +1,9 @@
 import request, { Response } from "supertest";
 import app from "../../config/testConfig";
-import { login } from "../../utils/testUtils";
+import { getValidationErrorMsg, login } from "../../utils/testUtils";
 import { User } from "@prisma/client";
 import prisma from "../../database/prisma/client";
+import { ProfileRes } from "../../@types/apiResponse";
 
 jest.mock("../../database/supabase/supabaseQueries", () => ({
   uploadFile: async ({
@@ -249,5 +250,251 @@ describe("Test user profile post controller", () => {
       })
       .expect(200)
       .end(done);
+  });
+});
+
+describe("Test profile_explore_get", () => {
+  let seedProfiles: ProfileRes[] = [];
+  let lastProfile: null | ProfileRes = null;
+  let middleProfile: null | ProfileRes = null;
+
+  beforeAll(async () => {
+    try {
+      seedProfiles = await prisma.user.findMany({
+        where: {
+          OR: [
+            {
+              username: {
+                startsWith: "seeduser",
+              },
+            },
+            {
+              displayName: {
+                startsWith: "seedUser",
+              },
+            },
+          ],
+        },
+        omit: {
+          password: true,
+        },
+        orderBy: [{ displayName: "asc" }, { username: "asc" }],
+      });
+
+      lastProfile = seedProfiles[seedProfiles.length - 1];
+
+      const middleIndex =
+        seedProfiles.length % 2 === 0
+          ? seedProfiles.length / 2 - 1
+          : (seedProfiles.length + 1) / 2 - 1;
+
+      if (middleIndex >= 0) {
+        middleProfile = seedProfiles[middleIndex];
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err);
+      }
+    }
+  });
+
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser1",
+    password: "seed@User1",
+  });
+
+  test("Failed to fetch profiles if the user is unauthenticated", done => {
+    request(app)
+      .get("/explore/profiles")
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch profiles",
+        error: {
+          message: "You are not authenticated",
+        },
+      })
+      .expect(401, done);
+  });
+
+  test(
+    "Failed to fetch profiles if the name query is longer" + " than 128",
+    done => {
+      const nameQuery = "a".repeat(129);
+
+      agent
+        .get(`/explore/profiles?name=${nameQuery}`)
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to fetch profiles");
+          expect(
+            getValidationErrorMsg({
+              error,
+              field: "name",
+            }),
+          ).toBe("Name query must not exceed 128 characters");
+        })
+        .expect(422, done);
+    },
+  );
+
+  test("Failed to fetch profiles if the limit is not an integer", done => {
+    agent
+      .get("/explore/profiles?limit=0.1")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch profiles");
+        expect(
+          getValidationErrorMsg({
+            error,
+            field: "limit",
+          }),
+        ).toBe("Limit must be an integer and between 1 and 100");
+      })
+      .expect(422, done);
+  });
+
+  test("Failed to fetch profiles if the limit is bigger than 100", done => {
+    agent
+      .get("/explore/profiles?limit=101")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch profiles");
+        expect(
+          getValidationErrorMsg({
+            error,
+            field: "limit",
+          }),
+        ).toBe("Limit must be an integer and between 1 and 100");
+      })
+      .expect(422, done);
+  });
+
+  test("Failed to fetch profiles if the limit is smaller than 1", done => {
+    agent
+      .get("/explore/profiles?limit=0")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch profiles");
+        expect(
+          getValidationErrorMsg({
+            error,
+            field: "limit",
+          }),
+        ).toBe("Limit must be an integer and between 1 and 100");
+      })
+      .expect(422, done);
+  });
+
+  test("Failed to fetch profiles if the cursor id is invalid", done => {
+    agent
+      .get("/explore/profiles?cursor=8")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch profiles");
+        expect(
+          getValidationErrorMsg({
+            error,
+            field: "cursor",
+          }),
+        ).toBe("Cursor value is invalid");
+      })
+      .expect(422, done);
+  });
+
+  test(
+    "Return 30 profiles on a successfull request with no" + " query params",
+    done => {
+      agent
+        .get("/explore/profiles")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const profiles = res.body.profiles;
+
+          expect(message).toBe("Successfully fetched profiles");
+          expect(profiles.length).toBe(30);
+        })
+        .expect(200, done);
+    },
+  );
+
+  test(
+    "Return the correct cursor when there are more profiles to" + " fetch",
+    done => {
+      agent
+        .get("/explore/profiles?name=seeduser")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const cursor = res.body.cursor;
+
+          expect(message).toBe("Successfully fetched profiles");
+          expect(cursor).toBe(seedProfiles[29].id);
+        })
+        .expect(200, done);
+    },
+  );
+
+  test("Return false cursor when there are no more profiles to fetch", done => {
+    const cursor =
+      `${lastProfile?.username}` + "_" + `${lastProfile?.displayName}`;
+
+    agent
+      .get(`/explore/profiles?cursor=${cursor}`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const cursor = res.body.cursor;
+
+        expect(message).toBe("Successfully fetched profiles");
+        expect(cursor).toBe(false);
+      })
+      .expect(200, done);
+  });
+
+  test("Return correct profiles with cursor", done => {
+    const cursor =
+      `${middleProfile?.username}` + "_" + `${middleProfile?.displayName}`;
+
+    agent
+      .get(`/explore/profiles?cursor=${cursor}`)
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const profiles = res.body.profiles;
+
+        expect(message).toBe("Successfully fetched profiles");
+        expect(profiles.length).toBeGreaterThanOrEqual(1);
+
+        for (const profile of profiles) {
+          if (middleProfile?.username) {
+            expect(profile.username > middleProfile?.username).toBeTruthy();
+          }
+
+          if (middleProfile?.displayName) {
+            expect(
+              profile.displayName >= middleProfile?.displayName,
+            ).toBeTruthy();
+          }
+        }
+      })
+      .expect(200, done);
   });
 });

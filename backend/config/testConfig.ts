@@ -72,6 +72,7 @@ app.post("/message", messageController.message_post);
 app.get("/inbox/:inboxid/messages", messageController.messages_get);
 
 app.get("/explore/communities", communityController.communities_explore_get);
+app.get("/explore/profiles", profileController.profiles_explore_get);
 
 app.get("/notifications", notificationController.notifications_get);
 app.get(
