@@ -1,4 +1,4 @@
-import { Notification } from "@prisma/client";
+import { Notification, User } from "@prisma/client";
 
 type CommunityPOST = {
   name: string;
@@ -22,4 +22,6 @@ type NotificationRes = Notification & {
   };
 };
 
-export { CommunityPOST, NotificationRes };
+type ProfileRes = Omit<User, "password">;
+
+export { CommunityPOST, NotificationRes, ProfileRes };
