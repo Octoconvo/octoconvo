@@ -49,4 +49,65 @@ const updateUserProfileById = async ({
   return userProfile;
 };
 
-export { getUserProfileById, updateUserProfileById };
+const searchProfiles = async ({
+  name,
+  cursor,
+  limit,
+}: {
+  name: string;
+  cursor: null | {
+    username: string;
+    displayName: string;
+  };
+  limit: number;
+}) => {
+  console.log({
+    cursor,
+    name,
+  });
+  const profiles = await prisma.user.findMany({
+    where: {
+      ...(name
+        ? {
+            OR: [
+              {
+                username: {
+                  startsWith: name,
+                  mode: "insensitive",
+                },
+              },
+              {
+                displayName: {
+                  startsWith: name,
+                  mode: "insensitive",
+                },
+              },
+            ],
+          }
+        : {}),
+      ...(cursor
+        ? {
+            OR: [
+              {
+                displayName: {
+                  gt: cursor.displayName,
+                },
+              },
+              {
+                displayName: cursor.displayName,
+                username: {
+                  gt: cursor.username,
+                },
+              },
+            ],
+          }
+        : {}),
+    },
+    orderBy: [{ displayName: "asc" }, { username: "asc" }],
+    ...(limit ? { take: limit } : {}),
+  });
+
+  return profiles;
+};
+
+export { getUserProfileById, updateUserProfileById, searchProfiles };
