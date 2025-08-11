@@ -1,4 +1,5 @@
 import TestAgent from "supertest/lib/agent";
+import { ErrorResponse } from "../@types/error";
 
 const login = (
   agent: TestAgent,
@@ -22,4 +23,25 @@ const login = (
       .end(done);
   });
 
-export { login };
+const getValidationErrorMsg = ({
+  error,
+  field,
+}: {
+  error?: ErrorResponse;
+  field: string;
+}) => {
+  let msg: null | string = null;
+
+  if (error) {
+    const newMsg = error.validationError?.find(
+      (obj: { field: string; msg: string; value: string }) =>
+        obj.field === field,
+    )?.msg;
+
+    if (newMsg) msg = newMsg;
+  }
+
+  return msg;
+};
+
+export { login, getValidationErrorMsg };
