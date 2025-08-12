@@ -284,10 +284,11 @@ const profiles_explore_get = [
 
     const lastProfile = profiles.length ? profiles[profiles.length - 1] : null;
     const nextCursor = lastProfile ? `${lastProfile.id}` : null;
+
     res.json({
       message: "Successfully fetched profiles",
       profiles,
-      cursor: profiles.length < limit ? false : nextCursor,
+      nextCursor: profiles.length < limit ? false : nextCursor,
     });
   }),
 ];

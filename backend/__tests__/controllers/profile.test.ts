@@ -443,10 +443,10 @@ describe("Test profile_explore_get", () => {
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
           const message = res.body.message;
-          const cursor = res.body.cursor;
+          const nextCursor = res.body.nextCursor;
 
           expect(message).toBe("Successfully fetched profiles");
-          expect(cursor).toBe(seedProfiles[29].id);
+          expect(nextCursor).toBe(seedProfiles[29].id);
         })
         .expect(200, done);
     },
@@ -461,10 +461,10 @@ describe("Test profile_explore_get", () => {
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
-        const cursor = res.body.cursor;
+        const nextCursor = res.body.nextCursor;
 
         expect(message).toBe("Successfully fetched profiles");
-        expect(cursor).toBe(false);
+        expect(nextCursor).toBe(false);
       })
       .expect(200, done);
   });
