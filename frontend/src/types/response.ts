@@ -121,6 +121,19 @@ type NotificationGET = {
   };
 };
 
+type ProfileAPI = {
+  id: string;
+  username: string;
+  displayName: string;
+  avatar: string | null;
+  bio: string | null;
+  banner: string | null;
+  isDeleted: boolean;
+  lastSeen: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type {
   CommunityResponsePOST,
   CommunitiesResponseGET,
@@ -130,4 +143,5 @@ export type {
   InboxMessageGET,
   Attachment,
   NotificationGET,
+  ProfileAPI,
 };
