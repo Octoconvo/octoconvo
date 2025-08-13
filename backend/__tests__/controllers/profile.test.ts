@@ -443,10 +443,11 @@ describe("Test profile_explore_get", () => {
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
           const message = res.body.message;
-          const nextCursor = res.body.nextCursor;
+          const nextCursor = res.body.nextCursor.split("_");
 
           expect(message).toBe("Successfully fetched profiles");
-          expect(nextCursor).toBe(seedProfiles[29].id);
+          expect(nextCursor[0]).toBe(seedProfiles[29].username);
+          expect(nextCursor[1]).toBe(seedProfiles[29].displayName);
         })
         .expect(200, done);
     },
