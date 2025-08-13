@@ -1,4 +1,7 @@
-import { getProfilesFromAPI } from "@/api/profile";
+import {
+  getProfilesFromAPI,
+  getProfilesFromAPIWithCursor,
+} from "@/api/profile";
 import { ProfileAPI } from "@/types/response";
 
 const profile: ProfileAPI = {
@@ -32,6 +35,22 @@ describe("Test getProfilesFromAPI", () => {
   test("getProfilesFromAPI return the correct data", async () => {
     const getProfilesResponse = await getProfilesFromAPI({
       name: "testname1",
+    });
+
+    expect(getProfilesResponse).toStrictEqual({
+      message,
+      status: 200,
+      profiles: [profile],
+      nextCursor,
+    });
+  });
+});
+
+describe("Test getProfilesFromAPIWitthCursor", () => {
+  test("getProfilesFromAPIWithCursor return the correct data", async () => {
+    const getProfilesResponse = await getProfilesFromAPIWithCursor({
+      name: "testname1",
+      cursor: "testcursor1",
     });
 
     expect(getProfilesResponse).toStrictEqual({
