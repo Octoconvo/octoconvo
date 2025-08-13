@@ -283,7 +283,9 @@ const profiles_explore_get = [
     });
 
     const lastProfile = profiles.length ? profiles[profiles.length - 1] : null;
-    const nextCursor = lastProfile ? `${lastProfile.id}` : null;
+    const nextCursor = lastProfile
+      ? `${lastProfile.username}` + "_" + `${lastProfile.displayName}`
+      : null;
 
     res.json({
       message: "Successfully fetched profiles",
