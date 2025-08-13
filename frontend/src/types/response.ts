@@ -134,6 +134,8 @@ type ProfileAPI = {
   updatedAt: string;
 };
 
+type ProfilesAPI = ProfileAPI[];
+
 export type {
   CommunityResponsePOST,
   CommunitiesResponseGET,
@@ -144,4 +146,5 @@ export type {
   Attachment,
   NotificationGET,
   ProfileAPI,
+  ProfilesAPI,
 };
