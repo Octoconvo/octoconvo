@@ -4,10 +4,12 @@ import { useState, useRef } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 
 const SearchBar = ({
+  path,
   onSubmitFn,
   onSuccessFn,
   onResetFn,
 }: {
+  path: string;
   onSubmitFn: (data: SearchBarForm) => void;
   onSuccessFn: <Data>({
     data,
@@ -35,7 +37,7 @@ const SearchBar = ({
 
     try {
       const response = await fetch(
-        `${domainURL}/explore/communities?name=${data.name}`,
+        `${domainURL}/explore/${path}?name=${data.name}`,
         {
           mode: "cors",
           credentials: "include",
@@ -44,11 +46,10 @@ const SearchBar = ({
       );
 
       const responseData = await response.json();
-      console.log({ status: response.status });
       // Handle errors
       if (response.status < 400) {
         onSuccessFn({
-          data: responseData.communities,
+          data: responseData[path],
           nextCursor: responseData.nextCursor,
         });
         setQueryView(true);
