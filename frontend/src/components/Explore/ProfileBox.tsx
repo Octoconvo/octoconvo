@@ -93,6 +93,7 @@ const ProfileBox: FC<ProfileBox> = ({
       }
     >
       <ul
+        data-testid="profile-box-ulist"
         className={
           "gap-[32px] p-[16px] grid" +
           " grid-cols-[repeat(auto-fill,480px)] max-w-[min(100%,1080px)]" +
