@@ -22,7 +22,7 @@
       "@/*": ["./src/*"],
       "@/fonts": ["./src/styles/fonts.ts"],
       "@/components": ["./src/components/*"],
-      "@/api": ["./src/api/*"]
+      "@/api/*": ["./src/utils/api/*"]
     },
     "types": ["jest"]
   },
