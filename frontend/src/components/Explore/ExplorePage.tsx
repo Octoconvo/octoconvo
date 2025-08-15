@@ -1,12 +1,15 @@
 "use client";
 
 import SearchBar from "@/components/SearchBar/SearchBar";
-import { useState, useEffect, useRef } from "react";
-import { CommunityExploreGET } from "@/types/response";
+import { useState, useEffect } from "react";
+import { CommunityExploreGET, ProfilesAPI, ProfileAPI } from "@/types/response";
 import CommunityBox from "./CommunityBox";
 import { SearchBarForm } from "@/types/form";
 import CommunityModal from "./CommunityModal";
 import { ActiveExploreCommunity } from "@/contexts/community";
+import { getProfilesFromAPI } from "@/api/profile";
+import { getCommunitiesFromAPI } from "@/api/community";
+import ProfileBox from "./ProfileBox";
 
 const ExplorePage = () => {
   const [featuredData, setFeaturedData] = useState<
@@ -15,55 +18,108 @@ const ExplorePage = () => {
   const [communityData, setCommunityData] = useState<
     null | CommunityExploreGET[]
   >(null);
-  const [view, setView] = useState<"COMMUNITY" | "USER" | "DEFAULT">("DEFAULT");
+  const [profiles, setProfiles] = useState<null | ProfilesAPI>(null);
+  const [view, setView] = useState<"COMMUNITY" | "PROFILE" | "DEFAULT">(
+    "DEFAULT"
+  );
+  const path = view === "PROFILE" ? "profiles" : "communities";
   const [currentQuery, setCurrentQuery] = useState<string>("");
   const [nextCursor, setNextCursor] = useState<string | false>(false);
   const [activeCommunity, setActiveCommunity] =
     useState<null | CommunityExploreGET>(null);
+  const [profilesNextCursor, setProfilesNextCursor] = useState<string | false>(
+    false
+  );
+
+  type SetFeaturedDataStates = {
+    featuredData: CommunityExploreGET[];
+  };
+
+  const setFeaturedDataStates = ({ featuredData }: SetFeaturedDataStates) => {
+    setFeaturedData(featuredData);
+  };
+
+  const getFeaturedCommunitiesAndSetCommunitiesStates = async () => {
+    const getCommunitiesAPIResponse = await getCommunitiesFromAPI({
+      name: "",
+    });
+
+    if (
+      getCommunitiesAPIResponse.status >= 200 &&
+      getCommunitiesAPIResponse.status <= 300 &&
+      getCommunitiesAPIResponse.communities !== undefined &&
+      getCommunitiesAPIResponse.nextCursor !== undefined
+    ) {
+      setFeaturedDataStates({
+        featuredData: getCommunitiesAPIResponse.communities,
+      });
+    }
+  };
 
   useEffect(() => {
-    const fetchFeaturedData = async () => {
-      const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
-
-      try {
-        const res = await fetch(`${domainURL}/explore/communities`, {
-          method: "GET",
-          credentials: "include",
-        });
-
-        const resData = await res.json();
-
-        console.log(resData);
-        if (res.status >= 400) {
-          console.log(resData.message);
-        }
-
-        if (res.status >= 200 && res.status <= 300) {
-          setFeaturedData(resData.communities);
-        }
-      } catch (err) {
-        if (err instanceof Error) console.log(err.message);
-      }
-    };
-
-    if (!featuredData) {
-      fetchFeaturedData();
+    try {
+      getFeaturedCommunitiesAndSetCommunitiesStates();
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
     }
 
     return () => {};
-  }, [featuredData]);
+  }, []);
 
-  type CommunitiesType = CommunityExploreGET[];
-
-  const onSuccessFn = <CommunitiesType,>({
+  const setProfilesStates = <ProfilesAPI,>({
     data,
     nextCursor,
   }: {
-    data: CommunitiesType;
+    data: ProfilesAPI;
     nextCursor: string | false;
   }) => {
-    const communities = data as CommunityExploreGET[];
+    const profiles = data as ProfileAPI[];
 
+    setProfiles(profiles);
+    setProfilesNextCursor(nextCursor);
+  };
+
+  type UpdateProfilesStatesArgs = {
+    profiles: ProfilesAPI;
+    fetchedProfiles: ProfilesAPI;
+    nextCursor: false | string;
+  };
+
+  const updateProfilesStates = ({
+    profiles,
+    fetchedProfiles,
+    nextCursor,
+  }: UpdateProfilesStatesArgs) => {
+    setProfiles([...profiles, ...fetchedProfiles]);
+    setProfilesNextCursor(nextCursor);
+  };
+
+  const getProfilesFromAPIAndSetProfilesStates = async () => {
+    const getProfilesAPIResponse = await getProfilesFromAPI({
+      name: currentQuery,
+    });
+
+    if (
+      getProfilesAPIResponse.status >= 200 &&
+      getProfilesAPIResponse.status <= 300 &&
+      getProfilesAPIResponse.profiles !== undefined &&
+      getProfilesAPIResponse.nextCursor !== undefined
+    ) {
+      setProfilesStates({
+        data: getProfilesAPIResponse.profiles,
+        nextCursor: getProfilesAPIResponse.nextCursor,
+      });
+    }
+  };
+
+  const setCommunitiesStates = <CommunitiesExploreGET,>({
+    data,
+    nextCursor,
+  }: {
+    data: CommunitiesExploreGET;
+    nextCursor: false | string;
+  }) => {
+    const communities = data as CommunityExploreGET[];
     setCommunityData(communities);
     setNextCursor(nextCursor);
   };
@@ -77,17 +133,49 @@ const ExplorePage = () => {
   }) => {
     if (communityData !== null) {
       setCommunityData([...communityData, ...communities]);
+      setNextCursor(nextCursor);
     }
-
-    setNextCursor(nextCursor);
   };
+
+  const getCommunitiesFromAPIAndSetCommunitiesStates = async () => {
+    const getCommunitiesAPIResponse = await getCommunitiesFromAPI({
+      name: currentQuery,
+    });
+
+    if (
+      getCommunitiesAPIResponse.status >= 200 &&
+      getCommunitiesAPIResponse.status <= 300 &&
+      getCommunitiesAPIResponse.communities !== undefined &&
+      getCommunitiesAPIResponse.nextCursor !== undefined
+    ) {
+      setCommunitiesStates({
+        data: getCommunitiesAPIResponse.communities,
+        nextCursor: getCommunitiesAPIResponse.nextCursor,
+      });
+    }
+  };
+
+  const onSuccessFn =
+    view === "PROFILE" ? setProfilesStates : setCommunitiesStates;
 
   return (
     <>
       <ActiveExploreCommunity value={{ activeCommunity, setActiveCommunity }}>
         <SearchBar
+          path={path}
           onSubmitFn={(data: SearchBarForm) => {
-            setView("COMMUNITY");
+            if (view === "DEFAULT") {
+              setView("COMMUNITY");
+            }
+
+            if (view !== "PROFILE") {
+              setProfiles(null);
+            }
+
+            if (view !== "COMMUNITY") {
+              setCommunityData(null);
+            }
+
             setCurrentQuery(data.name);
           }}
           onSuccessFn={onSuccessFn}
@@ -95,6 +183,7 @@ const ExplorePage = () => {
             setView("DEFAULT");
             setCommunityData(null);
             setCurrentQuery("");
+            setProfiles(null);
           }}
         />
         {view === "DEFAULT" && (
@@ -107,8 +196,16 @@ const ExplorePage = () => {
           >
             <button
               data-testid="explr-pg-cmmnty-btn"
-              onClick={() => {
+              onClick={async () => {
                 setView("COMMUNITY");
+
+                if (communityData === null) {
+                  try {
+                    await getCommunitiesFromAPIAndSetCommunitiesStates();
+                  } catch (err) {
+                    if (err instanceof Error) console.log(err.message);
+                  }
+                }
               }}
               className={
                 "px-[16px] py-[8px] rounded-[4px]" +
@@ -121,12 +218,20 @@ const ExplorePage = () => {
             </button>
             <button
               data-testid="explr-pg-usr-btn"
-              onClick={() => {
-                setView("USER");
+              onClick={async () => {
+                setView("PROFILE");
+
+                if (profiles === null) {
+                  try {
+                    await getProfilesFromAPIAndSetProfilesStates();
+                  } catch (err) {
+                    if (err instanceof Error) console.log(err.message);
+                  }
+                }
               }}
               className={
                 "px-[16px] py-[8px] rounded-[4px]" +
-                (view === "USER"
+                (view === "PROFILE"
                   ? " bg-brand-1-2 hover:bg-brand-1"
                   : " bg-grey-100 hover:bg-black-500")
               }
@@ -144,6 +249,17 @@ const ExplorePage = () => {
             />
           ) : (
             "No Data found"
+          ))}
+        {view === "PROFILE" &&
+          (profiles && profiles.length > 0 ? (
+            <ProfileBox
+              profiles={profiles}
+              nextCursor={profilesNextCursor}
+              nameQuery={currentQuery}
+              updateProfilesStates={updateProfilesStates}
+            />
+          ) : (
+            "No Profiles found"
           ))}
         {activeCommunity && (
           <CommunityModal
