@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { postCommunityJoinToAPI } from "@/utils/api/community";
 
 const participationButtonText = {
   NONE: "Join",
@@ -18,33 +19,32 @@ const CommunityParticipationButton = ({
   >;
 }) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const postCommunityJoinToAPIAndUpdateParticipationStatus = async () => {
+    const postCommunityJoinToAPIResponseData = await postCommunityJoinToAPI({
+      communityId: communityId,
+    });
+
+    if (
+      postCommunityJoinToAPIResponseData.status >= 200 &&
+      postCommunityJoinToAPIResponseData.status <= 300 &&
+      postCommunityJoinToAPIResponseData.participant
+    ) {
+      setParticipationStatus(
+        postCommunityJoinToAPIResponseData.participant.status
+      );
+    }
+  };
+
   return (
     <button
       onClick={() => {
         if (!isSubmitting) {
           setIsSubmitting(false);
-          const joinCommunity = async () => {
-            const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
+          if (participationStatus === "NONE") {
             try {
-              const response = await fetch(
-                `${domainURL}/community/${communityId}/join`,
-                {
-                  mode: "cors",
-                  credentials: "include",
-                  method: "POST",
-                }
-              );
-
-              const responseData = await response.json();
-
-              if (response.status >= 200 && response.status <= 300) {
-                setParticipationStatus(responseData.participant.status);
-              }
-
-              if (response.status >= 400) {
-                console.log(responseData);
-              }
+              postCommunityJoinToAPIAndUpdateParticipationStatus();
             } catch (err) {
               if (err instanceof Error) {
                 console.log(err.message);
@@ -52,10 +52,6 @@ const CommunityParticipationButton = ({
             } finally {
               setIsSubmitting(false);
             }
-          };
-
-          if (participationStatus === "NONE") {
-            joinCommunity();
           }
         }
       }}
