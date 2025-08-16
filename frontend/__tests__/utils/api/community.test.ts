@@ -1,6 +1,7 @@
 import {
   getCommunitiesFromAPI,
   getCommunitiesFromAPIWithCursor,
+  getCommunityParticipationStatusFromAPI,
   postCommunityJoinToAPI,
 } from "@/api/community";
 import {
@@ -44,16 +45,19 @@ const getCommunitiesFromAPIResponse = {
 
 const postCommunityJoinToAPIResponse = { participant: participant };
 
+const getCommunityParticipationStatusFromAPIResponse = {
+  nextCursor,
+  participationStatus: "ACTIVE",
+};
+
 global.fetch = jest.fn((_url: string) => {
   const isCommunities = _url
     .split("/")
     .find((path) => path.split("?").includes("communities"));
   const isCommunityJoin = _url.split("/").includes("join");
-
-  console.log({
-    isCommunities,
-    isCommunityJoin,
-  });
+  const isCommunityParticipationStatus = _url
+    .split("/")
+    .includes("participation-status");
 
   return Promise.resolve({
     status: 200,
@@ -62,6 +66,9 @@ global.fetch = jest.fn((_url: string) => {
         message,
         ...(isCommunities ? getCommunitiesFromAPIResponse : {}),
         ...(isCommunityJoin ? postCommunityJoinToAPIResponse : {}),
+        ...(isCommunityParticipationStatus
+          ? getCommunityParticipationStatusFromAPIResponse
+          : {}),
       }),
   });
 }) as jest.Mock;
@@ -107,6 +114,22 @@ describe("Test postCommunityJoinToAPI", () => {
       message,
       status: 200,
       participant,
+    });
+  });
+});
+
+describe("Test getCommunityParticipationStatusFromAPI", () => {
+  test("getCommunityParticipationStatusFromAPI return the correct data", async () => {
+    const getCommunityParticipationStatusFromAPIResponse =
+      await getCommunityParticipationStatusFromAPI({
+        communityId: "testcommunityid1",
+      });
+
+    expect(getCommunityParticipationStatusFromAPIResponse).toStrictEqual({
+      message,
+      status: 200,
+      nextCursor,
+      participationStatus: "ACTIVE",
     });
   });
 });
