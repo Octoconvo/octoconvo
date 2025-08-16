@@ -2,7 +2,7 @@ import CommunityParticipationButton from "@/components/Explore/CommunityParticip
 import userEvent from "@testing-library/user-event";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { CommunityJoinPOSTParticipant } from "@/types/response";
+import { CommunityJoinPOSTParticipant } from "@/types/api";
 
 const participant1: CommunityJoinPOSTParticipant = {
   id: "testparticipant1",

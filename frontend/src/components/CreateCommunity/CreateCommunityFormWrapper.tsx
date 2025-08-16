@@ -3,7 +3,7 @@
 import CreateCommunityForm from "@/components/CreateCommunity/CreateCommunityForm";
 import { useContext, useState } from "react";
 import { getFormData, createOnSubmit } from "@/utils/form";
-import { CommunityResponsePOST } from "@/types/response";
+import { CommunityResponsePOST } from "@/types/api";
 import {
   CreateCommunityForm as CreateCommunityFormType,
   ValidationError,

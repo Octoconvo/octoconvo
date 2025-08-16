@@ -3,7 +3,7 @@
 import CommunitiesList from "./CommunitiesList";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "@/contexts/user";
-import { CommunitiesResponseGET } from "@/types/response";
+import { CommunitiesResponseGET } from "@/types/api";
 import { connectToRoom } from "@/socket/eventHandler";
 import socket from "@/socket/socket";
 

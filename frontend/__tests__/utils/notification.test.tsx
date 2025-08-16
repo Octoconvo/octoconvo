@@ -1,5 +1,5 @@
 import { pushBufferedNotifications } from "@/utils/notification";
-import { NotificationGET } from "@/types/response";
+import { NotificationGET } from "@/types/api";
 
 const notifications: NotificationGET[] = [
   {

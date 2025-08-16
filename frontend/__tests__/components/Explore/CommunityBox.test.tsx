@@ -2,7 +2,7 @@ import CommunityBox from "@/components/Explore/CommunityBox";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { CommunityExploreGET } from "@/types/response";
+import { CommunityExploreGET } from "@/types/api";
 
 const communities: CommunityExploreGET[] = [
   {

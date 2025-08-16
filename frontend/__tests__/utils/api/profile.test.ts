@@ -2,7 +2,7 @@ import {
   getProfilesFromAPI,
   getProfilesFromAPIWithCursor,
 } from "@/api/profile";
-import { ProfileAPI } from "@/types/response";
+import { ProfileAPI } from "@/types/api";
 
 const profile: ProfileAPI = {
   id: "testprofile1",

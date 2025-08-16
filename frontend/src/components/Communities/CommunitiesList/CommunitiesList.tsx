@@ -1,6 +1,6 @@
 "use client";
 
-import { CommunitiesResponseGET } from "@/types/response";
+import { CommunitiesResponseGET } from "@/types/api";
 import CommunitiesItem from "./CommunitiesItem";
 
 const CommunitiesList = ({

@@ -1,4 +1,4 @@
-import { CommunityExploreGET } from "@/types/response";
+import { CommunityExploreGET } from "@/types/api";
 import { unescapeString } from "@/utils/string";
 import { useEffect, useRef, useState } from "react";
 import { formatDateString } from "@/utils/date";

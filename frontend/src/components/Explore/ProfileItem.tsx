@@ -1,4 +1,4 @@
-import { ProfileAPI } from "@/types/response";
+import { ProfileAPI } from "@/types/api";
 
 const ProfileItem = ({ profile }: { profile: ProfileAPI }) => {
   return (

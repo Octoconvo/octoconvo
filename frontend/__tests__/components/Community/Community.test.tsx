@@ -1,9 +1,9 @@
 import Community from "@/components/Community/Community";
-import { CommunityResponseGET, InboxMessageGET } from "@/types/response";
+import { CommunityResponseGET, InboxMessageGET } from "@/types/api";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { UserContext } from "@/contexts/user";
-import { Attachment } from "@/types/response";
+import { Attachment } from "@/types/api";
 import userEvent from "@testing-library/user-event";
 
 const community: CommunityResponseGET = {

@@ -1,11 +1,7 @@
 "use client";
 
 import { UserContext } from "@/contexts/user";
-import {
-  Attachment,
-  CommunityResponseGET,
-  InboxMessageGET,
-} from "@/types/response";
+import { Attachment, CommunityResponseGET, InboxMessageGET } from "@/types/api";
 import { useContext, useEffect, useRef, useState } from "react";
 import MessageBox from "../MessageBox/MessageBox";
 import Image from "next/image";

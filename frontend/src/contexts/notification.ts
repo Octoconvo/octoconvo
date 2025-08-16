@@ -1,4 +1,4 @@
-import { NotificationGET } from "@/types/response";
+import { NotificationGET } from "@/types/api";
 import { createContext } from "react";
 
 type NotificationCountContext = {

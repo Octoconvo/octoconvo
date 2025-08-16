@@ -1,8 +1,5 @@
 import { ValidationError } from "@/types/form";
-import {
-  CommunityExploreGET,
-  CommunityJoinPOSTParticipant,
-} from "@/types/response";
+import { CommunityExploreGET, CommunityJoinPOSTParticipant } from "@/types/api";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 

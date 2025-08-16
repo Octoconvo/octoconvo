@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Attachment } from "@/types/response";
+import { Attachment } from "@/types/api";
 import AttachmentBox from "@/components/AttachmentBox/AttachmentBox";
 import userEvent from "@testing-library/user-event";
 

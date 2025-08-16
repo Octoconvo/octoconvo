@@ -8,7 +8,7 @@ import {
 } from "@/contexts/notification";
 import { NotificationModalContext } from "@/contexts/modal";
 import { notificationsReadStatusPOST } from "@/api/notification";
-import { NotificationGET } from "@/types/response";
+import { NotificationGET } from "@/types/api";
 
 const NotificationNav = () => {
   const path = usePathname();

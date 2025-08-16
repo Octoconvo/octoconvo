@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { CommunitiesResponseGET } from "@/types/response";
+import { CommunitiesResponseGET } from "@/types/api";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";

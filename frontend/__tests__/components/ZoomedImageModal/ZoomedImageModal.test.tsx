@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Attachment } from "@/types/response";
+import { Attachment } from "@/types/api";
 import ZoomedImageModal from "@/components/ZoomedImageModal/ZoomedImagedModal";
 import userEvent from "@testing-library/user-event";
 

@@ -1,4 +1,4 @@
-import { ProfileAPI } from "@/types/response";
+import { ProfileAPI } from "@/types/api";
 import ProfileItem from "./ProfileItem";
 import { FC, useEffect, useRef } from "react";
 import { getProfilesFromAPIWithCursor } from "@/api/profile";

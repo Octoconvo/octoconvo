@@ -1,4 +1,4 @@
-import { CommunityExploreGET } from "@/types/response";
+import { CommunityExploreGET } from "@/types/api";
 import { createContext } from "react";
 
 type ActiveExploreCommunity = {

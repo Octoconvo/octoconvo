@@ -2,7 +2,7 @@ import NotificationModal from "@/components/Notification/NotificationModal";
 import "@testing-library/jest-dom";
 import { screen, render, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { NotificationGET } from "@/types/response";
+import { NotificationGET } from "@/types/api";
 import { NotificationModalContext } from "@/contexts/modal";
 import NotificationProvider from "@/components/NotificationProvider";
 import {

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { ProfileAPI } from "@/types/response";
+import { ProfileAPI } from "@/types/api";
 import ProfileItem from "@/components/Explore/ProfileItem";
 
 const profile: ProfileAPI = {

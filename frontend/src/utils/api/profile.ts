@@ -1,4 +1,4 @@
-import { ProfileAPI } from "@/types/response";
+import { ProfileAPI } from "@/types/api";
 import { ValidationError } from "@/types/form";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;

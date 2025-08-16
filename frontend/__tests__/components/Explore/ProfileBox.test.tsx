@@ -1,6 +1,6 @@
 import ProfileBox from "@/components/Explore/ProfileBox";
 import { render, screen } from "@testing-library/react";
-import { ProfileAPI } from "@/types/response";
+import { ProfileAPI } from "@/types/api";
 
 const profile: ProfileAPI = {
   id: "testprofile1",

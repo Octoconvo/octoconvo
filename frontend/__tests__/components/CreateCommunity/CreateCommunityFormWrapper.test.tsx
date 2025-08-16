@@ -1,7 +1,7 @@
 import CreateCommunityFormWrapper from "@/components/CreateCommunity/CreateCommunityFormWrapper";
 import { render, screen, act } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { CommunityResponsePOST } from "@/types/response";
+import { CommunityResponsePOST } from "@/types/api";
 import "@testing-library/jest-dom";
 import { ActiveModalsContext } from "@/contexts/modal";
 

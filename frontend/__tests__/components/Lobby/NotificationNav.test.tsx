@@ -7,7 +7,7 @@ import {
 } from "@/contexts/notification";
 import { NotificationModalContext } from "@/contexts/modal";
 import userEvent from "@testing-library/user-event";
-import { NotificationGET } from "@/types/response";
+import { NotificationGET } from "@/types/api";
 
 jest.mock(
   "next/navigation",

@@ -2,7 +2,7 @@
 
 import SearchBar from "@/components/SearchBar/SearchBar";
 import { useState, useEffect } from "react";
-import { CommunityExploreGET, ProfilesAPI, ProfileAPI } from "@/types/response";
+import { CommunityExploreGET, ProfilesAPI, ProfileAPI } from "@/types/api";
 import CommunityBox from "./CommunityBox";
 import { SearchBarForm } from "@/types/form";
 import CommunityModal from "./CommunityModal";

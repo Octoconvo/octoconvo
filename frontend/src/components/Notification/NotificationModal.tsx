@@ -2,7 +2,7 @@
 
 import { NotificationModalContext } from "@/contexts/modal";
 import { useContext, useEffect, useState, useRef } from "react";
-import { NotificationGET } from "@/types/response";
+import { NotificationGET } from "@/types/api";
 import NotificationRequestItem from "./NotificationRequestItem";
 import socket from "@/socket/socket";
 import { UserContext } from "@/contexts/user";

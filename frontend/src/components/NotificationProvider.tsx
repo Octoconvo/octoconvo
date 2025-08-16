@@ -8,7 +8,7 @@ import {
 } from "@/contexts/notification";
 import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
-import { NotificationGET } from "@/types/response";
+import { NotificationGET } from "@/types/api";
 import { NotificationModalContext } from "@/contexts/modal";
 import { notificationCountGET } from "@/api/notification";
 import { pushBufferedNotifications } from "@/utils/notification";

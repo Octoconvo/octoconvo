@@ -1,4 +1,4 @@
-import { CommunityExploreGET } from "@/types/response";
+import { CommunityExploreGET } from "@/types/api";
 import CommunityItem from "./CommunityItem";
 import { FC, useEffect, useRef } from "react";
 import { getCommunitiesFromAPIWithCursor } from "@/utils/api/community";

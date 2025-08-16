@@ -1,6 +1,6 @@
 "use client";
 
-import { Attachment } from "@/types/response";
+import { Attachment } from "@/types/api";
 
 const AttachmentStyles = [
   {

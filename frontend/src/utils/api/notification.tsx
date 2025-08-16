@@ -1,4 +1,4 @@
-import { NotificationGET } from "@/types/response";
+import { NotificationGET } from "@/types/api";
 
 const notificationCountGET = async ({
   successHandler,
