@@ -15,15 +15,15 @@ const ExplorePage = () => {
   const [featuredData, setFeaturedData] = useState<
     null | CommunityExploreGET[]
   >(null);
-  const [communityData, setCommunityData] = useState<
-    null | CommunityExploreGET[]
-  >(null);
+  const [communities, setCommunities] = useState<null | CommunityExploreGET[]>(
+    null
+  );
   const [profiles, setProfiles] = useState<null | ProfilesAPI>(null);
   const [view, setView] = useState<"COMMUNITY" | "PROFILE" | "DEFAULT">(
     "DEFAULT"
   );
   const path = view === "PROFILE" ? "profiles" : "communities";
-  const [currentQuery, setCurrentQuery] = useState<string>("");
+  const [nameQuery, setNameQuery] = useState<string>("");
   const [nextCursor, setNextCursor] = useState<string | false>(false);
   const [activeCommunity, setActiveCommunity] =
     useState<null | CommunityExploreGET>(null);
@@ -85,6 +85,12 @@ const ExplorePage = () => {
     nextCursor: false | string;
   };
 
+  type updateCommunitiesStatesArgs = {
+    communities: CommunityExploreGET[];
+    fetchedCommunities: CommunityExploreGET[];
+    nextCursor: false | string;
+  };
+
   const updateProfilesStates = ({
     profiles,
     fetchedProfiles,
@@ -96,7 +102,7 @@ const ExplorePage = () => {
 
   const getProfilesFromAPIAndSetProfilesStates = async () => {
     const getProfilesAPIResponse = await getProfilesFromAPI({
-      name: currentQuery,
+      name: nameQuery,
     });
 
     if (
@@ -120,26 +126,22 @@ const ExplorePage = () => {
     nextCursor: false | string;
   }) => {
     const communities = data as CommunityExploreGET[];
-    setCommunityData(communities);
+    setCommunities(communities);
     setNextCursor(nextCursor);
   };
 
-  const updateData = ({
+  const updateCommunitiesStates = ({
     communities,
+    fetchedCommunities,
     nextCursor,
-  }: {
-    communities: CommunityExploreGET[];
-    nextCursor: false | string;
-  }) => {
-    if (communityData !== null) {
-      setCommunityData([...communityData, ...communities]);
-      setNextCursor(nextCursor);
-    }
+  }: updateCommunitiesStatesArgs) => {
+    setCommunities([...communities, ...fetchedCommunities]);
+    setNextCursor(nextCursor);
   };
 
   const getCommunitiesFromAPIAndSetCommunitiesStates = async () => {
     const getCommunitiesAPIResponse = await getCommunitiesFromAPI({
-      name: currentQuery,
+      name: nameQuery,
     });
 
     if (
@@ -173,21 +175,27 @@ const ExplorePage = () => {
             }
 
             if (view !== "COMMUNITY") {
-              setCommunityData(null);
+              setCommunities(null);
             }
 
-            setCurrentQuery(data.name);
+            setNameQuery(data.name);
           }}
           onSuccessFn={onSuccessFn}
           onResetFn={() => {
             setView("DEFAULT");
-            setCommunityData(null);
-            setCurrentQuery("");
+            setCommunities(null);
+            setNameQuery("");
             setProfiles(null);
           }}
         />
-        {view === "DEFAULT" && (
-          <CommunityBox infiniteScrollData={false} Communities={featuredData} />
+        {view === "DEFAULT" && featuredData && (
+          <CommunityBox
+            isInfiniteScrollOn={false}
+            communities={featuredData}
+            nextCursor={false}
+            updateCommunitiesStates={updateCommunitiesStates}
+            nameQuery=""
+          />
         )}
         {view !== "DEFAULT" && (
           <nav
@@ -199,7 +207,7 @@ const ExplorePage = () => {
               onClick={async () => {
                 setView("COMMUNITY");
 
-                if (communityData === null) {
+                if (communities === null) {
                   try {
                     await getCommunitiesFromAPIAndSetCommunitiesStates();
                   } catch (err) {
@@ -241,11 +249,14 @@ const ExplorePage = () => {
           </nav>
         )}
         {view === "COMMUNITY" &&
-          communityData &&
-          (communityData.length > 0 ? (
+          communities &&
+          (communities.length > 0 ? (
             <CommunityBox
-              Communities={communityData}
-              infiniteScrollData={{ nextCursor, currentQuery, updateData }}
+              communities={communities}
+              nextCursor={nextCursor}
+              nameQuery={nameQuery}
+              updateCommunitiesStates={updateCommunitiesStates}
+              isInfiniteScrollOn={true}
             />
           ) : (
             "No Data found"
@@ -255,7 +266,7 @@ const ExplorePage = () => {
             <ProfileBox
               profiles={profiles}
               nextCursor={profilesNextCursor}
-              nameQuery={currentQuery}
+              nameQuery={nameQuery}
               updateProfilesStates={updateProfilesStates}
             />
           ) : (

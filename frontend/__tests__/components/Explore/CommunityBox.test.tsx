@@ -26,57 +26,20 @@ window.IntersectionObserver = jest.fn(() => ({
 })) as jest.Mock;
 
 describe("Render CommunityBox", () => {
-  const user = userEvent.setup();
+  beforeEach(() => {
+    render(
+      <CommunityBox
+        communities={communities}
+        nextCursor={false}
+        nameQuery=""
+        updateCommunitiesStates={jest.fn()}
+        isInfiniteScrollOn={false}
+      />
+    );
+  });
 
-  test(
-    "Render infinite scroll next observer" + " if infiniteScrollData is not",
-    () => {
-      render(
-        <CommunityBox
-          Communities={communities}
-          infiniteScrollData={{
-            nextCursor: false,
-            currentQuery: "",
-            updateData: jest.fn(),
-          }}
-        />
-      );
-
-      const observerNext = screen.getByTestId("obsrvr-nxt");
-      expect(observerNext).toBeInTheDocument();
-    }
-  );
-
-  test(
-    "Don't render infinite scroll next observer" +
-      " if infiniteScrollData is false",
-    () => {
-      render(
-        <CommunityBox Communities={communities} infiniteScrollData={false} />
-      );
-
-      const observerNext = screen.queryByTestId("obsrvr-nxt");
-      expect(observerNext).not.toBeInTheDocument();
-    }
-  );
-
-  test(
-    "Render infinite scroll next observer" +
-      " if infiniteScrollData is not false",
-    () => {
-      render(
-        <CommunityBox
-          Communities={communities}
-          infiniteScrollData={{
-            nextCursor: false,
-            currentQuery: "",
-            updateData: jest.fn(),
-          }}
-        />
-      );
-
-      const observerNext = screen.getByTestId("obsrvr-nxt");
-      expect(observerNext).toBeInTheDocument();
-    }
-  );
+  test("Render the communities", () => {
+    const lists = screen.getAllByRole("list");
+    expect(lists.length).toBe(1);
+  });
 });

@@ -1,99 +1,93 @@
 import { CommunityExploreGET } from "@/types/response";
 import CommunityItem from "./CommunityItem";
-import { useEffect, useRef } from "react";
+import { FC, useEffect, useRef } from "react";
+import { getCommunitiesFromAPIWithCursor } from "@/utils/api/community";
 
-const CommunityBox = ({
-  Communities,
-  infiniteScrollData,
-}: {
-  Communities: null | CommunityExploreGET[];
-  infiniteScrollData:
-    | false
-    | {
-        nextCursor: string | false;
-        currentQuery: string;
-        updateData: ({
-          communities,
-          nextCursor,
-        }: {
-          communities: CommunityExploreGET[];
-          nextCursor: string | false;
-        }) => void;
-      };
+type updateCommunitiesStates = {
+  communities: CommunityExploreGET[];
+  fetchedCommunities: CommunityExploreGET[];
+  nextCursor: false | string;
+};
+
+type CommunityBox = {
+  communities: CommunityExploreGET[];
+  nextCursor: false | string;
+  nameQuery: string;
+  updateCommunitiesStates: ({
+    communities,
+    fetchedCommunities,
+    nextCursor,
+  }: updateCommunitiesStates) => void;
+  isInfiniteScrollOn: boolean;
+};
+
+const CommunityBox: FC<CommunityBox> = ({
+  communities,
+  nextCursor,
+  nameQuery,
+  updateCommunitiesStates,
+  isInfiniteScrollOn,
 }) => {
-  const nextObserverRef = useRef<null | HTMLDivElement>(null);
+  const getMoreCommunitiesWithCursorObserverRef = useRef<null | HTMLDivElement>(
+    null
+  );
+
+  const getCommunitiesFromAPIWithCursorAndUpdateCommunitiesStates = async ({
+    cursor,
+    name,
+  }: {
+    cursor: string;
+    name: string;
+  }) => {
+    const communitiesAPIResponse = await getCommunitiesFromAPIWithCursor({
+      name,
+      cursor,
+    });
+
+    if (
+      communitiesAPIResponse.status >= 200 &&
+      communitiesAPIResponse.status <= 300 &&
+      communitiesAPIResponse.profiles &&
+      communitiesAPIResponse.nextCursor !== undefined
+    ) {
+      updateCommunitiesStates({
+        communities,
+        fetchedCommunities: communitiesAPIResponse.communities,
+        nextCursor: communitiesAPIResponse.nextCursor,
+      });
+    }
+  };
 
   useEffect(() => {
-    const fetchNextCommunities = async ({
-      nextCursor,
-      currentQuery,
-      updateData,
-    }: {
-      nextCursor: string;
-      currentQuery: string;
-      updateData: ({
-        communities,
-        nextCursor,
-      }: {
-        communities: CommunityExploreGET[];
-        nextCursor: string | false;
-      }) => void;
-    }) => {
-      const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
-
-      try {
-        const response = await fetch(
-          `${domainURL}/explore/communities?name=${currentQuery}&cursor=${nextCursor}`,
-          {
-            mode: "cors",
-            credentials: "include",
-            method: "GET",
-          }
-        );
-
-        const responseData = await response.json();
-
-        if (response.status < 400) {
-          updateData({
-            communities: responseData.communities,
-            nextCursor: responseData.nextCursor,
-          });
-        }
-      } catch (err) {
-        if (err instanceof Error) {
-          console.log(err.message);
-        }
-      }
-    };
-    const nextObserver = nextObserverRef.current;
+    const getMoreCommunitiesWithCursorObserverElement =
+      getMoreCommunitiesWithCursorObserverRef.current;
 
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => console.log(entry.intersectionRatio));
-
-      if (entries[0].isIntersecting) {
-        // Fetch next communities with cursor
-        // Fetch if cursor is not false
-
-        if (infiniteScrollData) {
-          const { nextCursor, currentQuery, updateData } = infiniteScrollData;
-
-          if (nextCursor) {
-            fetchNextCommunities({ nextCursor, currentQuery, updateData });
+      if (entries[0].isIntersecting && isInfiniteScrollOn && nextCursor) {
+        try {
+          getCommunitiesFromAPIWithCursorAndUpdateCommunitiesStates({
+            cursor: nextCursor,
+            name: nameQuery,
+          });
+        } catch (err) {
+          if (err instanceof Error) {
+            console.log(err.message);
           }
         }
       }
     });
 
-    if (nextObserver) {
-      observer.observe(nextObserver);
+    if (getMoreCommunitiesWithCursorObserverElement) {
+      observer.observe(getMoreCommunitiesWithCursorObserverElement);
     }
 
     return () => {
-      if (nextObserver) {
-        observer.unobserve(nextObserver);
+      if (getMoreCommunitiesWithCursorObserverElement) {
+        observer.unobserve(getMoreCommunitiesWithCursorObserverElement);
       }
     };
   });
+
   return (
     <ul
       data-testid="cmmnty-bx-ulst"
@@ -103,14 +97,15 @@ const CommunityBox = ({
         " max-h-full flex-auto"
       }
     >
-      {Communities &&
-        Communities.map((community) => {
+      {communities &&
+        communities.map((community) => {
           return <CommunityItem key={community.id} community={community} />;
         })}
 
-      {infiniteScrollData && (
-        <div data-testid="obsrvr-nxt" ref={nextObserverRef}></div>
-      )}
+      <div
+        data-testid="obsrvr-nxt"
+        ref={getMoreCommunitiesWithCursorObserverRef}
+      ></div>
     </ul>
   );
 };

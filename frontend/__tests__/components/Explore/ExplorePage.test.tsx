@@ -83,8 +83,12 @@ describe("Render ExplorePage", () => {
 
   test("The featured data's length should be 1", () => {
     const communityBox = screen.getByTestId("cmmnty-bx-ulst");
+    let communityBoxChildrenListCount = 0;
 
-    expect(communityBox.children.length).toBe(1);
+    for (const child of communityBox.children) {
+      if (child.nodeName === "LI") communityBoxChildrenListCount += 1;
+    }
+    expect(communityBoxChildrenListCount).toBe(1);
   });
 
   test("Hide explore page navigation on featured data view", () => {
