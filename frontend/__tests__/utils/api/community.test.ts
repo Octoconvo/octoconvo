@@ -46,7 +46,6 @@ const getCommunitiesFromAPIResponse = {
 const postCommunityJoinToAPIResponse = { participant: participant };
 
 const getCommunityParticipationStatusFromAPIResponse = {
-  nextCursor,
   participationStatus: "ACTIVE",
 };
 
@@ -128,7 +127,6 @@ describe("Test getCommunityParticipationStatusFromAPI", () => {
     expect(getCommunityParticipationStatusFromAPIResponse).toStrictEqual({
       message,
       status: 200,
-      nextCursor,
       participationStatus: "ACTIVE",
     });
   });
