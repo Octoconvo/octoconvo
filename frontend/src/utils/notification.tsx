@@ -1,12 +1,12 @@
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 
 const pushBufferedNotifications = ({
   notifications,
   bufferedNotifications,
 }: {
-  notifications: NotificationGET[];
-  bufferedNotifications: NotificationGET[];
-}): NotificationGET[] => {
+  notifications: NotificationAPI[];
+  bufferedNotifications: NotificationAPI[];
+}): NotificationAPI[] => {
   const updateNotifications = notifications.map((notif) => {
     const index = bufferedNotifications.findIndex(
       (buffer) => buffer.id === notif.id

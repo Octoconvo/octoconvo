@@ -1,7 +1,7 @@
 import { pushBufferedNotifications } from "@/utils/notification";
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 
-const notifications: NotificationGET[] = [
+const notifications: NotificationAPI[] = [
   {
     id: "1",
     triggeredFor: {

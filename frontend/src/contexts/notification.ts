@@ -1,4 +1,4 @@
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 import { createContext } from "react";
 
 type NotificationCountContext = {
@@ -12,13 +12,13 @@ const NotificationCountContext = createContext<NotificationCountContext>({
 });
 
 type NotificationContext = {
-  notifications: null | NotificationGET[];
+  notifications: null | NotificationAPI[];
   setNotifications: React.Dispatch<
-    React.SetStateAction<null | NotificationGET[]>
+    React.SetStateAction<null | NotificationAPI[]>
   >;
-  bufferedNotifications: NotificationGET[];
+  bufferedNotifications: NotificationAPI[];
   setBufferedNotifications: React.Dispatch<
-    React.SetStateAction<NotificationGET[]>
+    React.SetStateAction<NotificationAPI[]>
   >;
 };
 

@@ -8,7 +8,7 @@ import {
 } from "@/contexts/notification";
 import { NotificationModalContext } from "@/contexts/modal";
 import { notificationsReadStatusPOST } from "@/api/notification";
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 
 const NotificationNav = () => {
   const path = usePathname();
@@ -37,7 +37,7 @@ const NotificationNav = () => {
               if (containsUnreadNotifications && isNotificationModalOpen) {
                 notificationsReadStatusPOST({
                   notifications,
-                  onSuccess: ({ data }: { data: NotificationGET[] }) => {
+                  onSuccess: ({ data }: { data: NotificationAPI[] }) => {
                     setBufferedNotifications([
                       ...bufferedNotifications,
                       ...data,

@@ -100,7 +100,7 @@ type CommunityJoinPOSTParticipant = {
   memberSince: null | string;
 };
 
-type NotificationGET = {
+type NotificationAPI = {
   id: string;
   triggeredById: string;
   triggeredBy: {
@@ -144,7 +144,7 @@ export type {
   CommunityJoinPOSTParticipant,
   InboxMessageGET,
   Attachment,
-  NotificationGET,
+  NotificationAPI,
   ProfileAPI,
   ProfilesAPI,
 };

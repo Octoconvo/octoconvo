@@ -8,7 +8,7 @@ import {
 } from "@/contexts/notification";
 import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 import { NotificationModalContext } from "@/contexts/modal";
 import { notificationCountGET } from "@/api/notification";
 import { pushBufferedNotifications } from "@/utils/notification";
@@ -18,11 +18,11 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
   const [notificationCount, setNotificationCount] = useState<null | number>(
     null
   );
-  const [notifications, setNotifications] = useState<null | NotificationGET[]>(
+  const [notifications, setNotifications] = useState<null | NotificationAPI[]>(
     null
   );
   const [bufferedNotifications, setBufferedNotifications] = useState<
-    NotificationGET[]
+    NotificationAPI[]
   >([]);
   const notificationModal = useRef<null | HTMLDivElement>(null);
   const [isNotificationModalOpen, setIsNotificationModalOpen] =

@@ -2,9 +2,9 @@ import { screen, render, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import NotificationRequestItem from "@/components/Notification/NotificationRequestItem";
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 
-const notification: NotificationGET = {
+const notification: NotificationAPI = {
   id: "testnotification1",
   triggeredById: "testnotification1",
   triggeredBy: {

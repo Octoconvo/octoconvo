@@ -7,7 +7,7 @@ import {
 } from "@/contexts/notification";
 import { NotificationModalContext } from "@/contexts/modal";
 import userEvent from "@testing-library/user-event";
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 
 jest.mock(
   "next/navigation",
@@ -32,7 +32,7 @@ global.fetch = jest.fn().mockImplementationOnce(
   )
 );
 
-const notification: NotificationGET = {
+const notification: NotificationAPI = {
   id: "testnotification1",
   triggeredById: "testnotification1",
   triggeredBy: {

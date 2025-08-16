@@ -2,7 +2,7 @@
 
 import { NotificationModalContext } from "@/contexts/modal";
 import { useContext, useEffect, useState, useRef } from "react";
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 import NotificationRequestItem from "./NotificationRequestItem";
 import socket from "@/socket/socket";
 import { UserContext } from "@/contexts/user";
@@ -95,7 +95,7 @@ const NotificationModal = () => {
       notificationModalCurrent.addEventListener("animationend", hideModal);
     }
 
-    const pushNewNotification = (notification: NotificationGET) => {
+    const pushNewNotification = (notification: NotificationAPI) => {
       if (notifications !== null) {
         setNotifications([notification, ...notifications]);
       }
@@ -211,11 +211,11 @@ const NotificationModal = () => {
                     key={notification.id}
                     notification={notification}
                     updateNotification={(
-                      updatedNotification: NotificationGET
+                      updatedNotification: NotificationAPI
                     ) => {
                       if (notifications !== null) {
                         const updatedNotifications = notifications.map(
-                          (notification): NotificationGET => {
+                          (notification): NotificationAPI => {
                             return notification.id === updatedNotification.id
                               ? updatedNotification
                               : notification;

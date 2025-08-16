@@ -1,4 +1,4 @@
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 
 const notificationCountGET = async ({
   successHandler,
@@ -32,8 +32,8 @@ const notificationsReadStatusPOST = async ({
   notifications,
   onSuccess,
 }: {
-  notifications: NotificationGET[];
-  onSuccess: ({ data }: { data: NotificationGET[] }) => void;
+  notifications: NotificationAPI[];
+  onSuccess: ({ data }: { data: NotificationAPI[] }) => void;
 }) => {
   const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 

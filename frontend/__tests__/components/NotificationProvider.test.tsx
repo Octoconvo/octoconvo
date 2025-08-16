@@ -3,7 +3,7 @@ import NotificationNav from "@/components/Lobby/NotificationNav";
 import { render, screen, act, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { UserContext } from "@/contexts/user";
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 import userEvent from "@testing-library/user-event";
 
@@ -12,7 +12,7 @@ const successObj = {
   unreadNotificationCount: 1,
 };
 
-const notification: NotificationGET = {
+const notification: NotificationAPI = {
   id: "testnotification1",
   triggeredById: "testnotification1",
   triggeredBy: {

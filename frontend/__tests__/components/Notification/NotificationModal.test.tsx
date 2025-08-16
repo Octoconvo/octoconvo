@@ -2,7 +2,7 @@ import NotificationModal from "@/components/Notification/NotificationModal";
 import "@testing-library/jest-dom";
 import { screen, render, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 import { NotificationModalContext } from "@/contexts/modal";
 import NotificationProvider from "@/components/NotificationProvider";
 import {
@@ -10,7 +10,7 @@ import {
   NotificationCountContext,
 } from "@/contexts/notification";
 
-const notification: NotificationGET = {
+const notification: NotificationAPI = {
   id: "testnotification1",
   triggeredById: "testnotification1",
   triggeredBy: {

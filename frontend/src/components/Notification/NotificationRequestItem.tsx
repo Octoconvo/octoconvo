@@ -1,6 +1,6 @@
 "use client";
 
-import { NotificationGET } from "@/types/api";
+import { NotificationAPI } from "@/types/api";
 import { capitaliseStringFirstLetter } from "@/utils/string";
 import RequestActionBtn from "./RequestActionBtn";
 import { useCallback } from "react";
@@ -10,8 +10,8 @@ const NotificationRequestItem = ({
   notification,
   updateNotification,
 }: {
-  notification: NotificationGET;
-  updateNotification: (notification: NotificationGET) => void;
+  notification: NotificationAPI;
+  updateNotification: (notification: NotificationAPI) => void;
 }) => {
   const communityId = notification.communityId ? notification.communityId : " ";
   const notificationId = notification.id;
