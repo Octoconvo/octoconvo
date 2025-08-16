@@ -1,5 +1,8 @@
 import { ValidationError } from "@/types/form";
-import { CommunityExploreGET } from "@/types/response";
+import {
+  CommunityExploreGET,
+  CommunityJoinPOSTParticipant,
+} from "@/types/response";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
@@ -20,6 +23,20 @@ type GetCommunitiesFromAPIReturnValue = {
   };
   communities?: CommunityExploreGET[];
   nextCursor?: string;
+};
+
+type PostCommunityJoinToAPI = {
+  communityId: string;
+};
+
+type PostCommunityJoinToAPIReturnValue = {
+  status: number;
+  message: string;
+  error?: {
+    message?: string;
+    validationErrors: ValidationError[];
+  };
+  participant: CommunityJoinPOSTParticipant;
 };
 
 const getCommunitiesFromAPI = async ({
@@ -62,4 +79,25 @@ const getCommunitiesFromAPIWithCursor = async ({
   };
 };
 
-export { getCommunitiesFromAPI, getCommunitiesFromAPIWithCursor };
+const postCommunityJoinToAPI = async ({
+  communityId,
+}: PostCommunityJoinToAPI): Promise<PostCommunityJoinToAPIReturnValue> => {
+  const response = await fetch(`${DOMAIN_URL}/community/${communityId}/join`, {
+    mode: "cors",
+    credentials: "include",
+    method: "POST",
+  });
+
+  const responseData = await response.json();
+
+  return {
+    status: response.status,
+    ...responseData,
+  };
+};
+
+export {
+  getCommunitiesFromAPI,
+  getCommunitiesFromAPIWithCursor,
+  postCommunityJoinToAPI,
+};
