@@ -42,7 +42,7 @@ const ProfileBox: FC<ProfileBox> = ({
       profilesAPIResponse.status >= 200 &&
       profilesAPIResponse.status <= 300 &&
       profilesAPIResponse.profiles &&
-      profilesAPIResponse.nextCursor
+      profilesAPIResponse.nextCursor !== undefined
     ) {
       updateProfilesStates({
         profiles,
