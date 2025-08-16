@@ -39,6 +39,20 @@ type PostCommunityJoinToAPIReturnValue = {
   participant: CommunityJoinPOSTParticipant;
 };
 
+type GetCommunityParticipationStatusFromAPI = {
+  communityId: string;
+};
+
+type GetCommunityParticipationStatusFromAPIReturnValue = {
+  status: number;
+  message: string;
+  error?: {
+    message?: string;
+    validationErrors: ValidationError[];
+  };
+  participationStatus: "PENDING" | "ACTIVE" | "NONE";
+};
+
 const getCommunitiesFromAPI = async ({
   name,
 }: GetCommunitiesFromAPI): Promise<GetCommunitiesFromAPIReturnValue> => {
@@ -96,8 +110,30 @@ const postCommunityJoinToAPI = async ({
   };
 };
 
+const getCommunityParticipationStatusFromAPI = async ({
+  communityId,
+}: GetCommunityParticipationStatusFromAPI): //eslint-disable-next-line
+Promise<GetCommunityParticipationStatusFromAPIReturnValue> => {
+  const response = await fetch(
+    `${DOMAIN_URL}/community/${communityId}/participation-status`,
+    {
+      method: "GET",
+      credentials: "include",
+      mode: "cors",
+    }
+  );
+
+  const responseData = await response.json();
+
+  return {
+    status: response.status,
+    ...responseData,
+  };
+};
+
 export {
   getCommunitiesFromAPI,
   getCommunitiesFromAPIWithCursor,
   postCommunityJoinToAPI,
+  getCommunityParticipationStatusFromAPI,
 };
