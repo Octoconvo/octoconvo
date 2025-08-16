@@ -3,6 +3,7 @@ import { unescapeString } from "@/utils/string";
 import { useEffect, useRef, useState } from "react";
 import { formatDateString } from "@/utils/date";
 import CommunityParticipationButton from "./CommunityParticipationButton";
+import { getCommunityParticipationStatusFromAPI } from "@/utils/api/community";
 
 const CommunityModal = ({
   community,
@@ -15,39 +16,26 @@ const CommunityModal = ({
   const [participationStatus, setParticipationStatus] = useState<
     "NONE" | "PENDING" | "ACTIVE" | null
   >(null);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchParticipationStatus = async () => {
-      const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
+  const getCommunityParticipationStatusFromAPIAndUpdateParticipationStates =
+    async () => {
+      const { status, participationStatus } =
+        await getCommunityParticipationStatusFromAPI({
+          communityId: community.id,
+        });
 
-      try {
-        const res = await fetch(
-          `${domainURL}/community/${community.id}/participation-status`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-
-        const resData = await res.json();
-
-        if (res.status >= 400) {
-          console.log(resData.message);
-        }
-
-        if (res.status >= 200 && res.status <= 300) {
-          setParticipationStatus(resData.participationStatus);
-        }
-      } catch (err) {
-        if (err instanceof Error) {
-          console.log(err.message);
-        }
+      if (status >= 200 && status <= 300 && participationStatus !== undefined) {
+        setParticipationStatus(participationStatus);
       }
     };
 
+  useEffect(() => {
     if (participationStatus === null) {
-      fetchParticipationStatus();
+      try {
+        getCommunityParticipationStatusFromAPIAndUpdateParticipationStates();
+      } catch (err) {
+        if (err instanceof Error) console.log(err.message);
+      }
     }
 
     const closeOnEsc = (e: KeyboardEvent) => {
