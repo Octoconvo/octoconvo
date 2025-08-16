@@ -7,6 +7,10 @@ type GetCommunitiesFromAPI = {
   name: string;
 };
 
+type GetCommunitiesFromAPIWithCursor = GetCommunitiesFromAPI & {
+  cursor: string;
+};
+
 type GetCommunitiesFromAPIReturnValue = {
   status: number;
   message: string;
@@ -37,4 +41,25 @@ const getCommunitiesFromAPI = async ({
   };
 };
 
-export { getCommunitiesFromAPI };
+const getCommunitiesFromAPIWithCursor = async ({
+  name,
+  cursor,
+}: GetCommunitiesFromAPIWithCursor) => {
+  const response = await fetch(
+    `${DOMAIN_URL}/explore/communities?name=${name}&curssor=${cursor}`,
+    {
+      mode: "cors",
+      credentials: "include",
+      method: "GET",
+    }
+  );
+
+  const responseData = await response.json();
+
+  return {
+    status: response.status,
+    ...responseData,
+  };
+};
+
+export { getCommunitiesFromAPI, getCommunitiesFromAPIWithCursor };
