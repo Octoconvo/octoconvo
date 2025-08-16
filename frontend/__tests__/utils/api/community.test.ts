@@ -1,8 +1,12 @@
 import {
   getCommunitiesFromAPI,
   getCommunitiesFromAPIWithCursor,
+  postCommunityJoinToAPI,
 } from "@/api/community";
-import { CommunityExploreGET } from "@/types/response";
+import {
+  CommunityExploreGET,
+  CommunityJoinPOSTParticipant,
+} from "@/types/response";
 
 const community: CommunityExploreGET = {
   id: "testcommunity1",
@@ -18,20 +22,49 @@ const community: CommunityExploreGET = {
   },
 };
 
+const participant: CommunityJoinPOSTParticipant = {
+  id: "testparticipant1",
+  userId: "testparticipant1",
+  role: "MEMBER",
+  status: "PENDING",
+  communityId: null,
+  directMessageId: null,
+  createdAt: "testparticipant1",
+  updatedAt: "testparticipant1",
+  memberSince: null,
+};
+
 const message = "Successfully fetched data";
 const nextCursor = "testnextcursor1";
 
-global.fetch = jest.fn((_url) =>
-  Promise.resolve({
+const getCommunitiesFromAPIResponse = {
+  nextCursor: nextCursor,
+  communities: [community],
+};
+
+const postCommunityJoinToAPIResponse = { participant: participant };
+
+global.fetch = jest.fn((_url: string) => {
+  const isCommunities = _url
+    .split("/")
+    .find((path) => path.split("?").includes("communities"));
+  const isCommunityJoin = _url.split("/").includes("join");
+
+  console.log({
+    isCommunities,
+    isCommunityJoin,
+  });
+
+  return Promise.resolve({
     status: 200,
     json: () =>
       Promise.resolve({
-        nextCursor: nextCursor,
-        communities: [community],
         message,
+        ...(isCommunities ? getCommunitiesFromAPIResponse : {}),
+        ...(isCommunityJoin ? postCommunityJoinToAPIResponse : {}),
       }),
-  })
-) as jest.Mock;
+  });
+}) as jest.Mock;
 
 describe("Test getCommunitiesFromAPI", () => {
   test("getCommunitiesFromAPI return the correct data", async () => {
@@ -60,6 +93,20 @@ describe("Test getCommunitiesFromAPIWithCursor", () => {
       status: 200,
       communities: [community],
       nextCursor,
+    });
+  });
+});
+
+describe("Test postCommunityJoinToAPI", () => {
+  test("postCommunityJoinToAPI return the correct data", async () => {
+    const postCommunityJoinToAPIResponse = await postCommunityJoinToAPI({
+      communityId: "testcommunityid1",
+    });
+
+    expect(postCommunityJoinToAPIResponse).toStrictEqual({
+      message,
+      status: 200,
+      participant,
     });
   });
 });
