@@ -1,4 +1,7 @@
-import { getCommunitiesFromAPI } from "@/api/community";
+import {
+  getCommunitiesFromAPI,
+  getCommunitiesFromAPIWithCursor,
+} from "@/api/community";
 import { CommunityExploreGET } from "@/types/response";
 
 const community: CommunityExploreGET = {
@@ -34,6 +37,22 @@ describe("Test getCommunitiesFromAPI", () => {
   test("getCommunitiesFromAPI return the correct data", async () => {
     const getCommunitiesResponse = await getCommunitiesFromAPI({
       name: "testname1",
+    });
+
+    expect(getCommunitiesResponse).toStrictEqual({
+      message,
+      status: 200,
+      communities: [community],
+      nextCursor,
+    });
+  });
+});
+
+describe("Test getCommunitiesFromAPIWithCursor", () => {
+  test("getCommunitiesFromAPIWithCursor return the correct data", async () => {
+    const getCommunitiesResponse = await getCommunitiesFromAPIWithCursor({
+      name: "testname1",
+      cursor: "testcursor1",
     });
 
     expect(getCommunitiesResponse).toStrictEqual({
