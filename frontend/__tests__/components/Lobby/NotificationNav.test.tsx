@@ -159,7 +159,9 @@ describe("Render NotificationNav", () => {
           value={{
             notificationModal: null,
             isNotificationModalAnimating: false,
+            setIsNotificationModalAnimating: jest.fn(),
             isNotificationModalOpen: false,
+            setIsNotificationModalOpen: jest.fn(),
             toggleNotificationModalView: toggleNotificationModalViewMock,
           }}
         >
@@ -196,7 +198,9 @@ describe("Render NotificationNav", () => {
           value={{
             notificationModal: null,
             isNotificationModalAnimating: false,
+            setIsNotificationModalAnimating: jest.fn(),
             isNotificationModalOpen: false,
+            setIsNotificationModalOpen: jest.fn(),
             toggleNotificationModalView: toggleNotificationModalViewMock,
           }}
         >
@@ -233,7 +237,9 @@ describe("Render NotificationNav", () => {
             value={{
               notificationModal: null,
               isNotificationModalAnimating: false,
+              setIsNotificationModalAnimating: jest.fn(),
               isNotificationModalOpen: false,
+              setIsNotificationModalOpen: jest.fn(),
               toggleNotificationModalView: toggleNotificationModalViewMock,
             }}
           >
@@ -275,7 +281,9 @@ describe("Render NotificationNav", () => {
             value={{
               notificationModal: null,
               isNotificationModalAnimating: false,
+              setIsNotificationModalAnimating: jest.fn(),
               isNotificationModalOpen: false,
+              setIsNotificationModalOpen: jest.fn(),
               toggleNotificationModalView: toggleNotificationModalViewMock,
             }}
           >
@@ -318,7 +326,9 @@ describe("Render NotificationNav", () => {
             value={{
               notificationModal: null,
               isNotificationModalAnimating: false,
+              setIsNotificationModalAnimating: jest.fn(),
               isNotificationModalOpen: true,
+              setIsNotificationModalOpen: jest.fn(),
               toggleNotificationModalView: toggleNotificationModalViewMock,
             }}
           >
