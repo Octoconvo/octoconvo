@@ -2,10 +2,10 @@ import ExplorePage from "@/components/Explore/ExplorePage";
 import userEvent from "@testing-library/user-event";
 import { render, act, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { CommunityExploreGET, ProfileAPI } from "@/types/api";
+import { CommunityExploreAPI, ProfileAPI } from "@/types/api";
 import SearchBar from "@/components/SearchBar/SearchBar";
 
-const community1: CommunityExploreGET = {
+const community1: CommunityExploreAPI = {
   id: "testid1",
   _count: {
     participants: 1,

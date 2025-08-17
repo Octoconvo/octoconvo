@@ -1,5 +1,5 @@
 import { ValidationError } from "@/types/form";
-import { CommunityExploreGET, ParticipantAPI } from "@/types/api";
+import { CommunityExploreAPI, ParticipantAPI } from "@/types/api";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
@@ -18,7 +18,7 @@ type GetCommunitiesFromAPIReturnValue = {
     message?: string;
     validationErrors: ValidationError[];
   };
-  communities?: CommunityExploreGET[];
+  communities?: CommunityExploreAPI[];
   nextCursor?: string;
 };
 

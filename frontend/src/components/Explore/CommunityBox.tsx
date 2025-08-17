@@ -1,16 +1,16 @@
-import { CommunityExploreGET } from "@/types/api";
+import { CommunityExploreAPI } from "@/types/api";
 import CommunityItem from "./CommunityItem";
 import { FC, useEffect, useRef } from "react";
 import { getCommunitiesFromAPIWithCursor } from "@/utils/api/community";
 
 type updateCommunitiesStates = {
-  communities: CommunityExploreGET[];
-  fetchedCommunities: CommunityExploreGET[];
+  communities: CommunityExploreAPI[];
+  fetchedCommunities: CommunityExploreAPI[];
   nextCursor: false | string;
 };
 
 type CommunityBox = {
-  communities: CommunityExploreGET[];
+  communities: CommunityExploreAPI[];
   nextCursor: false | string;
   nameQuery: string;
   updateCommunitiesStates: ({

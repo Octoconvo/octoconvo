@@ -43,7 +43,7 @@ type CommunityResponseGET = {
   };
 };
 
-type CommunityExploreGET = {
+type CommunityExploreAPI = {
   id: string;
   name: string;
   bio: null | string;
@@ -140,7 +140,7 @@ export type {
   CommunityResponsePOST,
   CommunitiesResponseGET,
   CommunityResponseGET,
-  CommunityExploreGET,
+  CommunityExploreAPI,
   ParticipantAPI,
   InboxMessageAPI,
   AttachmentAPI,

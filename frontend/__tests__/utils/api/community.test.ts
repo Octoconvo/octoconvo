@@ -4,9 +4,9 @@ import {
   getCommunityParticipationStatusFromAPI,
   postCommunityJoinToAPI,
 } from "@/api/community";
-import { CommunityExploreGET, ParticipantAPI } from "@/types/api";
+import { CommunityExploreAPI, ParticipantAPI } from "@/types/api";
 
-const community: CommunityExploreGET = {
+const community: CommunityExploreAPI = {
   id: "testcommunity1",
   name: "testcommunity1",
   bio: null,

@@ -1,4 +1,4 @@
-import { CommunityExploreGET } from "@/types/api";
+import { CommunityExploreAPI } from "@/types/api";
 import { unescapeString } from "@/utils/string";
 import { FC, useEffect, useRef, useState } from "react";
 import { formatDateString } from "@/utils/date";
@@ -6,7 +6,7 @@ import CommunityParticipationButton from "./CommunityParticipationButton";
 import { getCommunityParticipationStatusFromAPI } from "@/utils/api/community";
 
 type CommunityModal = {
-  community: CommunityExploreGET;
+  community: CommunityExploreAPI;
   onCloseFn: () => void;
 };
 

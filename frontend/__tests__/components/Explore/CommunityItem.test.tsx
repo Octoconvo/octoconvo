@@ -2,10 +2,10 @@ import CommunityItem from "@/components/Explore/CommunityItem";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { CommunityExploreGET } from "@/types/api";
+import { CommunityExploreAPI } from "@/types/api";
 import { ActiveExploreCommunity } from "@/contexts/community";
 
-const community1: CommunityExploreGET = {
+const community1: CommunityExploreAPI = {
   id: "testid1",
   _count: {
     participants: 1,

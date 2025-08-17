@@ -2,7 +2,7 @@
 
 import SearchBar from "@/components/SearchBar/SearchBar";
 import { useState, useEffect } from "react";
-import { CommunityExploreGET, ProfilesAPI, ProfileAPI } from "@/types/api";
+import { CommunityExploreAPI, ProfilesAPI, ProfileAPI } from "@/types/api";
 import CommunityBox from "./CommunityBox";
 import { SearchBarForm } from "@/types/form";
 import CommunityModal from "./CommunityModal";
@@ -13,9 +13,9 @@ import ProfileBox from "./ProfileBox";
 
 const ExplorePage = () => {
   const [featuredData, setFeaturedData] = useState<
-    null | CommunityExploreGET[]
+    null | CommunityExploreAPI[]
   >(null);
-  const [communities, setCommunities] = useState<null | CommunityExploreGET[]>(
+  const [communities, setCommunities] = useState<null | CommunityExploreAPI[]>(
     null
   );
   const [profiles, setProfiles] = useState<null | ProfilesAPI>(null);
@@ -26,7 +26,7 @@ const ExplorePage = () => {
   const [nameQuery, setNameQuery] = useState<string>("");
   const [nextCursor, setNextCursor] = useState<string | false>(false);
   const [activeCommunity, setActiveCommunity] =
-    useState<null | CommunityExploreGET>(null);
+    useState<null | CommunityExploreAPI>(null);
   const [profilesNextCursor, setProfilesNextCursor] = useState<string | false>(
     false
   );
@@ -106,14 +106,14 @@ const ExplorePage = () => {
     data: CommunitiesExploreGET;
     nextCursor: false | string;
   }) => {
-    const communities = data as CommunityExploreGET[];
+    const communities = data as CommunityExploreAPI[];
     setCommunities(communities);
     setNextCursor(nextCursor);
   };
 
   type updateCommunitiesStates = {
-    communities: CommunityExploreGET[];
-    fetchedCommunities: CommunityExploreGET[];
+    communities: CommunityExploreAPI[];
+    fetchedCommunities: CommunityExploreAPI[];
     nextCursor: false | string;
   };
 

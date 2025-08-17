@@ -1,9 +1,9 @@
-import { CommunityExploreGET } from "@/types/api";
+import { CommunityExploreAPI } from "@/types/api";
 import { unescapeString } from "@/utils/string";
 import { ActiveExploreCommunity } from "@/contexts/community";
 import { useContext } from "react";
 
-const CommunityItem = ({ community }: { community: CommunityExploreGET }) => {
+const CommunityItem = ({ community }: { community: CommunityExploreAPI }) => {
   const { setActiveCommunity } = useContext(ActiveExploreCommunity);
 
   return (

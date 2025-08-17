@@ -2,9 +2,9 @@ import CommunityBox from "@/components/Explore/CommunityBox";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { CommunityExploreGET } from "@/types/api";
+import { CommunityExploreAPI } from "@/types/api";
 
-const communities: CommunityExploreGET[] = [
+const communities: CommunityExploreAPI[] = [
   {
     id: "testid1",
     _count: {

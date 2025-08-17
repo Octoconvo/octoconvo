@@ -1,10 +1,10 @@
-import { CommunityExploreGET } from "@/types/api";
+import { CommunityExploreAPI } from "@/types/api";
 import { createContext } from "react";
 
 type ActiveExploreCommunity = {
-  activeCommunity: null | CommunityExploreGET;
+  activeCommunity: null | CommunityExploreAPI;
   setActiveCommunity: React.Dispatch<
-    React.SetStateAction<null | CommunityExploreGET>
+    React.SetStateAction<null | CommunityExploreAPI>
   >;
 };
 
