@@ -1,6 +1,6 @@
 "use client";
 
-import { Attachment } from "@/types/api";
+import { AttachmentAPI } from "@/types/api";
 
 const AttachmentStyles = [
   {
@@ -74,8 +74,8 @@ const AttachmentBox = ({
   attachments,
   zoomImage,
 }: {
-  attachments: Attachment[];
-  zoomImage: (attachment: Attachment) => void;
+  attachments: AttachmentAPI[];
+  zoomImage: (attachment: AttachmentAPI) => void;
 }) => {
   return (
     <figure

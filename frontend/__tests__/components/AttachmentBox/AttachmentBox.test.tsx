@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Attachment } from "@/types/api";
+import { AttachmentAPI } from "@/types/api";
 import AttachmentBox from "@/components/AttachmentBox/AttachmentBox";
 import userEvent from "@testing-library/user-event";
 
-const attachment: Attachment = {
+const attachment: AttachmentAPI = {
   id: "1",
   height: 150,
   width: 320,
@@ -15,7 +15,7 @@ const attachment: Attachment = {
   messageId: "testmessageid1",
 };
 
-const attachmentsMock: Attachment[] = [attachment];
+const attachmentsMock: AttachmentAPI[] = [attachment];
 
 const zoomImageMock = jest.fn(() => {});
 

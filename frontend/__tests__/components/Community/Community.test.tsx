@@ -3,7 +3,7 @@ import { CommunityResponseGET, InboxMessageAPI } from "@/types/api";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { UserContext } from "@/contexts/user";
-import { Attachment } from "@/types/api";
+import { AttachmentAPI } from "@/types/api";
 import userEvent from "@testing-library/user-event";
 
 const community: CommunityResponseGET = {
@@ -43,7 +43,7 @@ const msg = {
   attachments: [],
 };
 
-const attachments: Attachment[] = [
+const attachments: AttachmentAPI[] = [
   {
     id: "1",
     height: 150,

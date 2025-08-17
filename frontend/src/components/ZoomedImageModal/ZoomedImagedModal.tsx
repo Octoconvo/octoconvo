@@ -1,13 +1,13 @@
 "use client";
 
-import { Attachment } from "@/types/api";
+import { AttachmentAPI } from "@/types/api";
 import { useEffect } from "react";
 
 const ZoomedImageModal = ({
   image,
   closeImage,
 }: {
-  image: Attachment;
+  image: AttachmentAPI;
   closeImage: () => void;
 }) => {
   const zoomedImageAspect = {

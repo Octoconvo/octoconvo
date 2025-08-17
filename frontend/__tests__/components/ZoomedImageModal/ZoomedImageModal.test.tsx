@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import { Attachment } from "@/types/api";
+import { AttachmentAPI } from "@/types/api";
 import ZoomedImageModal from "@/components/ZoomedImageModal/ZoomedImagedModal";
 import userEvent from "@testing-library/user-event";
 
-const attachmentsMock: Attachment[] = [
+const attachmentsMock: AttachmentAPI[] = [
   {
     id: "1",
     height: 150,

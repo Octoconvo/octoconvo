@@ -57,7 +57,7 @@ type CommunityExploreGET = {
   };
 };
 
-type Attachment = {
+type AttachmentAPI = {
   id: string;
   messageId: string | null;
   type: "IMAGE";
@@ -85,7 +85,7 @@ type InboxMessageAPI = {
     displayName: string;
     avatar: null | string;
   };
-  attachments: Attachment[];
+  attachments: AttachmentAPI[];
 };
 
 type ParticipantAPI = {
@@ -143,7 +143,7 @@ export type {
   CommunityExploreGET,
   ParticipantAPI,
   InboxMessageAPI,
-  Attachment,
+  AttachmentAPI,
   NotificationAPI,
   ProfileAPI,
   ProfilesAPI,
