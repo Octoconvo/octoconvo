@@ -1,32 +1,28 @@
 import { NotificationAPI } from "@/types/api";
+import { RedirectType } from "next/navigation";
 
-const notificationCountGET = async ({
-  successHandler,
-}: {
-  successHandler: ({ data }: { data: number }) => void;
-}) => {
-  const domainURL = process.env.NEXT_PUBLIC_DOMAIN_URL;
+const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
-  try {
-    const res = await fetch(`${domainURL}/notification/unread-count`, {
+type GetNotificationCountFromAPIData = {
+  status: number;
+  unreadNotificationCount: number;
+};
+
+const getNotificationCountFromAPIData =
+  async (): Promise<GetNotificationCountFromAPIData> => {
+    const response = await fetch(`${DOMAIN_URL}/notification/unread-count`, {
       credentials: "include",
       mode: "cors",
       method: "GET",
     });
 
-    const resData = await res.json();
+    const responseData = await response.json();
 
-    if (res.status >= 400) {
-      console.log(resData.message);
-    }
-
-    if (res.status >= 200 && res.status <= 300) {
-      successHandler({ data: resData.unreadNotificationCount });
-    }
-  } catch (err) {
-    if (err instanceof Error) console.log(err.message);
-  }
-};
+    return {
+      status: response.status,
+      ...responseData,
+    };
+  };
 
 const notificationsReadStatusPOST = async ({
   notifications,
@@ -72,4 +68,4 @@ const notificationsReadStatusPOST = async ({
   }
 };
 
-export { notificationCountGET, notificationsReadStatusPOST };
+export { getNotificationCountFromAPIData, notificationsReadStatusPOST };

@@ -10,7 +10,7 @@ import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
 import { NotificationAPI } from "@/types/api";
 import { NotificationModalContext } from "@/contexts/modal";
-import { notificationCountGET } from "@/api/notification";
+import { getNotificationCountFromAPIData } from "@/api/notification";
 import { pushBufferedNotifications } from "@/utils/notification";
 
 const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
@@ -30,28 +30,33 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
   const [isNotificationModalAnimating, setIsNotificationModalAnimating] =
     useState<boolean>(false);
 
+  const loadNotificationCount = async () => {
+    try {
+      const { status, unreadNotificationCount } =
+        await getNotificationCountFromAPIData();
+
+      if (
+        status >= 200 &&
+        status <= 300 &&
+        unreadNotificationCount !== undefined
+      ) {
+        setNotificationCount(unreadNotificationCount);
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
+    }
+  };
+
   useEffect(() => {
     // Fetch initial unread notification count
-    const notificationCountGETSuccessHandler = ({ data }: { data: number }) => {
-      console.log("UPDATING NOTIFICATION COUNT");
-      console.log({ data });
-      setNotificationCount(data);
-    };
     if (user && notificationCount === null) {
-      notificationCountGET({
-        successHandler: notificationCountGETSuccessHandler,
-      });
+      loadNotificationCount();
     }
 
     if (user) {
       // Listen to notification update
       socket.emit("subscribe", `notification:${user.id}`);
-      socket.on(
-        "notificationupdate",
-        notificationCountGET.bind(this, {
-          successHandler: notificationCountGETSuccessHandler,
-        })
-      );
+      socket.on("notificationupdate", loadNotificationCount);
 
       socket.on(
         "initiate",
@@ -81,20 +86,13 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Update notificationCount when bufferedNotifications is not empty
     if (bufferedNotifications.length > 0 && !isNotificationModalOpen) {
-      notificationCountGET({
-        successHandler: notificationCountGETSuccessHandler,
-      });
+      loadNotificationCount();
     }
 
     return () => {
       if (user) {
         socket.off("initiate");
-        socket.off(
-          "notificationupdate",
-          notificationCountGET.bind(this, {
-            successHandler: notificationCountGETSuccessHandler,
-          })
-        );
+        socket.off("notificationupdate", loadNotificationCount);
         socket.emit("unsubscribe", `notification:${user.id}`);
       }
     };
