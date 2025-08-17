@@ -1,24 +1,23 @@
 import { CommunityExploreGET } from "@/types/api";
 import { unescapeString } from "@/utils/string";
-import { useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { formatDateString } from "@/utils/date";
 import CommunityParticipationButton from "./CommunityParticipationButton";
 import { getCommunityParticipationStatusFromAPI } from "@/utils/api/community";
 
-const CommunityModal = ({
-  community,
-  onCloseFn,
-}: {
+type CommunityModal = {
   community: CommunityExploreGET;
   onCloseFn: () => void;
-}) => {
+};
+
+const CommunityModal: FC<CommunityModal> = ({ community, onCloseFn }) => {
   const communityModalRef = useRef<null | HTMLDivElement>(null);
   const [participationStatus, setParticipationStatus] = useState<
     "NONE" | "PENDING" | "ACTIVE" | null
   >(null);
 
-  const getCommunityParticipationStatusFromAPIAndUpdateParticipationStates =
-    async () => {
+  const loadCommunityParticipationStatus = async () => {
+    try {
       const { status, participationStatus } =
         await getCommunityParticipationStatusFromAPI({
           communityId: community.id,
@@ -27,15 +26,14 @@ const CommunityModal = ({
       if (status >= 200 && status <= 300 && participationStatus !== undefined) {
         setParticipationStatus(participationStatus);
       }
-    };
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
+    }
+  };
 
   useEffect(() => {
     if (participationStatus === null) {
-      try {
-        getCommunityParticipationStatusFromAPIAndUpdateParticipationStates();
-      } catch (err) {
-        if (err instanceof Error) console.log(err.message);
-      }
+      loadCommunityParticipationStatus();
     }
 
     const closeOnEsc = (e: KeyboardEvent) => {
