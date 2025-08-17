@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FC, useState } from "react";
 import { postCommunityJoinToAPI } from "@/utils/api/community";
 
 const participationButtonText = {
@@ -7,44 +7,42 @@ const participationButtonText = {
   PENDING: "Requested",
 };
 
-const CommunityParticipationButton = ({
+type ParticipationStatus = "NONE" | "PENDING" | "ACTIVE" | null;
+
+type CommunityParticipationButton = {
+  communityId: string;
+  participationStatus: ParticipationStatus;
+  setParticipationStatus: React.Dispatch<
+    React.SetStateAction<ParticipationStatus>
+  >;
+};
+
+const CommunityParticipationButton: FC<CommunityParticipationButton> = ({
   communityId,
   participationStatus,
   setParticipationStatus,
-}: {
-  communityId: string;
-  participationStatus: "NONE" | "PENDING" | "ACTIVE" | null;
-  setParticipationStatus: React.Dispatch<
-    React.SetStateAction<"NONE" | "PENDING" | "ACTIVE" | null>
-  >;
 }) => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const postCommunityJoinToAPIAndUpdateParticipationStatus = async () => {
-    const postCommunityJoinToAPIResponseData = await postCommunityJoinToAPI({
+  const joinCommunity = async () => {
+    const { status, participant } = await postCommunityJoinToAPI({
       communityId: communityId,
     });
 
-    if (
-      postCommunityJoinToAPIResponseData.status >= 200 &&
-      postCommunityJoinToAPIResponseData.status <= 300 &&
-      postCommunityJoinToAPIResponseData.participant
-    ) {
-      setParticipationStatus(
-        postCommunityJoinToAPIResponseData.participant.status
-      );
+    if (status >= 200 && status <= 300 && participant) {
+      setParticipationStatus(participant.status);
     }
   };
 
   return (
     <button
-      onClick={() => {
+      onClick={async () => {
         if (!isSubmitting) {
           setIsSubmitting(false);
 
           if (participationStatus === "NONE") {
             try {
-              postCommunityJoinToAPIAndUpdateParticipationStatus();
+              await joinCommunity();
             } catch (err) {
               if (err instanceof Error) {
                 console.log(err.message);
