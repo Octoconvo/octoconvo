@@ -88,7 +88,7 @@ type InboxMessageGET = {
   attachments: Attachment[];
 };
 
-type CommunityJoinPOSTParticipant = {
+type ParticipantAPI = {
   id: string;
   userId: string;
   role: "MEMBER" | "OWNER";
@@ -141,7 +141,7 @@ export type {
   CommunitiesResponseGET,
   CommunityResponseGET,
   CommunityExploreGET,
-  CommunityJoinPOSTParticipant,
+  ParticipantAPI,
   InboxMessageGET,
   Attachment,
   NotificationAPI,

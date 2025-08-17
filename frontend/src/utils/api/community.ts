@@ -1,5 +1,5 @@
 import { ValidationError } from "@/types/form";
-import { CommunityExploreGET, CommunityJoinPOSTParticipant } from "@/types/api";
+import { CommunityExploreGET, ParticipantAPI } from "@/types/api";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
@@ -33,7 +33,7 @@ type PostCommunityJoinToAPIReturnValue = {
     message?: string;
     validationErrors: ValidationError[];
   };
-  participant: CommunityJoinPOSTParticipant;
+  participant: ParticipantAPI;
 };
 
 type GetCommunityParticipationStatusFromAPI = {
