@@ -3,7 +3,7 @@ import ProfileItem from "./ProfileItem";
 import { FC, useEffect, useRef } from "react";
 import { getProfilesFromAPIWithCursor } from "@/api/profile";
 
-type UpdateProfilesArgs = {
+type UpdateProfiles = {
   profiles: ProfileAPI[];
   fetchedProfiles: ProfileAPI[];
   nextCursor: false | string;
@@ -17,7 +17,7 @@ type ProfileBox = {
     profiles,
     fetchedProfiles,
     nextCursor,
-  }: UpdateProfilesArgs) => void;
+  }: UpdateProfiles) => void;
 };
 
 const ProfileBox: FC<ProfileBox> = ({
