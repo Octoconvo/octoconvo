@@ -32,29 +32,37 @@ const CommunityBox: FC<CommunityBox> = ({
     null
   );
 
-  const getCommunitiesFromAPIWithCursorAndUpdateCommunitiesStates = async ({
+  const loadMoreCommunities = async ({
     cursor,
     name,
   }: {
     cursor: string;
     name: string;
   }) => {
-    const communitiesAPIResponse = await getCommunitiesFromAPIWithCursor({
-      name,
-      cursor,
-    });
-
-    if (
-      communitiesAPIResponse.status >= 200 &&
-      communitiesAPIResponse.status <= 300 &&
-      communitiesAPIResponse.profiles &&
-      communitiesAPIResponse.nextCursor !== undefined
-    ) {
-      updateCommunitiesStates({
-        communities,
-        fetchedCommunities: communitiesAPIResponse.communities,
-        nextCursor: communitiesAPIResponse.nextCursor,
+    try {
+      const {
+        status,
+        communities: fetchedCommunities,
+        nextCursor,
+      } = await getCommunitiesFromAPIWithCursor({
+        name,
+        cursor,
       });
+
+      if (
+        status >= 200 &&
+        status <= 300 &&
+        fetchedCommunities &&
+        nextCursor !== undefined
+      ) {
+        updateCommunitiesStates({
+          communities,
+          fetchedCommunities,
+          nextCursor: nextCursor,
+        });
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
     }
   };
 
@@ -64,16 +72,10 @@ const CommunityBox: FC<CommunityBox> = ({
 
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting && isInfiniteScrollOn && nextCursor) {
-        try {
-          getCommunitiesFromAPIWithCursorAndUpdateCommunitiesStates({
-            cursor: nextCursor,
-            name: nameQuery,
-          });
-        } catch (err) {
-          if (err instanceof Error) {
-            console.log(err.message);
-          }
-        }
+        loadMoreCommunities({
+          cursor: nextCursor,
+          name: nameQuery,
+        });
       }
     });
 
