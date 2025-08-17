@@ -26,29 +26,37 @@ const ProfileBox: FC<ProfileBox> = ({
   nameQuery,
   updateProfilesStates,
 }) => {
-  const getMoreProfilesWithCursorObserverRef = useRef(null);
+  const getMoreProfilesWithCursorObserverRef = useRef<null | HTMLDivElement>(
+    null
+  );
 
-  const getProfilesFromAPIWithCursorAndUpdateProfilesStates = async ({
-    cursor,
-  }: {
-    cursor: string;
-  }) => {
-    const profilesAPIResponse = await getProfilesFromAPIWithCursor({
-      name: nameQuery,
-      cursor,
-    });
-
-    if (
-      profilesAPIResponse.status >= 200 &&
-      profilesAPIResponse.status <= 300 &&
-      profilesAPIResponse.profiles &&
-      profilesAPIResponse.nextCursor !== undefined
-    ) {
-      updateProfilesStates({
-        profiles,
-        fetchedProfiles: profilesAPIResponse.profiles,
-        nextCursor: profilesAPIResponse.nextCursor,
+  const loadMoreProfiles = async ({ cursor }: { cursor: string }) => {
+    try {
+      const {
+        status,
+        profiles: fetchedProfiles,
+        nextCursor,
+      } = await getProfilesFromAPIWithCursor({
+        name: nameQuery,
+        cursor,
       });
+
+      if (
+        status >= 200 &&
+        status <= 300 &&
+        fetchedProfiles &&
+        nextCursor !== undefined
+      ) {
+        updateProfilesStates({
+          profiles,
+          fetchedProfiles: fetchedProfiles,
+          nextCursor: nextCursor,
+        });
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        console.log(err.message);
+      }
     }
   };
 
@@ -57,20 +65,10 @@ const ProfileBox: FC<ProfileBox> = ({
       getMoreProfilesWithCursorObserverRef.current;
 
     const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        console.log(entries[0].intersectionRatio);
-      }
-
       if (entries[0].isIntersecting && nextCursor) {
-        try {
-          getProfilesFromAPIWithCursorAndUpdateProfilesStates({
-            cursor: nextCursor,
-          });
-        } catch (err) {
-          if (err instanceof Error) {
-            console.log(err.message);
-          }
-        }
+        loadMoreProfiles({
+          cursor: nextCursor,
+        });
       }
     });
 
