@@ -1,17 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { CommunitiesResponseGET } from "@/types/api";
+import { CommunityAPI } from "@/types/api";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { unescapeString } from "@/utils/string";
 
-const CommunitiesItem = ({
-  community,
-}: {
-  community: CommunitiesResponseGET;
-}) => {
+const CommunitiesItem = ({ community }: { community: CommunityAPI }) => {
   const [isHovered, setIsHovered] = useState(false);
   const linkRef = useRef<null | HTMLAnchorElement>(null);
   const { communityid } = useParams();

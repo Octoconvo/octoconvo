@@ -2,7 +2,7 @@ import CommunitiesItem from "@/components/Communities/CommunitiesList/Communitie
 import { render, act, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { userEvent } from "@testing-library/user-event";
-import { CommunitiesResponseGET } from "@/types/api";
+import { CommunityAPI } from "@/types/api";
 
 const communitiesList = [
   {
@@ -37,7 +37,7 @@ const communitiesList = [
       directMessageId: null,
     },
   },
-] as CommunitiesResponseGET[];
+] as CommunityAPI[];
 
 jest.mock(
   "next/navigation",

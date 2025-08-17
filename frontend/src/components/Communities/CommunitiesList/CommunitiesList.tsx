@@ -1,12 +1,12 @@
 "use client";
 
-import { CommunitiesResponseGET } from "@/types/api";
+import { CommunityAPI } from "@/types/api";
 import CommunitiesItem from "./CommunitiesItem";
 
 const CommunitiesList = ({
   communitiesList,
 }: {
-  communitiesList: CommunitiesResponseGET[];
+  communitiesList: CommunityAPI[];
 }) => {
   return (
     <ul
@@ -15,7 +15,7 @@ const CommunitiesList = ({
         " box-border"
       }
     >
-      {communitiesList.map((community: CommunitiesResponseGET) => {
+      {communitiesList.map((community: CommunityAPI) => {
         return <CommunitiesItem key={community.id} community={community} />;
       })}
     </ul>

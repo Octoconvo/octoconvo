@@ -3,7 +3,7 @@
 import CreateCommunityForm from "@/components/CreateCommunity/CreateCommunityForm";
 import { useContext, useState } from "react";
 import { getFormData, createOnSubmit } from "@/utils/form";
-import { CommunityResponsePOST } from "@/types/api";
+import { CommunityAPI } from "@/types/api";
 import {
   CreateCommunityForm as CreateCommunityFormType,
   ValidationError,
@@ -34,7 +34,7 @@ const EditProfileFormWrapper = () => {
     }
   };
 
-  const successHandler = (data: CommunityResponsePOST) => {
+  const successHandler = (data: CommunityAPI) => {
     // Redirect to the created community and close the community creation modal
     router.replace(`/lobby/communities/${data.id}`);
     closeModal();
@@ -42,7 +42,7 @@ const EditProfileFormWrapper = () => {
 
   const onSubmit = createOnSubmit<
     CreateCommunityFormType,
-    CommunityResponsePOST,
+    CommunityAPI,
     ErrorHandlerType
   >({
     dataKey: "community",

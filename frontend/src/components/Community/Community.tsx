@@ -1,7 +1,7 @@
 "use client";
 
 import { UserContext } from "@/contexts/user";
-import { Attachment, CommunityResponseGET, InboxMessageAPI } from "@/types/api";
+import { Attachment, CommunityAPI, InboxMessageAPI } from "@/types/api";
 import { useContext, useEffect, useRef, useState } from "react";
 import MessageBox from "../MessageBox/MessageBox";
 import Image from "next/image";
@@ -12,7 +12,7 @@ import ZoomedImageModal from "../ZoomedImageModal/ZoomedImagedModal";
 import { unescapeString, createHTMLNewLine } from "@/utils/string";
 
 const Community = ({ id }: { id: string | null }) => {
-  const [community, setCommunity] = useState<null | CommunityResponseGET>(null);
+  const [community, setCommunity] = useState<null | CommunityAPI>(null);
   const { user } = useContext(UserContext);
   const [messages, setMessages] = useState<InboxMessageAPI[] | null>(null);
   const [prevCursor, setPrevCursor] = useState<string | false>();

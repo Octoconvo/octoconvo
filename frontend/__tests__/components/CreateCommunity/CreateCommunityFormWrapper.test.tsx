@@ -1,7 +1,7 @@
 import CreateCommunityFormWrapper from "@/components/CreateCommunity/CreateCommunityFormWrapper";
 import { render, screen, act } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
-import { CommunityResponsePOST } from "@/types/api";
+import { CommunityAPI } from "@/types/api";
 import "@testing-library/jest-dom";
 import { ActiveModalsContext } from "@/contexts/modal";
 
@@ -14,7 +14,7 @@ jest.mock("next/navigation", () => ({
 // Mock close modal context
 const closeModalMock = jest.fn(() => {});
 
-const community: CommunityResponsePOST = {
+const community: CommunityAPI = {
   id: "123",
   name: "community_test",
   bio: "Test bio.",

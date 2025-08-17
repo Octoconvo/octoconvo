@@ -1,12 +1,12 @@
 import Community from "@/components/Community/Community";
-import { CommunityResponseGET, InboxMessageAPI } from "@/types/api";
+import { CommunityAPI, InboxMessageAPI } from "@/types/api";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { UserContext } from "@/contexts/user";
 import { AttachmentAPI } from "@/types/api";
 import userEvent from "@testing-library/user-event";
 
-const community: CommunityResponseGET = {
+const community: CommunityAPI = {
   id: "testid1",
   name: "testname1",
   bio: "testbio1",

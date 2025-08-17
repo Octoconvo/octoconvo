@@ -3,15 +3,13 @@
 import CommunitiesList from "./CommunitiesList";
 import { useState, useEffect, useContext } from "react";
 import { UserContext } from "@/contexts/user";
-import { CommunitiesResponseGET } from "@/types/api";
+import { CommunityAPI } from "@/types/api";
 import { connectToRoom } from "@/socket/eventHandler";
 import socket from "@/socket/socket";
 
 const CommunitiesListWrapper = () => {
   const { user } = useContext(UserContext);
-  const [userCommunities, setUserCommunities] = useState<
-    CommunitiesResponseGET[]
-  >([]);
+  const [userCommunities, setUserCommunities] = useState<CommunityAPI[]>([]);
 
   useEffect(() => {
     const fetchUserCommunities = async () => {
