@@ -31,37 +31,24 @@ const ExplorePage = () => {
     false
   );
 
-  type SetFeaturedDataStates = {
-    featuredData: CommunityExploreGET[];
-  };
+  const loadFeaturedData = async () => {
+    try {
+      const { status, communities: featuredData } = await getCommunitiesFromAPI(
+        {
+          name: "",
+        }
+      );
 
-  const setFeaturedDataStates = ({ featuredData }: SetFeaturedDataStates) => {
-    setFeaturedData(featuredData);
-  };
-
-  const getFeaturedCommunitiesAndSetCommunitiesStates = async () => {
-    const getCommunitiesAPIResponse = await getCommunitiesFromAPI({
-      name: "",
-    });
-
-    if (
-      getCommunitiesAPIResponse.status >= 200 &&
-      getCommunitiesAPIResponse.status <= 300 &&
-      getCommunitiesAPIResponse.communities !== undefined &&
-      getCommunitiesAPIResponse.nextCursor !== undefined
-    ) {
-      setFeaturedDataStates({
-        featuredData: getCommunitiesAPIResponse.communities,
-      });
+      if (status >= 200 && status <= 300 && featuredData !== undefined) {
+        setFeaturedData(featuredData);
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
     }
   };
 
   useEffect(() => {
-    try {
-      getFeaturedCommunitiesAndSetCommunitiesStates();
-    } catch (err) {
-      if (err instanceof Error) console.log(err.message);
-    }
+    loadFeaturedData();
 
     return () => {};
   }, []);
@@ -79,15 +66,9 @@ const ExplorePage = () => {
     setProfilesNextCursor(nextCursor);
   };
 
-  type UpdateProfilesStatesArgs = {
+  type UpdateProfilesStates = {
     profiles: ProfilesAPI;
     fetchedProfiles: ProfilesAPI;
-    nextCursor: false | string;
-  };
-
-  type updateCommunitiesStatesArgs = {
-    communities: CommunityExploreGET[];
-    fetchedCommunities: CommunityExploreGET[];
     nextCursor: false | string;
   };
 
@@ -95,25 +76,25 @@ const ExplorePage = () => {
     profiles,
     fetchedProfiles,
     nextCursor,
-  }: UpdateProfilesStatesArgs) => {
+  }: UpdateProfilesStates) => {
     setProfiles([...profiles, ...fetchedProfiles]);
     setProfilesNextCursor(nextCursor);
   };
 
-  const getProfilesFromAPIAndSetProfilesStates = async () => {
-    const getProfilesAPIResponse = await getProfilesFromAPI({
+  const loadProfiles = async () => {
+    const { status, profiles, nextCursor } = await getProfilesFromAPI({
       name: nameQuery,
     });
 
     if (
-      getProfilesAPIResponse.status >= 200 &&
-      getProfilesAPIResponse.status <= 300 &&
-      getProfilesAPIResponse.profiles !== undefined &&
-      getProfilesAPIResponse.nextCursor !== undefined
+      status >= 200 &&
+      status <= 300 &&
+      profiles !== undefined &&
+      nextCursor !== undefined
     ) {
       setProfilesStates({
-        data: getProfilesAPIResponse.profiles,
-        nextCursor: getProfilesAPIResponse.nextCursor,
+        data: profiles,
+        nextCursor: nextCursor,
       });
     }
   };
@@ -130,30 +111,40 @@ const ExplorePage = () => {
     setNextCursor(nextCursor);
   };
 
+  type updateCommunitiesStates = {
+    communities: CommunityExploreGET[];
+    fetchedCommunities: CommunityExploreGET[];
+    nextCursor: false | string;
+  };
+
   const updateCommunitiesStates = ({
     communities,
     fetchedCommunities,
     nextCursor,
-  }: updateCommunitiesStatesArgs) => {
+  }: updateCommunitiesStates) => {
     setCommunities([...communities, ...fetchedCommunities]);
     setNextCursor(nextCursor);
   };
 
-  const getCommunitiesFromAPIAndSetCommunitiesStates = async () => {
-    const getCommunitiesAPIResponse = await getCommunitiesFromAPI({
-      name: nameQuery,
-    });
-
-    if (
-      getCommunitiesAPIResponse.status >= 200 &&
-      getCommunitiesAPIResponse.status <= 300 &&
-      getCommunitiesAPIResponse.communities !== undefined &&
-      getCommunitiesAPIResponse.nextCursor !== undefined
-    ) {
-      setCommunitiesStates({
-        data: getCommunitiesAPIResponse.communities,
-        nextCursor: getCommunitiesAPIResponse.nextCursor,
+  const loadCommunities = async () => {
+    try {
+      const { status, communities, nextCursor } = await getCommunitiesFromAPI({
+        name: nameQuery,
       });
+
+      if (
+        status >= 200 &&
+        status <= 300 &&
+        communities !== undefined &&
+        nextCursor !== undefined
+      ) {
+        setCommunitiesStates({
+          data: communities,
+          nextCursor: nextCursor,
+        });
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
     }
   };
 
@@ -208,11 +199,7 @@ const ExplorePage = () => {
                 setView("COMMUNITY");
 
                 if (communities === null) {
-                  try {
-                    await getCommunitiesFromAPIAndSetCommunitiesStates();
-                  } catch (err) {
-                    if (err instanceof Error) console.log(err.message);
-                  }
+                  await loadCommunities();
                 }
               }}
               className={
@@ -230,11 +217,7 @@ const ExplorePage = () => {
                 setView("PROFILE");
 
                 if (profiles === null) {
-                  try {
-                    await getProfilesFromAPIAndSetProfilesStates();
-                  } catch (err) {
-                    if (err instanceof Error) console.log(err.message);
-                  }
+                  await loadProfiles();
                 }
               }}
               className={
