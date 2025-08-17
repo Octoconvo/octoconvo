@@ -1,7 +1,7 @@
 "use client";
 
 import { UserContext } from "@/contexts/user";
-import { Attachment, CommunityResponseGET, InboxMessageGET } from "@/types/api";
+import { Attachment, CommunityResponseGET, InboxMessageAPI } from "@/types/api";
 import { useContext, useEffect, useRef, useState } from "react";
 import MessageBox from "../MessageBox/MessageBox";
 import Image from "next/image";
@@ -14,7 +14,7 @@ import { unescapeString, createHTMLNewLine } from "@/utils/string";
 const Community = ({ id }: { id: string | null }) => {
   const [community, setCommunity] = useState<null | CommunityResponseGET>(null);
   const { user } = useContext(UserContext);
-  const [messages, setMessages] = useState<InboxMessageGET[] | null>(null);
+  const [messages, setMessages] = useState<InboxMessageAPI[] | null>(null);
   const [prevCursor, setPrevCursor] = useState<string | false>();
   const prevObserverRef = useRef<null | HTMLDivElement>(null);
   const messageListRef = useRef<null | HTMLUListElement>(null);
@@ -112,7 +112,7 @@ const Community = ({ id }: { id: string | null }) => {
         if (res.status >= 200 && res.status <= 300) {
           setMessages([
             ...resData.messagesData,
-            ...(messages as InboxMessageGET[]),
+            ...(messages as InboxMessageAPI[]),
           ]);
           setPrevCursor(resData.prevCursor);
 
@@ -171,7 +171,7 @@ const Community = ({ id }: { id: string | null }) => {
     }
 
     // push emited socket message inside message list
-    const pushSocketMessage = (message: InboxMessageGET) => {
+    const pushSocketMessage = (message: InboxMessageAPI) => {
       if (messages !== null) {
         setMessages([...messages, message]);
       }

@@ -68,7 +68,7 @@ type Attachment = {
   thumbnailUrl: string;
 };
 
-type InboxMessageGET = {
+type InboxMessageAPI = {
   id: string;
   inboxId: string;
   authorId: string;
@@ -142,7 +142,7 @@ export type {
   CommunityResponseGET,
   CommunityExploreGET,
   ParticipantAPI,
-  InboxMessageGET,
+  InboxMessageAPI,
   Attachment,
   NotificationAPI,
   ProfileAPI,
