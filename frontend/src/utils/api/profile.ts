@@ -1,5 +1,4 @@
-import { ProfileAPI } from "@/types/api";
-import { ValidationError } from "@/types/form";
+import { ErrorAPI, ProfileAPI } from "@/types/api";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
@@ -12,10 +11,7 @@ type GetProfilesFromAPIWithCursor = GetProfilesFromAPI & { cursor: string };
 type GetProfilesFromAPIReturnValue = {
   status: number;
   message: string;
-  error?: {
-    message?: string;
-    validationErrors?: ValidationError[];
-  };
+  error?: ErrorAPI;
   profiles?: ProfileAPI[];
   nextCursor?: string;
 };

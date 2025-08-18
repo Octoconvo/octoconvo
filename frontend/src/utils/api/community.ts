@@ -1,5 +1,4 @@
-import { ValidationError } from "@/types/form";
-import { CommunityExploreAPI, ParticipantAPI } from "@/types/api";
+import { CommunityExploreAPI, ErrorAPI, ParticipantAPI } from "@/types/api";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
@@ -14,10 +13,7 @@ type GetCommunitiesFromAPIWithCursor = GetCommunitiesFromAPI & {
 type GetCommunitiesFromAPIReturnValue = {
   status: number;
   message: string;
-  error?: {
-    message?: string;
-    validationErrors: ValidationError[];
-  };
+  error?: ErrorAPI;
   communities?: CommunityExploreAPI[];
   nextCursor?: string;
 };
@@ -29,10 +25,7 @@ type PostCommunityJoinToAPI = {
 type PostCommunityJoinToAPIReturnValue = {
   status: number;
   message: string;
-  error?: {
-    message?: string;
-    validationErrors: ValidationError[];
-  };
+  error?: ErrorAPI;
   participant: ParticipantAPI;
 };
 
@@ -43,10 +36,7 @@ type GetCommunityParticipationStatusFromAPI = {
 type GetCommunityParticipationStatusFromAPIReturnValue = {
   status: number;
   message: string;
-  error?: {
-    message?: string;
-    validationErrors: ValidationError[];
-  };
+  error: ErrorAPI;
   participationStatus: "PENDING" | "ACTIVE" | "NONE";
 };
 

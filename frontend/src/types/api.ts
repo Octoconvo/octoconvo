@@ -1,3 +1,5 @@
+import { ValidationError } from "./form";
+
 type CommunityAPI = {
   id: string;
   name: string;
@@ -108,6 +110,11 @@ type ProfileAPI = {
 
 type ProfilesAPI = ProfileAPI[];
 
+type ErrorAPI = {
+  message?: string;
+  validationErrors: ValidationError[];
+};
+
 export type {
   CommunityAPI,
   CommunityExploreAPI,
@@ -117,4 +124,5 @@ export type {
   NotificationAPI,
   ProfileAPI,
   ProfilesAPI,
+  ErrorAPI,
 };
