@@ -1,14 +1,13 @@
 import { NotificationAPI } from "@/types/api";
-import { RedirectType } from "next/navigation";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
 type GetNotificationCountFromAPIData = {
   status: number;
-  unreadNotificationCount: number;
+  unreadNotificationCount?: number;
 };
 
-const getNotificationCountFromAPIData =
+const getNotificationCountFromAPI =
   async (): Promise<GetNotificationCountFromAPIData> => {
     const response = await fetch(`${DOMAIN_URL}/notification/unread-count`, {
       credentials: "include",
@@ -68,4 +67,4 @@ const notificationsReadStatusPOST = async ({
   }
 };
 
-export { getNotificationCountFromAPIData, notificationsReadStatusPOST };
+export { getNotificationCountFromAPI, notificationsReadStatusPOST };

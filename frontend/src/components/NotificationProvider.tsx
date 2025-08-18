@@ -10,7 +10,7 @@ import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
 import { NotificationAPI } from "@/types/api";
 import { NotificationModalContext } from "@/contexts/modal";
-import { getNotificationCountFromAPIData } from "@/api/notification";
+import { getNotificationCountFromAPI } from "@/api/notification";
 import { pushBufferedNotifications } from "@/utils/notification";
 
 const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
@@ -33,7 +33,7 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
   const loadNotificationCount = async () => {
     try {
       const { status, unreadNotificationCount } =
-        await getNotificationCountFromAPIData();
+        await getNotificationCountFromAPI();
 
       if (
         status >= 200 &&
