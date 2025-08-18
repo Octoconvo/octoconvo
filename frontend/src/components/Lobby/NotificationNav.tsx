@@ -7,7 +7,7 @@ import {
   NotificationCountContext,
 } from "@/contexts/notification";
 import { NotificationModalContext } from "@/contexts/modal";
-import { notificationsReadStatusPOST } from "@/api/notification";
+import { postNotificationsReadStatusesToAPI } from "@/api/notification";
 import { NotificationAPI } from "@/types/api";
 
 const NotificationNav = () => {
@@ -18,6 +18,52 @@ const NotificationNav = () => {
   const { toggleNotificationModalView, isNotificationModalOpen } = useContext(
     NotificationModalContext
   );
+
+  type CreateNotificationsReadStatusesFormData = {
+    startDate: string;
+    endDate: string;
+  };
+
+  const createNotificationsReadStatusesFormData = ({
+    startDate,
+    endDate,
+  }: CreateNotificationsReadStatusesFormData) => {
+    const formData = new URLSearchParams();
+    formData.append("startdate", startDate);
+    formData.append("enddate", endDate);
+
+    return formData;
+  };
+
+  type UpdateNotificationsReadStatuses = {
+    notifications: NotificationAPI[];
+  };
+
+  const updateNotificationsReadStatuses = async ({
+    notifications,
+  }: UpdateNotificationsReadStatuses) => {
+    try {
+      const startDate = notifications[0].createdAt;
+      const endDate = notifications[notifications.length - 1].createdAt;
+
+      const formData = createNotificationsReadStatusesFormData({
+        startDate,
+        endDate,
+      });
+
+      const { status, notifications: updatedNotifications } =
+        await postNotificationsReadStatusesToAPI({ formData });
+
+      if (status >= 200 && status <= 300 && updatedNotifications) {
+        setBufferedNotifications([
+          ...bufferedNotifications,
+          ...updatedNotifications,
+        ]);
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
+    }
+  };
 
   return (
     <>
@@ -35,15 +81,7 @@ const NotificationNav = () => {
               );
 
               if (containsUnreadNotifications && isNotificationModalOpen) {
-                notificationsReadStatusPOST({
-                  notifications,
-                  onSuccess: ({ data }: { data: NotificationAPI[] }) => {
-                    setBufferedNotifications([
-                      ...bufferedNotifications,
-                      ...data,
-                    ]);
-                  },
-                });
+                updateNotificationsReadStatuses({ notifications });
               }
             }
           }}
