@@ -1,10 +1,11 @@
-import { NotificationAPI } from "@/types/api";
+import { ErrorAPI, NotificationAPI } from "@/types/api";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
 type GetNotificationCountFromAPIData = {
   status: number;
   unreadNotificationCount?: number;
+  error?: ErrorAPI;
 };
 
 const getNotificationCountFromAPI =
