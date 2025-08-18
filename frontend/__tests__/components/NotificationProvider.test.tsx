@@ -152,7 +152,7 @@ describe("Test NotificationProvider notifications buffer", () => {
     await user.click(notificationBtn);
     // close notification modal
     await user.click(notificationBtn);
-    expect(notificationCount.textContent).toBe("2");
+    await waitFor(() => expect(notificationCount.textContent).toBe("2"));
   });
 
   test(
