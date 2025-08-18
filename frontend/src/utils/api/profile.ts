@@ -8,7 +8,7 @@ type GetProfilesFromAPI = {
 
 type GetProfilesFromAPIWithCursor = GetProfilesFromAPI & { cursor: string };
 
-type GetProfilesFromAPIReturnValue = {
+type GetProfilesFromAPIData = {
   status: number;
   message: string;
   error?: ErrorAPI;
@@ -18,7 +18,7 @@ type GetProfilesFromAPIReturnValue = {
 
 const getProfilesFromAPI = async ({
   name,
-}: GetProfilesFromAPI): Promise<GetProfilesFromAPIReturnValue> => {
+}: GetProfilesFromAPI): Promise<GetProfilesFromAPIData> => {
   const response = await fetch(`${DOMAIN_URL}/explore/profiles?name=${name}`, {
     method: "GET",
     credentials: "include",
@@ -35,7 +35,7 @@ const getProfilesFromAPI = async ({
 const getProfilesFromAPIWithCursor = async ({
   name,
   cursor,
-}: GetProfilesFromAPIWithCursor): Promise<GetProfilesFromAPIReturnValue> => {
+}: GetProfilesFromAPIWithCursor): Promise<GetProfilesFromAPIData> => {
   const response = await fetch(
     `${DOMAIN_URL}/explore/profiles?name=${name}&cursor=${cursor}`,
     {

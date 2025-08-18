@@ -10,7 +10,7 @@ type GetCommunitiesFromAPIWithCursor = GetCommunitiesFromAPI & {
   cursor: string;
 };
 
-type GetCommunitiesFromAPIReturnValue = {
+type GetCommunitiesFromAPIData = {
   status: number;
   message: string;
   error?: ErrorAPI;
@@ -22,7 +22,7 @@ type PostCommunityJoinToAPI = {
   communityId: string;
 };
 
-type PostCommunityJoinToAPIReturnValue = {
+type PostCommunityJoinToAPIData = {
   status: number;
   message: string;
   error?: ErrorAPI;
@@ -33,7 +33,7 @@ type GetCommunityParticipationStatusFromAPI = {
   communityId: string;
 };
 
-type GetCommunityParticipationStatusFromAPIReturnValue = {
+type GetCommunityParticipationStatusFromAPIData = {
   status: number;
   message: string;
   error: ErrorAPI;
@@ -42,7 +42,7 @@ type GetCommunityParticipationStatusFromAPIReturnValue = {
 
 const getCommunitiesFromAPI = async ({
   name,
-}: GetCommunitiesFromAPI): Promise<GetCommunitiesFromAPIReturnValue> => {
+}: GetCommunitiesFromAPI): Promise<GetCommunitiesFromAPIData> => {
   const response = await fetch(
     `${DOMAIN_URL}/explore/communities?name=${name}`,
     {
@@ -82,7 +82,7 @@ const getCommunitiesFromAPIWithCursor = async ({
 
 const postCommunityJoinToAPI = async ({
   communityId,
-}: PostCommunityJoinToAPI): Promise<PostCommunityJoinToAPIReturnValue> => {
+}: PostCommunityJoinToAPI): Promise<PostCommunityJoinToAPIData> => {
   const response = await fetch(`${DOMAIN_URL}/community/${communityId}/join`, {
     mode: "cors",
     credentials: "include",
@@ -100,7 +100,7 @@ const postCommunityJoinToAPI = async ({
 const getCommunityParticipationStatusFromAPI = async ({
   communityId,
 }: GetCommunityParticipationStatusFromAPI): //eslint-disable-next-line
-Promise<GetCommunityParticipationStatusFromAPIReturnValue> => {
+Promise<GetCommunityParticipationStatusFromAPIData> => {
   const response = await fetch(
     `${DOMAIN_URL}/community/${communityId}/participation-status`,
     {
