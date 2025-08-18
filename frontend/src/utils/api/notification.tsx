@@ -4,6 +4,7 @@ const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
 type GetNotificationCountFromAPIData = {
   status: number;
+  message: string;
   unreadNotificationCount?: number;
   error?: ErrorAPI;
 };
