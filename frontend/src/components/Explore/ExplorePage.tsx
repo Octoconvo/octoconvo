@@ -10,6 +10,8 @@ import { ActiveExploreCommunity } from "@/contexts/community";
 import { getProfilesFromAPI } from "@/api/profile";
 import { getCommunitiesFromAPI } from "@/api/community";
 import ProfileBox from "./ProfileBox";
+import ProfileModal from "./ProfileModal";
+import { ActiveExploreProfileContext } from "@/contexts/profile";
 
 const ExplorePage = () => {
   const [featuredData, setFeaturedData] = useState<
@@ -30,6 +32,7 @@ const ExplorePage = () => {
   const [profilesNextCursor, setProfilesNextCursor] = useState<string | false>(
     false
   );
+  const [activeProfile, setActiveProfile] = useState<null | ProfileAPI>(null);
 
   const loadFeaturedData = async () => {
     try {
@@ -154,113 +157,123 @@ const ExplorePage = () => {
   return (
     <>
       <ActiveExploreCommunity value={{ activeCommunity, setActiveCommunity }}>
-        <SearchBar
-          path={path}
-          onSubmitFn={(data: SearchBarForm) => {
-            if (view === "DEFAULT") {
-              setView("COMMUNITY");
-            }
-
-            if (view !== "PROFILE") {
-              setProfiles(null);
-            }
-
-            if (view !== "COMMUNITY") {
-              setCommunities(null);
-            }
-
-            setNameQuery(data.name);
-          }}
-          onSuccessFn={onSuccessFn}
-          onResetFn={() => {
-            setView("DEFAULT");
-            setCommunities(null);
-            setNameQuery("");
-            setProfiles(null);
-          }}
-        />
-        {view === "DEFAULT" && featuredData && (
-          <CommunityBox
-            isInfiniteScrollOn={false}
-            communities={featuredData}
-            nextCursor={false}
-            updateCommunitiesStates={updateCommunitiesStates}
-            nameQuery=""
-          />
-        )}
-        {view !== "DEFAULT" && (
-          <nav
-            data-testid="explr-pg-nav"
-            className="flex bg-gr-black-1-b self-start p-[8px] gap-[16px]"
-          >
-            <button
-              data-testid="explr-pg-cmmnty-btn"
-              onClick={async () => {
+        <ActiveExploreProfileContext
+          value={{ activeProfile, setActiveProfile }}
+        >
+          <SearchBar
+            path={path}
+            onSubmitFn={(data: SearchBarForm) => {
+              if (view === "DEFAULT") {
                 setView("COMMUNITY");
-
-                if (communities === null) {
-                  await loadCommunities();
-                }
-              }}
-              className={
-                "px-[16px] py-[8px] rounded-[4px]" +
-                (view === "COMMUNITY"
-                  ? " bg-brand-1-2 hover:bg-brand-1"
-                  : " bg-grey-100 hover:bg-black-500")
               }
-            >
-              Community
-            </button>
-            <button
-              data-testid="explr-pg-usr-btn"
-              onClick={async () => {
-                setView("PROFILE");
 
-                if (profiles === null) {
-                  await loadProfiles();
-                }
-              }}
-              className={
-                "px-[16px] py-[8px] rounded-[4px]" +
-                (view === "PROFILE"
-                  ? " bg-brand-1-2 hover:bg-brand-1"
-                  : " bg-grey-100 hover:bg-black-500")
+              if (view !== "PROFILE") {
+                setProfiles(null);
               }
-            >
-              User
-            </button>
-          </nav>
-        )}
-        {view === "COMMUNITY" &&
-          communities &&
-          (communities.length > 0 ? (
-            <CommunityBox
-              communities={communities}
-              nextCursor={nextCursor}
-              nameQuery={nameQuery}
-              updateCommunitiesStates={updateCommunitiesStates}
-              isInfiniteScrollOn={true}
-            />
-          ) : (
-            "No Data found"
-          ))}
-        {view === "PROFILE" &&
-          (profiles && profiles.length > 0 ? (
-            <ProfileBox
-              profiles={profiles}
-              nextCursor={profilesNextCursor}
-              nameQuery={nameQuery}
-              updateProfilesStates={updateProfilesStates}
-            />
-          ) : (
-            "No Profiles found"
-          ))}
-        {activeCommunity && (
-          <CommunityModal
-            community={activeCommunity}
-            onCloseFn={() => setActiveCommunity(null)}
+
+              if (view !== "COMMUNITY") {
+                setCommunities(null);
+              }
+
+              setNameQuery(data.name);
+            }}
+            onSuccessFn={onSuccessFn}
+            onResetFn={() => {
+              setView("DEFAULT");
+              setCommunities(null);
+              setNameQuery("");
+              setProfiles(null);
+            }}
           />
-        )}
+          {view === "DEFAULT" && featuredData && (
+            <CommunityBox
+              isInfiniteScrollOn={false}
+              communities={featuredData}
+              nextCursor={false}
+              updateCommunitiesStates={updateCommunitiesStates}
+              nameQuery=""
+            />
+          )}
+          {view !== "DEFAULT" && (
+            <nav
+              data-testid="explr-pg-nav"
+              className="flex bg-gr-black-1-b self-start p-[8px] gap-[16px]"
+            >
+              <button
+                data-testid="explr-pg-cmmnty-btn"
+                onClick={async () => {
+                  setView("COMMUNITY");
+
+                  if (communities === null) {
+                    await loadCommunities();
+                  }
+                }}
+                className={
+                  "px-[16px] py-[8px] rounded-[4px]" +
+                  (view === "COMMUNITY"
+                    ? " bg-brand-1-2 hover:bg-brand-1"
+                    : " bg-grey-100 hover:bg-black-500")
+                }
+              >
+                Community
+              </button>
+              <button
+                data-testid="explr-pg-usr-btn"
+                onClick={async () => {
+                  setView("PROFILE");
+
+                  if (profiles === null) {
+                    await loadProfiles();
+                  }
+                }}
+                className={
+                  "px-[16px] py-[8px] rounded-[4px]" +
+                  (view === "PROFILE"
+                    ? " bg-brand-1-2 hover:bg-brand-1"
+                    : " bg-grey-100 hover:bg-black-500")
+                }
+              >
+                User
+              </button>
+            </nav>
+          )}
+          {view === "COMMUNITY" &&
+            communities &&
+            (communities.length > 0 ? (
+              <CommunityBox
+                communities={communities}
+                nextCursor={nextCursor}
+                nameQuery={nameQuery}
+                updateCommunitiesStates={updateCommunitiesStates}
+                isInfiniteScrollOn={true}
+              />
+            ) : (
+              "No Data found"
+            ))}
+          {view === "PROFILE" &&
+            (profiles && profiles.length > 0 ? (
+              <ProfileBox
+                profiles={profiles}
+                nextCursor={profilesNextCursor}
+                nameQuery={nameQuery}
+                updateProfilesStates={updateProfilesStates}
+              />
+            ) : (
+              "No Profiles found"
+            ))}
+          {activeCommunity && (
+            <CommunityModal
+              community={activeCommunity}
+              onCloseFn={() => setActiveCommunity(null)}
+            />
+          )}
+          {activeProfile && (
+            <ProfileModal
+              profile={activeProfile}
+              onClose={() => setActiveProfile(null)}
+            />
+          )}
+        </ActiveExploreProfileContext>
       </ActiveExploreCommunity>
     </>
   );

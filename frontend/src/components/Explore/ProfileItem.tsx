@@ -1,9 +1,19 @@
+import { ActiveExploreProfileContext } from "@/contexts/profile";
 import { ProfileAPI } from "@/types/api";
+import { useContext, FC } from "react";
 
-const ProfileItem = ({ profile }: { profile: ProfileAPI }) => {
+type ProfileItemProps = { profile: ProfileAPI };
+
+const ProfileItem: FC<ProfileItemProps> = ({ profile }) => {
+  const { setActiveProfile } = useContext(ActiveExploreProfileContext);
+
   return (
     <li className="flex flex-col bg-black-100 p-[32px] rounded-8 h-[150px]">
-      <button className="flex gap-[32px] h-full items-center">
+      <button
+        data-testid="open-profile-modal-btn"
+        onClick={() => setActiveProfile(profile)}
+        className="flex gap-[32px] h-full items-center"
+      >
         <figure className="bg-gr-black-2-r min-w-[64px] h-[64px] rounded-full">
           {profile.avatar && (
             <img
@@ -16,7 +26,11 @@ const ProfileItem = ({ profile }: { profile: ProfileAPI }) => {
             />
           )}
         </figure>
-        <div className="flex flex-col gap-[16px] justify-between overflow-hidden">
+        <div
+          className={
+            "flex flex-col gap-[16px] justify-between" + " overflow-hidden"
+          }
+        >
           <div className="flex flex-col gap-[4px]">
             <p
               data-testid="profile-item-displayname"
