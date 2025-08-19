@@ -27,9 +27,9 @@ const profile1: ProfileAPI = {
   bio: null,
   banner: null,
   isDeleted: false,
-  lastSeen: "testprofile1",
-  createdAt: "testprofile1",
-  updatedAt: "testprofile1",
+  lastSeen: new Date().toISOString(),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toDateString(),
 };
 
 const response = {
@@ -228,5 +228,33 @@ describe("Test ExplorePage buttons and fetches", () => {
 
     const profileBox = screen.getByTestId("profile-box-ulist");
     expect(profileBox).toBeInTheDocument();
+  });
+
+  test("Don't render profile modal if the activeProfile is null", async () => {
+    const profileModal = screen.queryByTestId("profileModal");
+    expect(profileModal).not.toBeInTheDocument();
+  });
+
+  test("Close ProfileModal after pressing the Escape key", async () => {
+    const nameInput = screen.getByTestId("srchbr-nm-input");
+    const searchBtn = screen.getByTestId("srchbr-sbmt-btn");
+
+    await user.type(nameInput, "testname1");
+    await user.click(searchBtn);
+
+    const explorePageUserBtn = screen.getByTestId("explr-pg-usr-btn");
+    await user.click(explorePageUserBtn);
+
+    const profileBox = screen.getByTestId("profile-box-ulist");
+    expect(profileBox).toBeInTheDocument();
+
+    const openProfileModalBtn = screen.getByTestId("open-profile-modal-btn");
+    await user.click(openProfileModalBtn);
+
+    const profileModal = screen.getByTestId("profile-modal");
+    expect(profileModal).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(profileModal).not.toBeInTheDocument();
   });
 });
