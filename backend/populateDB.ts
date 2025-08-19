@@ -1,25 +1,26 @@
 #!/usr/bin/env node
-import { User } from "@prisma/client";
+import { Community, Inbox } from "@prisma/client";
 import prisma from "./database/prisma/client";
 import bcrypt from "bcrypt";
+
 // Populate database for testing purposes
+type SeedUser = {
+  username: string;
+  displayName: string;
+  password: string;
+  community: string;
+};
+
+const seedUsers: SeedUser[] = [];
+
 const populateDB = async () => {
   console.log(`\x1b[36mPopulating database...`);
-  try {
-    // Create 102 Users
-    /* The first two users are used for authorisation check so we'll exclude 
-     them from the communities join loop */
-    const users: {
-      username: string;
-      displayName: string;
-      password: string;
-      community: string;
-    }[] = [];
 
-    // Create another 100 users
-    const addUser = async () => {
-      const pushUser = new Promise(resolve => {
-        for (let i = 1; i <= 1000; i++) {
+  try {
+    // push users to the seedUsers
+    const createAndPushToSeedUsers = async ({ count }: { count: number }) => {
+      return new Promise(resolve => {
+        for (let i = 1; i <= count; i++) {
           const user = {
             username: `seeduser${i}`,
             displayName: `seeduser${i}`,
@@ -27,73 +28,87 @@ const populateDB = async () => {
             community: `seedcommunity${i}`,
           };
 
-          users.push(user);
+          seedUsers.push(user);
         }
 
         resolve(1);
       });
-
-      return pushUser;
     };
 
-    await addUser();
+    await createAndPushToSeedUsers({ count: 1000 });
 
-    const createUserData = async () => {
-      const createData = users.map(user => {
+    const populateDatabaseWithSeedData = async () => {
+      const createSeedUserAndItsData = seedUsers.map(seedUser => {
         return new Promise((resolve): void =>
-          bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
+          bcrypt.hash(seedUser.password, 10, async (err, hashedPassword) => {
             if (err) {
               if (err instanceof Error) console.log(err.message);
             }
 
-            const userData: User = await prisma.user.create({
-              data: {
-                username: user.username,
-                displayName: user.username,
-                password: hashedPassword,
-              },
-            });
+            const createUser = async () => {
+              const user = await prisma.user.create({
+                data: {
+                  username: seedUser.username,
+                  displayName: seedUser.username,
+                  password: hashedPassword,
+                },
+              });
 
-            console.log(`\x1b[36mCreated user ${user.username}...`);
+              console.log(`\x1b[36mCreated user ${user.username}...`);
 
-            // Create communities
-            const community = await prisma.community.create({
-              data: {
-                name: user.community,
-                bio: user.community,
-                inbox: {
-                  create: {
-                    inboxType: "COMMUNITY",
+              return user;
+            };
+
+            const user = await createUser();
+
+            type CommunityWithInbox = Community & { inbox: Inbox };
+
+            const createCommunity = async (): Promise<CommunityWithInbox> => {
+              const community = await prisma.community.create({
+                data: {
+                  name: seedUser.community,
+                  bio: seedUser.community,
+                  inbox: {
+                    create: {
+                      inboxType: "COMMUNITY",
+                    },
+                  },
+                  participantsCount: 1,
+                  participants: {
+                    create: {
+                      userId: user.id,
+                      role: "OWNER",
+                      status: "ACTIVE",
+                      memberSince: new Date(),
+                    },
                   },
                 },
-                participantsCount: 1,
-                participants: {
-                  create: {
-                    userId: userData.id,
-                    role: "OWNER",
-                    status: "ACTIVE",
-                    memberSince: new Date(),
-                  },
+                include: {
+                  inbox: true,
                 },
-              },
-              include: {
-                inbox: true,
-              },
-            });
+              });
 
-            console.log(`\x1b[36mCreated community ${user.community}...`);
+              console.log(`\x1b[36mCreated community ${seedUser.community}...`);
+
+              return community as CommunityWithInbox;
+            };
+
+            const community = await createCommunity();
+
+            const createMessage = async (i: number) => {
+              await prisma.message.create({
+                data: {
+                  content: `seedmessage${i}`,
+                  inboxId: community.inbox?.id,
+                  authorId: user.id,
+                },
+              });
+            };
 
             if (community?.inbox) {
               for (let i = 1; i <= 20; i++) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
-
-                await prisma.message.create({
-                  data: {
-                    content: `seedmessage${i}`,
-                    inboxId: community.inbox?.id,
-                    authorId: userData.id,
-                  },
-                });
+                await createMessage(i);
               }
             }
 
@@ -102,51 +117,61 @@ const populateDB = async () => {
         );
       });
 
-      await Promise.all(createData);
+      await Promise.all(createSeedUserAndItsData);
 
-      const joinCommunity = async ({
+      const populateCommunitiesWithParticipants = async ({
         start,
         end,
       }: {
         start: number;
         end: number;
       }) => {
-        users.map(async (user, index) => {
+        seedUsers.map(async (seedUser, index) => {
           if (index > start && index <= end) {
-            console.log(`\x1b[36mAdding participants to ${user.community}`);
+            console.log(`\x1b[36mAdding participants to ${seedUser.community}`);
             const community = await prisma.community.findUnique({
               where: {
-                name: user.community,
+                name: seedUser.community,
               },
             });
 
             if (community) {
               for (let i = 0; i < index - 2; i++) {
                 if (i !== index) {
-                  const userData = await prisma.user.findUnique({
+                  const user = await prisma.user.findUnique({
                     where: {
-                      username: users[i].username,
+                      username: seedUsers[i].username,
                     },
                   });
 
-                  if (userData) {
-                    const status = (i + index) % 2 === 0 ? "PENDING" : "ACTIVE";
+                  type ParticipantStatus = "PENDING" | "ACTIVE";
 
-                    console.log(
-                      `\x1b[36mAdding ${userData.username} as a ${community.name}'s` +
-                        ` ${status} participant`,
-                    );
+                  type AddParticipant = {
+                    status: ParticipantStatus;
+                    userId: string;
+                  };
 
-                    const addParticipant = prisma.participant.create({
+                  const createAddParticipant = ({
+                    status,
+                    userId,
+                  }: AddParticipant) =>
+                    prisma.participant.create({
                       data: {
                         role: "MEMBER",
                         status: status,
                         communityId: community?.id,
-                        userId: userData?.id,
+                        userId: userId,
                       },
                     });
 
-                    const incrementParticipantsCount = prisma.community.update({
+                  type CreateIncrementParticipantsCount = {
+                    status: ParticipantStatus;
+                  };
+
+                  const createIncrementParticipantsCount = ({
+                    status,
+                  }: CreateIncrementParticipantsCount) =>
+                    prisma.community.update({
                       where: {
                         id: community.id,
                       },
@@ -157,10 +182,31 @@ const populateDB = async () => {
                       },
                     });
 
-                    prisma.$transaction([
-                      addParticipant,
-                      incrementParticipantsCount,
-                    ]);
+                  if (user) {
+                    const addParticipantToTheCommunity = async () => {
+                      const status =
+                        (i + index) % 2 === 0 ? "PENDING" : "ACTIVE";
+
+                      console.log(
+                        `\x1b[36mAdding ${user.username} as a` +
+                          ` ${community.name}'s ${status} participant`,
+                      );
+
+                      const addParticipant = createAddParticipant({
+                        status,
+                        userId: user.id,
+                      });
+
+                      const incrementParticipantsCount =
+                        createIncrementParticipantsCount({ status });
+
+                      await prisma.$transaction([
+                        addParticipant,
+                        incrementParticipantsCount,
+                      ]);
+                    };
+
+                    await addParticipantToTheCommunity();
                   }
                 }
               }
@@ -169,26 +215,25 @@ const populateDB = async () => {
         });
       };
 
-      // handle communities participants
-
       /* 
-        Add participants to communities that are positioned in the middle of
-        the array to improve the cursor based testing.
+        Add participants to communities starting in the middle to simulate
+        different participants density with higher density in the community
+        positioned in the middle the array to improve the cursor based testing.
         This way we can test the fetching communities with equal participants
         with communities created before and after our cursor's createdAt.
       */
-      await joinCommunity({
-        start: 0 + users.length / 4,
-        end: users.length - users.length / 4,
+      await populateCommunitiesWithParticipants({
+        start: 0 + seedUsers.length / 4,
+        end: seedUsers.length - seedUsers.length / 4,
       });
 
-      // Create 5 community request notification for seeduser1
-
+      // Create community requests notification for seeduser1
       const seeduser1 = await prisma.user.findUnique({
         where: {
           username: "seeduser1",
         },
       });
+
       const seedusers = await prisma.user.findMany({
         where: {
           username: {
@@ -197,6 +242,7 @@ const populateDB = async () => {
         },
         take: 100,
       });
+
       const seedcommunity1 = await prisma.community.findUnique({
         where: {
           name: "seedcommunity1",
@@ -234,7 +280,7 @@ const populateDB = async () => {
       }
     };
 
-    await createUserData();
+    await populateDatabaseWithSeedData();
   } catch (err) {
     if (err instanceof Error) console.log(err.message);
   } finally {
