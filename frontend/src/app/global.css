@@ -299,6 +299,10 @@
     background-size: 100% auto;
   }
 
+  .msg-icon {
+    @apply icon before:bg-[url("/images/dm-icon.svg")];
+  }
+
   @keyframes spinner {
     to {
       transform: rotate(1turn);
