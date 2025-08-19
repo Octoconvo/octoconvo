@@ -303,6 +303,10 @@
     @apply icon before:bg-[url("/images/dm-icon.svg")];
   }
 
+  .add-friend-icon {
+    @apply icon before:bg-[url("/images/add-friend-icon.svg")];
+  }
+
   @keyframes spinner {
     to {
       transform: rotate(1turn);
