@@ -64,7 +64,7 @@ const getCommunitiesFromAPIWithCursor = async ({
   cursor,
 }: GetCommunitiesFromAPIWithCursor) => {
   const response = await fetch(
-    `${DOMAIN_URL}/explore/communities?name=${name}&curssor=${cursor}`,
+    `${DOMAIN_URL}/explore/communities?name=${name}&cursor=${cursor}`,
     {
       mode: "cors",
       credentials: "include",
