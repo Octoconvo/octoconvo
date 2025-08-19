@@ -119,7 +119,7 @@ const NotificationModal = () => {
     };
 
     const closeOnEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === "Escape" && isNotificationModalOpen) {
         closeModal();
       }
     };
