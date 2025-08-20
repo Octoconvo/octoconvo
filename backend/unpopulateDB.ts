@@ -27,6 +27,16 @@ const unpopulateDB = async () => {
 
     await deleteUserNotifications();
 
+    const deleteUserFriends = async () => {
+      await prisma.friend.deleteMany({
+        where: {
+          OR: [{ friendOfId: user.id }, { friendId: user.id }],
+        },
+      });
+    };
+
+    await deleteUserFriends();
+
     const getUserCommunities = async (): Promise<CommunityWithInbox[]> => {
       const community = (await prisma.community.findMany({
         where: {
