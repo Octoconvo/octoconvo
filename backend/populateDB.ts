@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { Community, Inbox } from "@prisma/client";
+import { Community, Inbox, User } from "@prisma/client";
 import prisma from "./database/prisma/client";
 import bcrypt from "bcrypt";
 
@@ -228,13 +228,25 @@ const populateDB = async () => {
       });
 
       // Create community requests notification for seeduser1
-      const seeduser1 = await prisma.user.findUnique({
+      const user1 = await prisma.user.findUnique({
         where: {
           username: "seeduser1",
         },
       });
 
-      const seedusers = await prisma.user.findMany({
+      const user2 = await prisma.user.findUnique({
+        where: {
+          username: "seeduser2",
+        },
+      });
+
+      const user3 = await prisma.user.findUnique({
+        where: {
+          username: "seeduser3",
+        },
+      });
+
+      const users = await prisma.user.findMany({
         where: {
           username: {
             startsWith: "seeduser",
@@ -243,7 +255,7 @@ const populateDB = async () => {
         take: 100,
       });
 
-      const seedcommunity1 = await prisma.community.findUnique({
+      const community1 = await prisma.community.findUnique({
         where: {
           name: "seedcommunity1",
         },
@@ -256,7 +268,7 @@ const populateDB = async () => {
         triggeredForId: string;
         communityId: string;
       }) => {
-        for (const user of seedusers) {
+        for (const user of users) {
           await new Promise(resolve => setTimeout(resolve, 1000));
 
           await prisma.notification.create({
@@ -272,11 +284,81 @@ const populateDB = async () => {
         }
       };
 
-      if (seeduser1 && seedcommunity1) {
+      if (user1 && community1) {
         await createCommunityReqNotifications({
-          triggeredForId: seeduser1.id,
-          communityId: seedcommunity1.id,
+          triggeredForId: user1.id,
+          communityId: community1.id,
         });
+      }
+
+      type FriendsStatus = "PENDING" | "ACTIVE";
+
+      type CreateFriends = {
+        friendOfId: string;
+        friendId: string;
+        status: FriendsStatus;
+      };
+
+      const createFriends = async ({
+        friendOfId,
+        friendId,
+        status,
+      }: CreateFriends) => {
+        await prisma.friend.create({
+          data: {
+            friendOf: {
+              connect: {
+                id: friendOfId,
+              },
+            },
+            friend: {
+              connect: {
+                id: friendId,
+              },
+            },
+            status: status,
+          },
+        });
+      };
+
+      type CreateFriendsRelationship = {
+        user1: User;
+        user2: User;
+        status: FriendsStatus;
+      };
+
+      const createFriendsRelationship = async ({
+        user1,
+        user2,
+        status,
+      }: CreateFriendsRelationship) => {
+        await createFriends({
+          friendOfId: user1.id,
+          friendId: user2.id,
+          status: status,
+        });
+
+        await createFriends({
+          friendOfId: user2.id,
+          friendId: user1.id,
+          status: status,
+        });
+
+        console.log(
+          `\x1b[36mCreated friends ${status} relationship between` +
+            `${user1.username}` +
+            ` and ${user2.username}`,
+        );
+      };
+
+      // Create active friends
+      if (user1 && user2) {
+        createFriendsRelationship({ user1, user2, status: "ACTIVE" });
+      }
+
+      // Create pending friends
+      if (user1 && user3) {
+        createFriendsRelationship({ user1, user2: user3, status: "PENDING" });
       }
     };
 
