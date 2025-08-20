@@ -26,15 +26,15 @@ model User {
   lastSeen       DateTime       @default(now()) @db.Timestamptz(3)
   createdAt      DateTime       @default(now()) @db.Timestamptz(3)
   updatedAt      DateTime       @default(now()) @db.Timestamptz(3)
-  friends        Friends[]      @relation("friendOf")
-  friendsOf      Friends[]      @relation("friend")
+  friends        Friend[]       @relation("friendOf")
+  friendsOf      Friend[]       @relation("friend")
   participations Participant[]
   messages       Message[]
   requests       Notification[] @relation("request")
   notifications  Notification[] @relation("notification")
 }
 
-model Friends {
+model Friend {
   friendOf   User          @relation("friendOf", fields: [friendOfId], references: [id])
   friendOfId String
   friend     User          @relation("friend", fields: [friendId], references: [id])
