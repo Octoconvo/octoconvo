@@ -8,7 +8,7 @@ const ProfileItem: FC<ProfileItemProps> = ({ profile }) => {
   const { setActiveProfile } = useContext(ActiveExploreProfileContext);
 
   return (
-    <li className="flex flex-col bg-black-100 p-[32px] rounded-8 h-[150px]">
+    <li className="flex flex-col bg-black-100 p-[32px] rounded-[8px] h-[150px]">
       <button
         data-testid="open-profile-modal-btn"
         onClick={() => setActiveProfile(profile)}
