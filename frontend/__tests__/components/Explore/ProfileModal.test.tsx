@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { ProfileAPI } from "@/types/api";
+import { fr } from "date-fns/locale";
 
 const profile: ProfileAPI = {
   id: "testprofile1",
@@ -18,6 +19,16 @@ const profile: ProfileAPI = {
 };
 
 const onCloseMock = jest.fn();
+
+global.fetch = jest.fn((_url) => {
+  return Promise.resolve().then(() => ({
+    status: 200,
+    json: () =>
+      Promise.resolve({
+        friendshipStatus: "ACTIVE",
+      }),
+  }));
+}) as jest.Mock;
 
 describe("Render ProfileModal", () => {
   const user = userEvent.setup();
@@ -58,6 +69,12 @@ describe("Render ProfileModal", () => {
       expect(onCloseMock).toHaveBeenCalledTimes(1);
     }
   );
+
+  test("Fetch friendship status and render itin the FriendshipStatusButton", async () => {
+    const friendshipStatusButton = screen.getByTestId("friendship-status-btn");
+
+    expect(friendshipStatusButton.textContent).toBe("Friend");
+  });
 });
 
 describe("Test ProfileModal conditional render", () => {
