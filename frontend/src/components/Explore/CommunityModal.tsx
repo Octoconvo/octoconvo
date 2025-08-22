@@ -5,12 +5,12 @@ import { formatDateString } from "@/utils/date";
 import CommunityParticipationButton from "./CommunityParticipationButton";
 import { getCommunityParticipationStatusFromAPI } from "@/utils/api/community";
 
-type CommunityModal = {
+type CommunityModalProps = {
   community: CommunityExploreAPI;
   onCloseFn: () => void;
 };
 
-const CommunityModal: FC<CommunityModal> = ({ community, onCloseFn }) => {
+const CommunityModal: FC<CommunityModalProps> = ({ community, onCloseFn }) => {
   const communityModalRef = useRef<null | HTMLDivElement>(null);
   const [participationStatus, setParticipationStatus] = useState<
     "NONE" | "PENDING" | "ACTIVE" | null

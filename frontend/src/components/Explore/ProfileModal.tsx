@@ -7,14 +7,14 @@ import { ProfileAPI } from "@/types/api";
 import { getFriendshipStatusFromAPI } from "@/utils/api/friend";
 import FriendshipStatusButton from "./FriendshipStatusButton";
 
-type ProfileModal = {
+type ProfileModalProps = {
   profile: ProfileAPI;
   onClose: () => void;
 };
 
 type FriendshipStatus = "NONE" | "PENDING" | "ACTIVE" | null;
 
-const ProfileModal: FC<ProfileModal> = ({ profile, onClose }) => {
+const ProfileModal: FC<ProfileModalProps> = ({ profile, onClose }) => {
   const profileModalRef = useRef<null | HTMLDivElement>(null);
   const [friendshipStatus, setFriendshipStatus] =
     useState<FriendshipStatus>(null);

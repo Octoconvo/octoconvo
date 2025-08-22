@@ -9,7 +9,7 @@ const participationButtonText = {
 
 type ParticipationStatus = "NONE" | "PENDING" | "ACTIVE" | null;
 
-type CommunityParticipationButton = {
+type CommunityParticipationButtonProps = {
   communityId: string;
   participationStatus: ParticipationStatus;
   setParticipationStatus: React.Dispatch<
@@ -17,7 +17,7 @@ type CommunityParticipationButton = {
   >;
 };
 
-const CommunityParticipationButton: FC<CommunityParticipationButton> = ({
+const CommunityParticipationButton: FC<CommunityParticipationButtonProps> = ({
   communityId,
   participationStatus,
   setParticipationStatus,

@@ -9,7 +9,7 @@ type UpdateProfiles = {
   nextCursor: false | string;
 };
 
-type ProfileBox = {
+type ProfileBoxProps = {
   profiles: ProfileAPI[];
   nextCursor: false | string;
   nameQuery: string;
@@ -20,7 +20,7 @@ type ProfileBox = {
   }: UpdateProfiles) => void;
 };
 
-const ProfileBox: FC<ProfileBox> = ({
+const ProfileBox: FC<ProfileBoxProps> = ({
   profiles,
   nextCursor,
   nameQuery,

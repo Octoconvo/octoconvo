@@ -9,7 +9,7 @@ type updateCommunitiesStates = {
   nextCursor: false | string;
 };
 
-type CommunityBox = {
+type CommunityBoxProps = {
   communities: CommunityExploreAPI[];
   nextCursor: false | string;
   nameQuery: string;
@@ -21,7 +21,7 @@ type CommunityBox = {
   isInfiniteScrollOn: boolean;
 };
 
-const CommunityBox: FC<CommunityBox> = ({
+const CommunityBox: FC<CommunityBoxProps> = ({
   communities,
   nextCursor,
   nameQuery,
