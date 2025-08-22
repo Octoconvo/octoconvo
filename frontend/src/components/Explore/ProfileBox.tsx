@@ -87,7 +87,7 @@ const ProfileBox: FC<ProfileBox> = ({
     <div
       className={
         "scrollbar gap-[32px] p-[16px] overflow-auto flex bg-gr-black-1-b" +
-        " max-h-full w-full flex-auto"
+        " max-h-full w-full flex-auto items-start"
       }
     >
       <ul
