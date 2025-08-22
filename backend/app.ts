@@ -20,6 +20,7 @@ import messageRouter from "./routes/message";
 import inboxRouter from "./routes/inbox";
 import exploreRouter from "./routes/explore";
 import notificationRouter from "./routes/notification";
+import friendRouter from "./routes/friend";
 
 const app = express();
 app.use(logger("dev"));
@@ -60,6 +61,7 @@ app.use("/community", communityRouter);
 app.use("/message", messageRouter);
 app.use("/inbox", inboxRouter);
 app.use("/notification", notificationRouter);
+app.use("/friend", friendRouter);
 
 app.use(createNotFoundErrorMiddleware);
 app.use(errorMiddleware);
