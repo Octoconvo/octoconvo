@@ -1,17 +1,37 @@
 "use client";
 
 import Image from "next/image";
-import { FC, useEffect, useRef } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { formatDateString } from "@/utils/date";
 import { ProfileAPI } from "@/types/api";
+import { getFriendshipStatusFromAPI } from "@/utils/api/friend";
+import FriendshipStatusButton from "./FriendshipStatusButton";
 
 type ProfileModal = {
   profile: ProfileAPI;
   onClose: () => void;
 };
 
+type FriendshipStatus = "NONE" | "PENDING" | "ACTIVE" | null;
+
 const ProfileModal: FC<ProfileModal> = ({ profile, onClose }) => {
   const profileModalRef = useRef<null | HTMLDivElement>(null);
+  const [friendshipStatus, setFriendshipStatus] =
+    useState<FriendshipStatus>(null);
+
+  const loadFriendshipStatus = async () => {
+    try {
+      const { status, friendshipStatus } = await getFriendshipStatusFromAPI({
+        username: profile.username,
+      });
+
+      if (status >= 200 && status <= 300 && friendshipStatus) {
+        setFriendshipStatus(friendshipStatus);
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
+    }
+  };
 
   const closeOnEsc = (e: KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -38,12 +58,16 @@ const ProfileModal: FC<ProfileModal> = ({ profile, onClose }) => {
   };
 
   useEffect(() => {
+    if (friendshipStatus === null) {
+      loadFriendshipStatus();
+    }
+
     window.addEventListener("keydown", closeOnEsc);
 
     return () => {
       window.removeEventListener("keydown", closeOnEsc);
     };
-  });
+  }, [friendshipStatus]);
 
   return (
     <div
@@ -111,17 +135,7 @@ const ProfileModal: FC<ProfileModal> = ({ profile, onClose }) => {
                   ></Image>
                 </figure>
                 <div className="flex justify-end gap-[16px]">
-                  <button
-                    data-testid="add-friend-btn"
-                    className={
-                      "bg-grey-100 text-white-100 py-1 px-4 rounded-[4px] " +
-                      "font-normal leading-normal " +
-                      "hover:bg-brand-1 flex items-center gap-[8px]"
-                    }
-                  >
-                    <span className="add-friend-icon w-[16px] h-[16px]"></span>
-                    Add friend
-                  </button>
+                  <FriendshipStatusButton friendshipStatus={friendshipStatus} />
                   <button
                     data-testid="message-btn"
                     className={
