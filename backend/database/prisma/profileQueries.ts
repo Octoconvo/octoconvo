@@ -49,6 +49,20 @@ const updateUserProfileById = async ({
   return userProfile;
 };
 
+const getProfileByUsername = async (username: string) => {
+  const profile = await prisma.user.findUnique({
+    where: {
+      username: username,
+    },
+    omit: {
+      password: true,
+      isDeleted: true,
+    },
+  });
+
+  return profile;
+};
+
 const searchProfiles = async ({
   name,
   cursor,
@@ -110,4 +124,9 @@ const searchProfiles = async ({
   return profiles;
 };
 
-export { getUserProfileById, updateUserProfileById, searchProfiles };
+export {
+  getUserProfileById,
+  updateUserProfileById,
+  searchProfiles,
+  getProfileByUsername,
+};
