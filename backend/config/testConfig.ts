@@ -12,6 +12,7 @@ import * as profileController from "../controllers/profile";
 import * as communityController from "../controllers/community";
 import * as messageController from "../controllers/message";
 import * as notificationController from "../controllers/notification";
+import * as friendController from "../controllers/friend";
 
 const app = express();
 
@@ -82,6 +83,11 @@ app.get(
 app.post(
   "/notifications/update-read-status",
   notificationController.notifications_update_read_status_post,
+);
+
+app.get(
+  "/friend/friendship-status",
+  friendController.user_friendship_status_get,
 );
 
 app.use(expr404ErrorHandler);
