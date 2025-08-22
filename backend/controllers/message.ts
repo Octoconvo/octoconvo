@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
-import { createAuthenticationHandler } from "../utils/authentication";
+import { createAuthenticationMiddleware } from "../utils/authentication";
 import { createValidationErrObj } from "../utils/error";
 import { body, check, param, query, validationResult } from "express-validator";
 import { getInboxById } from "../database/prisma/inboxQueries";
@@ -139,11 +139,13 @@ const messageValidation = {
     ),
 };
 
+const messagePOSTAuthentication = createAuthenticationMiddleware({
+  message: "Failed to create message",
+  errMessage: "You are not authenticated",
+});
+
 const message_post = [
-  createAuthenticationHandler({
-    message: "Failed to create message",
-    errMessage: "You are not authenticated",
-  }),
+  messagePOSTAuthentication,
   (req: Request, res: Response, next: NextFunction) => {
     upload.array("attachments", 10)(req, res, function (err) {
       // Handle file validation
@@ -343,11 +345,13 @@ const message_post = [
   }),
 ];
 
+const messagesGETAuthentication = createAuthenticationMiddleware({
+  message: "Failed to fetch messages",
+  errMessage: "You are not authenticated",
+});
+
 const messages_get = [
-  createAuthenticationHandler({
-    message: "Failed to fetch messages",
-    errMessage: "You are not authenticated",
-  }),
+  messagesGETAuthentication,
   messageValidation.inboxIdParam,
   messageValidation.limit,
   messageValidation.cursor,

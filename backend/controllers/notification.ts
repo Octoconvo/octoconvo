@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import { Request, Response } from "express";
-import { createAuthenticationHandler } from "../utils/authentication";
+import { createAuthenticationMiddleware } from "../utils/authentication";
 import {
   getUserUnreadNotificationCount,
   getUserNotifications,
@@ -81,11 +81,15 @@ const notificationValidation = {
     }),
 };
 
-const unread_notification_count_get = [
-  createAuthenticationHandler({
+const unreadNotificationCountGETAuthentication = createAuthenticationMiddleware(
+  {
     message: "Failed to fetch user's unread notification count",
     errMessage: "You are not authenticated",
-  }),
+  },
+);
+
+const unread_notification_count_get = [
+  unreadNotificationCountGETAuthentication,
   asyncHandler(async (req: Request, res: Response) => {
     const userId = req.user?.id as string;
 
@@ -100,11 +104,13 @@ const unread_notification_count_get = [
   }),
 ];
 
+const notificationGETAuthentication = createAuthenticationMiddleware({
+  message: "Failed to fetch user's notifications",
+  errMessage: "You are not authenticated",
+});
+
 const notifications_get = [
-  createAuthenticationHandler({
-    message: "Failed to fetch user's notifications",
-    errMessage: "You are not authenticated",
-  }),
+  notificationGETAuthentication,
   notificationValidation.limit,
   notificationValidation.cursor,
   asyncHandler(async (req: Request, res: Response) => {
@@ -152,11 +158,14 @@ const notifications_get = [
   }),
 ];
 
-const notifications_update_read_status_post = [
-  createAuthenticationHandler({
+const notificationUpdateReadStatusPOSTAuthentication =
+  createAuthenticationMiddleware({
     message: "Failed to update user's notifications' read statuses",
     errMessage: "You are not authenticated",
-  }),
+  });
+
+const notifications_update_read_status_post = [
+  notificationUpdateReadStatusPOSTAuthentication,
   notificationValidation.updateMode,
   notificationValidation.startDate,
   notificationValidation.endDate,

@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 
-const createAuthenticationHandler = ({
+const createAuthenticationMiddleware = ({
   message,
   errMessage,
 }: {
@@ -24,4 +24,4 @@ const createAuthenticationHandler = ({
   };
 };
 
-export { createAuthenticationHandler };
+export { createAuthenticationMiddleware };

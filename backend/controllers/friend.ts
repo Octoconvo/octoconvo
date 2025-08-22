@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import { Request, RequestHandler, Response } from "express";
-import { createAuthenticationHandler } from "../utils/authentication";
+import { createAuthenticationMiddleware } from "../utils/authentication";
 import { createValidationErrorMiddleware } from "../utils/error";
 import { query } from "express-validator";
 import { getProfileByUsername } from "../database/prisma/profileQueries";
@@ -27,7 +27,7 @@ const friendValidation = {
 };
 
 const userFriendshipStatusGETAuthenticationMiddleware =
-  createAuthenticationHandler({
+  createAuthenticationMiddleware({
     message: "Failed to fetch your friendship status with the user",
     errMessage: "You are not authenticated",
   });

@@ -5,7 +5,7 @@ import {
   updateUserProfileById,
   searchProfiles,
 } from "../database/prisma/profileQueries";
-import { createAuthenticationHandler } from "../utils/authentication";
+import { createAuthenticationMiddleware } from "../utils/authentication";
 import { query, body, check, validationResult } from "express-validator";
 import { createValidationErrObj } from "../utils/error";
 import multer from "multer";
@@ -121,11 +121,13 @@ const user_profile_get = asyncHandler(async (req: Request, res: Response) => {
   });
 });
 
+const userProfilePOSTAuthentication = createAuthenticationMiddleware({
+  message: "Failed to update user profile",
+  errMessage: "You are not authenticated",
+});
+
 const user_profile_post = [
-  createAuthenticationHandler({
-    message: "Failed to update user profile",
-    errMessage: "You are not authenticated",
-  }),
+  userProfilePOSTAuthentication,
   upload.fields([
     { name: "avatar", maxCount: 1 },
     { name: "banner", maxCount: 1 },
@@ -252,11 +254,13 @@ const user_profile_post = [
   }),
 ];
 
+const profilesExploreGET = createAuthenticationMiddleware({
+  message: "Failed to fetch profiles",
+  errMessage: "You are not authenticated",
+});
+
 const profiles_explore_get = [
-  createAuthenticationHandler({
-    message: "Failed to fetch profiles",
-    errMessage: "You are not authenticated",
-  }),
+  profilesExploreGET,
   profileValidation.name_query,
   profileValidation.limit,
   profileValidation.cursor,

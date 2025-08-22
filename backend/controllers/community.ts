@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 import { Request, Response } from "express";
-import { createAuthenticationHandler } from "../utils/authentication";
+import { createAuthenticationMiddleware } from "../utils/authentication";
 import { body, check, query, validationResult } from "express-validator";
 import { createValidationErrObj } from "../utils/error";
 import {
@@ -156,11 +156,13 @@ const communityValidation = {
   }),
 };
 
+const communityGETAuthentication = createAuthenticationMiddleware({
+  message: "Failed to fetch community",
+  errMessage: "You are not authenticated",
+});
+
 const community_get = [
-  createAuthenticationHandler({
-    message: "Failed to fetch community",
-    errMessage: "You are not authenticated",
-  }),
+  communityGETAuthentication,
   communityValidation.communityIdParam,
   asyncHandler(async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -194,11 +196,13 @@ const community_get = [
   }),
 ];
 
+const communityPOSTAuthentication = createAuthenticationMiddleware({
+  message: "Failed to create community",
+  errMessage: "You are not authenticated",
+});
+
 const community_post = [
-  createAuthenticationHandler({
-    message: "Failed to create community",
-    errMessage: "You are not authenticated",
-  }),
+  communityPOSTAuthentication,
   upload.fields([
     { name: "avatar", maxCount: 1 },
     { name: "banner", maxCount: 1 },
@@ -329,11 +333,13 @@ const community_post = [
   }),
 ];
 
+const communitiesGETAuthentication = createAuthenticationMiddleware({
+  message: "Failed to fetch user's communities",
+  errMessage: "You are not authenticated",
+});
+
 const communities_get = [
-  createAuthenticationHandler({
-    message: "Failed to fetch user's communities",
-    errMessage: "You are not authenticated",
-  }),
+  communitiesGETAuthentication,
   asyncHandler(async (req: Request, res: Response) => {
     const id = req.user?.id as string;
 
@@ -346,11 +352,13 @@ const communities_get = [
   }),
 ];
 
+const communitiesExploreGETAuthentication = createAuthenticationMiddleware({
+  message: "Failed to fetch communities",
+  errMessage: "You are not authenticated",
+});
+
 const communities_explore_get = [
-  createAuthenticationHandler({
-    message: "Failed to fetch communities",
-    errMessage: "You are not authenticated",
-  }),
+  communitiesExploreGETAuthentication,
   communityValidation.name_query,
   communityValidation.limit,
   communityValidation.cursor,
@@ -401,11 +409,14 @@ const communities_explore_get = [
   }),
 ];
 
-const community_participation_status_get = [
-  createAuthenticationHandler({
+const communityParticipationStatusGETAuthentication =
+  createAuthenticationMiddleware({
     message: "Failed to fetch your community participation status",
     errMessage: "You are not authenticated",
-  }),
+  });
+
+const community_participation_status_get = [
+  communityParticipationStatusGETAuthentication,
   communityValidation.communityIdParam,
   asyncHandler(async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -456,11 +467,13 @@ const community_participation_status_get = [
   }),
 ];
 
+const communtiyJoinPOSTAuthentication = createAuthenticationMiddleware({
+  message: "Failed to send a join request to the community",
+  errMessage: "You are not authenticated",
+});
+
 const community_join_post = [
-  createAuthenticationHandler({
-    message: "Failed to send a join request to the community",
-    errMessage: "You are not authenticated",
-  }),
+  communtiyJoinPOSTAuthentication,
   communityValidation.communityIdParam,
   asyncHandler(async (req: Request, res: Response) => {
     const errors = validationResult(req);
@@ -551,11 +564,12 @@ const community_join_post = [
 ];
 
 // This controller is used to accept or reject community join requests
+const communityRequestPOSTAuthentication = createAuthenticationMiddleware({
+  message: "Failed to trigger the action on the community request",
+  errMessage: "You are not authenticated",
+});
 const community_request_POST = [
-  createAuthenticationHandler({
-    message: "Failed to trigger the action on the community request",
-    errMessage: "You are not authenticated",
-  }),
+  communityRequestPOSTAuthentication,
   communityValidation.communityIdParam,
   communityValidation.action,
   communityValidation.notificationId,
