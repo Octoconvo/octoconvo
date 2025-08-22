@@ -26,13 +26,12 @@ const friendValidation = {
     .escape(),
 };
 
-const userFriendshipStatusGETAuthenticationMiddleware =
-  createAuthenticationMiddleware({
-    message: "Failed to fetch your friendship status with the user",
-    errMessage: "You are not authenticated",
-  });
+const userFriendshipStatusGETAuthentication = createAuthenticationMiddleware({
+  message: "Failed to fetch your friendship status with the user",
+  errMessage: "You are not authenticated",
+});
 
-const userFriendshipStatusGETUserNotFoundMiddleware: RequestHandler = async (
+const userFriendshipStatusGETUserNotFound: RequestHandler = async (
   req,
   res,
   next,
@@ -54,16 +53,15 @@ const userFriendshipStatusGETUserNotFoundMiddleware: RequestHandler = async (
   next();
 };
 
-const userFriendShipStatusGETValidationErrorMiddleware =
-  createValidationErrorMiddleware({
-    message: "Failed to fetch your friendship status with the user",
-  });
+const userFriendShipStatusGETValidationError = createValidationErrorMiddleware({
+  message: "Failed to fetch your friendship status with the user",
+});
 
 const user_friendship_status_get = [
-  userFriendshipStatusGETAuthenticationMiddleware,
+  userFriendshipStatusGETAuthentication,
   friendValidation.usernameQuery,
-  userFriendShipStatusGETValidationErrorMiddleware,
-  asyncHandler(userFriendshipStatusGETUserNotFoundMiddleware),
+  userFriendShipStatusGETValidationError,
+  asyncHandler(userFriendshipStatusGETUserNotFound),
   asyncHandler(async (req: Request, res: Response) => {
     const userUsername = req.user?.username as string;
     const friendUsername = req.query.username as string;
