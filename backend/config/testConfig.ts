@@ -2,7 +2,10 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passportConfig from "../config/passportConfig";
-import { expr404ErrorHandler, exprErrorHandler } from "../utils/error";
+import {
+  createNotFoundErrorMiddleware,
+  errorMiddleware,
+} from "../middlewares/error";
 import { createServer } from "node:http";
 import { createSocketServer } from "../events/socketIO";
 
@@ -90,7 +93,7 @@ app.get(
   friendController.user_friendship_status_get,
 );
 
-app.use(expr404ErrorHandler);
-app.use(exprErrorHandler);
+app.use(createNotFoundErrorMiddleware);
+app.use(errorMiddleware);
 
 export default app;
