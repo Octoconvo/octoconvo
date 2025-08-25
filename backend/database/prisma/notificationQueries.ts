@@ -1,6 +1,71 @@
 import { Prisma } from "@prisma/client";
 import prisma from "./client";
 
+type CreateNotificationTransaction = {
+  tx: Prisma.TransactionClient;
+  type: "COMMUNITYREQUEST" | "FRIENDREQUEST" | "REQUESTUPDATE";
+  communityId: string | null;
+  triggeredById: string;
+  triggeredForId: string;
+  payload: string;
+  status: "PENDING" | "COMPLETED" | "REJECTED" | "ACCEPTED";
+};
+
+const createNotificationTransaction = async ({
+  tx,
+  type,
+  communityId,
+  triggeredById,
+  triggeredForId,
+  payload,
+  status,
+}: CreateNotificationTransaction) => {
+  return tx.notification.create({
+    data: {
+      type: type,
+      ...(communityId
+        ? {
+            community: {
+              connect: {
+                id: communityId,
+              },
+            },
+          }
+        : {}),
+      triggeredBy: {
+        connect: {
+          id: triggeredById,
+        },
+      },
+      triggeredFor: {
+        connect: {
+          id: triggeredForId,
+        },
+      },
+      payload: payload,
+      isRead: false,
+      status: status,
+    },
+    include: {
+      triggeredBy: {
+        select: {
+          username: true,
+        },
+      },
+      triggeredFor: {
+        select: {
+          username: true,
+        },
+      },
+      community: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+};
+
 const createNotificationsTransaction = async ({
   tx,
   type,
@@ -263,6 +328,7 @@ const updateNotificationsReadStatus = async ({
 };
 
 export {
+  createNotificationTransaction,
   createNotificationsTransaction,
   getUserUnreadNotificationCount,
   getUserNotifications,
