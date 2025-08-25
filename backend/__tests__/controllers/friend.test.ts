@@ -227,7 +227,7 @@ describe("Test friend add post controller", () => {
           friendsOf: {
             every: {
               NOT: {
-                friendOf: {
+                friend: {
                   username: "seeduser1",
                 },
               },
@@ -328,7 +328,10 @@ describe("Test friend add post controller", () => {
       " while being unauthenticated",
     done => {
       request(app)
-        .post(`/friend?username=${friendNONE?.username}`)
+        .post("/friend")
+        .send({
+          username: friendNONE?.username,
+        })
         .expect("Content-Type", /json/)
         .expect({
           message: "Failed to send a friend request to the user",
@@ -343,9 +346,10 @@ describe("Test friend add post controller", () => {
   test(
     "Return 404 error when trying to add a user that doesn't" + " exist",
     done => {
-      const usernameQuery = "testusername1DONOTEXIST";
+      const username = "testusername1DONOTEXIST";
       agent
-        .post(`/friend?username=${usernameQuery}`)
+        .post("/friend")
+        .send({ username })
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
           const message = res.body.message;
@@ -362,9 +366,12 @@ describe("Test friend add post controller", () => {
     "Return 409 error when the trying to send a friend request to" +
       " a friend",
     done => {
-      const usernameQuery = "seeduser2";
+      const username = "seeduser2";
       agent
-        .post(`/friend?username=${usernameQuery}`)
+        .post("/friend")
+        .send({
+          username,
+        })
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
           const message = res.body.message;
@@ -381,9 +388,12 @@ describe("Test friend add post controller", () => {
     "Return 409 error when the trying to send a friend request to" +
       " the user with a pending friend request",
     done => {
-      const usernameQuery = "seeduser3";
+      const username = "seeduser3";
       agent
-        .post(`/friend?username=${usernameQuery}`)
+        .post("/friend")
+        .send({
+          username,
+        })
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
           const message = res.body.message;
@@ -399,12 +409,17 @@ describe("Test friend add post controller", () => {
   );
 
   test("Return 200 success if all validations pass", done => {
-    const usernameQuery = friendNONE?.username;
+    const username = friendNONE?.username;
     agent
-      .post(`/friend?username=${usernameQuery}`)
+      .post("/friend")
+      .send({
+        username,
+      })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
+        const error = res.body.error;
+        expect(error).toBeUndefined();
 
         expect(message).toBe("Successfully sent a friend request to the user");
       })
@@ -412,9 +427,12 @@ describe("Test friend add post controller", () => {
   });
 
   test("Succss 200 return 2 friends object", done => {
-    const usernameQuery = friendNONE?.username;
+    const username = friendNONE?.username;
     agent
-      .post(`/friend?username=${usernameQuery}`)
+      .post("/friend")
+      .send({
+        username,
+      })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const friends = res.body.friends;
@@ -425,9 +443,12 @@ describe("Test friend add post controller", () => {
   });
 
   test("Succss 200 create the correct friends", done => {
-    const usernameQuery = friendNONE?.username;
+    const username = friendNONE?.username;
     agent
-      .post(`/friend?username=${usernameQuery}`)
+      .post("/friend")
+      .send({
+        username,
+      })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const friends = res.body.friends;

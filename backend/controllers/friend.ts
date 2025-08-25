@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler";
 import { Request, RequestHandler, Response } from "express";
 import { createAuthenticationMiddleware } from "../utils/authentication";
 import { createValidationErrorMiddleware } from "../middlewares/error";
-import { query } from "express-validator";
+import { query, body } from "express-validator";
 import { getProfileByUsername } from "../database/prisma/profileQueries";
 import {
   addFriend,
@@ -12,6 +12,23 @@ import { createCheckProfileByUsernameMiddleware } from "../middlewares/profile";
 
 const friendValidation = {
   usernameQuery: query("username", "Username query is required")
+    .trim()
+    .isLength({ min: 1 })
+    .bail()
+    .isLength({ max: 32 })
+    .withMessage("Username query must not exceed 32 characters")
+    .custom(async val => {
+      const regex = new RegExp("^[a-zA-Z0-9_]+$");
+      const match = regex.test(val);
+      if (!match) {
+        throw new Error(
+          "Username query must only contain alphanumeric characters" +
+            " and underscores",
+        );
+      }
+    })
+    .escape(),
+  username: body("username", "Username query is required")
     .trim()
     .isLength({ min: 1 })
     .bail()
@@ -101,7 +118,7 @@ const friendAddPOSTProfileNotFound = createCheckProfileByUsernameMiddleware({
 
 const friendAddPOSTFriendshipCheck: RequestHandler = async (req, res, next) => {
   const userUsername = req.user?.username as string;
-  const friendUsername = req.query.username as string;
+  const friendUsername = req.body.username as string;
 
   const friend = await getFriendByUsername({
     userUsername,
@@ -130,7 +147,7 @@ const friendAddPOSTFriendshipCheck: RequestHandler = async (req, res, next) => {
 
 const friend_add_post = [
   friendAddPOSTAuthentication,
-  friendValidation.usernameQuery,
+  friendValidation.username,
   friendAddPOSTValidationError,
   asyncHandler(friendAddPOSTProfileNotFound),
   asyncHandler(friendAddPOSTFriendshipCheck),
