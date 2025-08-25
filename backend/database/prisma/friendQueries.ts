@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import prisma from "./client";
+import { createNotificationTransaction } from "./notificationQueries";
 
 type GetFriendByUsername = {
   userUsername: string;
@@ -54,4 +55,45 @@ const createFriendTransaction = async ({
   });
 };
 
-export { getFriendByUsername, createFriendTransaction };
+type AddFriend = {
+  userId: string;
+  friendId: string;
+  payload: string;
+};
+
+const addFriend = async ({ userId, friendId, payload }: AddFriend) => {
+  const { friends, notification } = await prisma.$transaction(async tx => {
+    const userToFriend = createFriendTransaction({
+      tx,
+      userId: userId,
+      friendId,
+      status: "PENDING",
+    });
+    const friendToUser = createFriendTransaction({
+      tx,
+      userId: friendId,
+      friendId: userId,
+      status: "PENDING",
+    });
+    const friends = await Promise.all([userToFriend, friendToUser]);
+
+    const notification = await createNotificationTransaction({
+      tx: tx,
+      type: "FRIENDREQUEST",
+      communityId: null,
+      triggeredById: userId,
+      triggeredForId: friendId,
+      payload: payload,
+      status: "PENDING",
+    });
+
+    return {
+      friends,
+      notification,
+    };
+  });
+
+  return { friends, notification };
+};
+
+export { getFriendByUsername, createFriendTransaction, addFriend };
