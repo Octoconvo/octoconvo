@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "./client";
 
 type GetFriendByUsername = {
@@ -23,4 +24,34 @@ const getFriendByUsername = async ({
   return friend;
 };
 
-export { getFriendByUsername };
+type CreateFriendTransaction = {
+  tx: Prisma.TransactionClient;
+  status: "PENDING" | "ACTIVE";
+  userId: string;
+  friendId: string;
+};
+
+const createFriendTransaction = async ({
+  tx,
+  status,
+  userId,
+  friendId,
+}: CreateFriendTransaction) => {
+  return tx.friend.create({
+    data: {
+      friendOf: {
+        connect: {
+          id: userId,
+        },
+      },
+      friend: {
+        connect: {
+          id: friendId,
+        },
+      },
+      status: status,
+    },
+  });
+};
+
+export { getFriendByUsername, createFriendTransaction };
