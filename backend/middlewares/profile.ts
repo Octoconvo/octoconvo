@@ -7,7 +7,8 @@ const createCheckProfileByUsernameMiddleware = ({
   message: string;
 }): RequestHandler => {
   return async (req, res, next) => {
-    const username = req.query.username as string;
+    const username =
+      (req.query.username as string) || (req.body.username as string);
     const profile = await getProfileByUsername(username);
 
     if (profile === null) {
