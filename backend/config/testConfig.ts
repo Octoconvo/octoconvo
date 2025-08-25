@@ -93,6 +93,8 @@ app.get(
   friendController.user_friendship_status_get,
 );
 
+app.post("/friend", friendController.friend_add_post);
+
 app.use(createNotFoundErrorMiddleware);
 app.use(errorMiddleware);
 
