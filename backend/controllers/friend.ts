@@ -1,7 +1,7 @@
 import asyncHandler from "express-async-handler";
 import { Request, RequestHandler, Response } from "express";
 import { createAuthenticationMiddleware } from "../utils/authentication";
-import { createValidationErrorMiddleware } from "../utils/error";
+import { createValidationErrorMiddleware } from "../middlewares/error";
 import { query } from "express-validator";
 import { getProfileByUsername } from "../database/prisma/profileQueries";
 import {
