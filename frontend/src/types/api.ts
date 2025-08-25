@@ -115,6 +115,14 @@ type ErrorAPI = {
   validationErrors: ValidationError[];
 };
 
+type FriendAPI = {
+  status: "PENDING" | "ACTIVE";
+  createdAt: string;
+  updatedAt: string;
+  friendOfId: string;
+  friendId: string;
+};
+
 export type {
   CommunityAPI,
   CommunityExploreAPI,
@@ -125,4 +133,5 @@ export type {
   ProfileAPI,
   ProfilesAPI,
   ErrorAPI,
+  FriendAPI,
 };
