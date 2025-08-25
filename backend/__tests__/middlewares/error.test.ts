@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import express from "express";
 import {
-  createNotFoundErrorMiddleware,
+  notFoundErrorMiddleware,
   errorMiddleware,
 } from "../../middlewares/error";
 import request from "supertest";
@@ -19,7 +19,7 @@ app.use("/error/:status", (req: Request, res: Response, next: NextFunction) => {
   const error = createHttpError(status);
   next(error);
 });
-app.use(createNotFoundErrorMiddleware);
+app.use(notFoundErrorMiddleware);
 app.use(errorMiddleware);
 
 describe("Test exprErrorHandler middleware", () => {

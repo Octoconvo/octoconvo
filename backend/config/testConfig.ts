@@ -2,10 +2,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import passportConfig from "../config/passportConfig";
-import {
-  createNotFoundErrorMiddleware,
-  errorMiddleware,
-} from "../middlewares/error";
+import { notFoundErrorMiddleware, errorMiddleware } from "../middlewares/error";
 import { createServer } from "node:http";
 import { createSocketServer } from "../events/socketIO";
 
@@ -95,7 +92,7 @@ app.get(
 
 app.post("/friend", friendController.friend_add_post);
 
-app.use(createNotFoundErrorMiddleware);
+app.use(notFoundErrorMiddleware);
 app.use(errorMiddleware);
 
 export default app;

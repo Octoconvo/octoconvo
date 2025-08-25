@@ -26,7 +26,7 @@ const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
   });
 };
 
-const createNotFoundErrorMiddleware = (
+const notFoundErrorMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -57,6 +57,6 @@ const createValidationErrorMiddleware = ({
 
 export {
   errorMiddleware,
-  createNotFoundErrorMiddleware,
+  notFoundErrorMiddleware,
   createValidationErrorMiddleware,
 };

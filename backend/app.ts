@@ -5,10 +5,7 @@ import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import prisma from "./database/prisma/client";
 import passportConfig from "./config/passportConfig";
-import {
-  createNotFoundErrorMiddleware,
-  errorMiddleware,
-} from "./middlewares/error";
+import { notFoundErrorMiddleware, errorMiddleware } from "./middlewares/error";
 import cors from "cors";
 
 import indexRouter from "./routes/index";
@@ -63,7 +60,7 @@ app.use("/inbox", inboxRouter);
 app.use("/notification", notificationRouter);
 app.use("/friend", friendRouter);
 
-app.use(createNotFoundErrorMiddleware);
+app.use(notFoundErrorMiddleware);
 app.use(errorMiddleware);
 
 module.exports = app;
