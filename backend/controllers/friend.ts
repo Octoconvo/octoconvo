@@ -183,6 +183,11 @@ const friend_add_post = [
       .to(`notification:${notification.triggeredForId}`)
       .emit("notificationcreate", notification);
 
+    req.app
+      .get("io")
+      .to(`notification:${notification.triggeredForId}`)
+      .emit("notificationupdate");
+
     res.json({
       message: "Successfully sent a friend request to the user",
       friends,
