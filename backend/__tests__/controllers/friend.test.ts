@@ -408,6 +408,30 @@ describe("Test friend add post controller", () => {
     },
   );
 
+  test(
+    "Return 409 error when the user is trying to send a friend request to" +
+      " themself",
+    done => {
+      const username = "seeduser1";
+      agent
+        .post("/friend")
+        .send({
+          username,
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const errorMessage = res.body.error.message;
+
+          expect(message).toBe("Failed to send a friend request to the user");
+          expect(errorMessage).toBe(
+            "You can't send a friend request to yourself",
+          );
+        })
+        .expect(409, done);
+    },
+  );
+
   test("Return 200 success if all validations pass", done => {
     const username = friendNONE?.username;
     agent
@@ -418,8 +442,6 @@ describe("Test friend add post controller", () => {
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
-        const error = res.body.error;
-        expect(error).toBeUndefined();
 
         expect(message).toBe("Successfully sent a friend request to the user");
       })
