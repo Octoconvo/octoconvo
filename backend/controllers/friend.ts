@@ -1,5 +1,5 @@
 import asyncHandler from "express-async-handler";
-import { Request, RequestHandler, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import { createAuthenticationMiddleware } from "../utils/authentication";
 import { createValidationErrorMiddleware } from "../middlewares/error";
 import { query, body } from "express-validator";
@@ -148,6 +148,23 @@ const friendAddPOSTFriendshipCheck: RequestHandler = async (req, res, next) => {
 const friend_add_post = [
   friendAddPOSTAuthentication,
   friendValidation.username,
+  (req: Request, res: Response, next: NextFunction) => {
+    const userUsername = req.user?.username as string;
+    const friendUsername = req.body.username as string;
+
+    if (userUsername === friendUsername) {
+      res.status(409).json({
+        message: "Failed to send a friend request to the user",
+        error: {
+          message: "You can't send a friend request to yourself",
+        },
+      });
+
+      return;
+    }
+
+    next();
+  },
   friendAddPOSTValidationError,
   asyncHandler(friendAddPOSTProfileNotFound),
   asyncHandler(friendAddPOSTFriendshipCheck),
