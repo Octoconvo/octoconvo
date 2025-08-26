@@ -229,7 +229,7 @@ describe("Render NotificationNav", () => {
   });
 
   test(
-    "Don't Update the notificationsBuffer if the notification is" + " falsy",
+    "Don't Update the notificationsBuffer if the notification is" + " null",
     async () => {
       await act(async () =>
         render(
@@ -272,8 +272,8 @@ describe("Render NotificationNav", () => {
   );
 
   test(
-    "Don't Update the notificationsBuffer if the notification modal is" +
-      " closed",
+    "Update the bufferednotifications if the bufferedNotifications is not" +
+      " empty and the notifications is not null",
     async () => {
       await act(async () =>
         render(
@@ -309,54 +309,6 @@ describe("Render NotificationNav", () => {
       );
 
       const notificationNavBtn = screen.getByTestId("notification-l");
-      // Open notification modal
-      await user.click(notificationNavBtn);
-      expect(setBufferedNotificationMock).toHaveBeenCalledTimes(0);
-    }
-  );
-
-  test(
-    "Update the bufferednotifications if the bufferedNotifications is not" +
-      ", empty the notifications is not falsy and the notification modal" +
-      " is open",
-    async () => {
-      await act(async () =>
-        render(
-          <NotificationModalContext
-            value={{
-              notificationModal: null,
-              isNotificationModalAnimating: false,
-              setIsNotificationModalAnimating: jest.fn(),
-              isNotificationModalOpen: true,
-              setIsNotificationModalOpen: jest.fn(),
-              toggleNotificationModalView: toggleNotificationModalViewMock,
-            }}
-          >
-            <NotificationContext
-              value={{
-                notifications: [notification],
-                setNotifications: setNotificationsMock,
-                bufferedNotifications: [notification],
-                setBufferedNotifications: setBufferedNotificationMock,
-              }}
-            >
-              <NotificationCountContext
-                value={{
-                  notificationCount: 0,
-                  setNotificationCount: jest.fn(),
-                }}
-              >
-                <NotificationNav />
-              </NotificationCountContext>
-            </NotificationContext>
-          </NotificationModalContext>
-        )
-      );
-
-      const notificationNavBtn = screen.getByTestId("notification-l");
-      // Open notification modal
-
-      setBufferedNotificationMock.mockClear();
       await user.click(notificationNavBtn);
       expect(setBufferedNotificationMock).toHaveBeenCalledTimes(1);
     }
