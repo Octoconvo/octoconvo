@@ -15,9 +15,7 @@ const NotificationNav = () => {
   const { notificationCount } = useContext(NotificationCountContext);
   const { bufferedNotifications, notifications, setBufferedNotifications } =
     useContext(NotificationContext);
-  const { toggleNotificationModalView, isNotificationModalOpen } = useContext(
-    NotificationModalContext
-  );
+  const { toggleNotificationModalView } = useContext(NotificationModalContext);
 
   type CreateNotificationsReadStatusesFormData = {
     startDate: string;
@@ -80,7 +78,7 @@ const NotificationNav = () => {
                 (notification) => notification.isRead === false
               );
 
-              if (containsUnreadNotifications && isNotificationModalOpen) {
+              if (containsUnreadNotifications) {
                 updateNotificationsReadStatuses({ notifications });
               }
             }
