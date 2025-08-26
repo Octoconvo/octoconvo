@@ -2,7 +2,8 @@ import request, { Response } from "supertest";
 import app from "../../config/testConfig";
 import { getValidationErrorMsg, login } from "../../utils/testUtils";
 import prisma from "../../database/prisma/client";
-import { User } from "@prisma/client";
+import { Friend, User } from "@prisma/client";
+import { NotificationRes } from "../../@types/apiResponse";
 
 describe("Test user's friendship status get controller with seeduser1", () => {
   test(
@@ -235,8 +236,6 @@ describe("Test friend add post controller", () => {
           },
         },
       });
-
-      console.log({ friendNONE });
     } catch (err) {
       console.error(err);
     }
@@ -479,6 +478,442 @@ describe("Test friend add post controller", () => {
         expect(friends[0].friendId).toBe(friendNONE?.id);
         expect(friends[1].friendOfId).toBe(friendNONE?.id);
         expect(friends[1].friendId).toBe(seedUser1?.id);
+      })
+      .expect(200, done);
+  });
+});
+
+describe("Test friend request post controller", () => {
+  let friendNONE1: null | User = null;
+  let friendNONE2: null | User = null;
+  let friendRequestNotification1SeedUser1: null | NotificationRes = null;
+  let friendRequestNotification1SeedUser2: null | NotificationRes = null;
+  let friendRequestNotification2SeedUser1: null | NotificationRes = null;
+  let communityRequestNotification1: null | NotificationRes = null;
+  let friends1: Friend[] | null = null;
+  let friends2: Friend[] | null = null;
+
+  type CreateNotification = {
+    triggeredByUsername: string;
+    triggeredForUsername: string;
+    type: "FRIENDREQUEST" | "REQUESTUPDATE" | "COMMUNITYREQUEST";
+    payload: string;
+  };
+
+  const createNotification = async ({
+    triggeredByUsername,
+    triggeredForUsername,
+    type,
+    payload,
+  }: CreateNotification) => {
+    const notification = await prisma.notification.create({
+      data: {
+        triggeredBy: {
+          connect: {
+            username: triggeredByUsername,
+          },
+        },
+        triggeredFor: {
+          connect: {
+            username: triggeredForUsername,
+          },
+        },
+        type: type,
+        payload: payload,
+        status: "PENDING",
+        isRead: false,
+      },
+      include: {
+        triggeredBy: {
+          select: {
+            username: true,
+          },
+        },
+        triggeredFor: {
+          select: {
+            username: true,
+          },
+        },
+        community: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return notification;
+  };
+
+  type CreateFriend = {
+    friendOfUsername: string;
+    friendUsername: string;
+  };
+
+  const createFriend = async ({
+    friendOfUsername,
+    friendUsername,
+  }: CreateFriend) => {
+    const friend = await prisma.friend.create({
+      data: {
+        friendOf: {
+          connect: {
+            username: friendOfUsername,
+          },
+        },
+        friend: {
+          connect: {
+            username: friendUsername,
+          },
+        },
+      },
+    });
+
+    return friend;
+  };
+
+  beforeAll(async () => {
+    try {
+      friendNONE1 = await prisma.user.findFirst({
+        where: {
+          NOT: { AND: [{ username: "seeduser1" }, { username: "seeduser2" }] },
+          friendsOf: {
+            every: {
+              friend: {
+                username: "seeduser4",
+              },
+            },
+          },
+          friends: {
+            every: {
+              friendOf: {
+                username: "seeduser4",
+              },
+            },
+          },
+        },
+      });
+
+      if (friendNONE1) {
+        friendNONE2 = await prisma.user.findFirst({
+          where: {
+            id: {
+              not: friendNONE1.id,
+            },
+            NOT: {
+              AND: [{ username: "seeduser1" }, { username: "seeduser2" }],
+            },
+            friendsOf: {
+              every: {
+                friend: {
+                  username: "seeduser4",
+                },
+              },
+            },
+            friends: {
+              every: {
+                friendOf: {
+                  username: "seeduser4",
+                },
+              },
+            },
+          },
+        });
+      }
+
+      if (friendNONE1) {
+        friendRequestNotification1SeedUser1 = await createNotification({
+          triggeredForUsername: "seeduser4",
+          triggeredByUsername: friendNONE1.username,
+          payload: "sent a friend request",
+          type: "FRIENDREQUEST",
+        });
+
+        friendRequestNotification1SeedUser2 = await createNotification({
+          triggeredForUsername: friendNONE1.username,
+          triggeredByUsername: "seeduser4",
+          payload: "sent a friend request",
+          type: "FRIENDREQUEST",
+        });
+        communityRequestNotification1 = await createNotification({
+          triggeredForUsername: "seeduser4",
+          triggeredByUsername: friendNONE1.username,
+          payload: "requested to join",
+          type: "COMMUNITYREQUEST",
+        });
+
+        friends1 = await Promise.all([
+          createFriend({
+            friendOfUsername: "seeduser4",
+            friendUsername: friendNONE1.username,
+          }),
+          createFriend({
+            friendOfUsername: friendNONE1.username,
+            friendUsername: "seeduser4",
+          }),
+        ]);
+      }
+
+      if (friendNONE2) {
+        friendRequestNotification2SeedUser1 = await createNotification({
+          triggeredForUsername: "seeduser4",
+          triggeredByUsername: friendNONE2.username,
+          payload: "sent a friend request",
+          type: "FRIENDREQUEST",
+        });
+
+        friends2 = await Promise.all([
+          createFriend({
+            friendOfUsername: "seeduser4",
+            friendUsername: friendNONE2.username,
+          }),
+          createFriend({
+            friendOfUsername: friendNONE2.username,
+            friendUsername: "seeduser4",
+          }),
+        ]);
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
+    }
+  });
+
+  type DeleteFriendByIds = {
+    friendOfId: string;
+    friendId: string;
+  };
+
+  const deleteFriendByIds = async ({
+    friendOfId,
+    friendId,
+  }: DeleteFriendByIds) => {
+    await prisma.friend.delete({
+      where: {
+        friendOfId_friendId: {
+          friendOfId: friendOfId,
+          friendId: friendId,
+        },
+      },
+    });
+  };
+
+  const deleteFriend = async (friend: Friend) => {
+    try {
+      await deleteFriendByIds({
+        friendOfId: friend.friendOfId,
+        friendId: friend.friendId,
+      });
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
+    }
+  };
+
+  const deleteNotificatioById = async (id: string) => {
+    await prisma.notification.delete({
+      where: {
+        id: id,
+      },
+    });
+  };
+
+  const deleteNotification = async (notification: NotificationRes | null) => {
+    if (notification !== null) {
+      try {
+        await deleteNotificatioById(notification.id);
+      } catch (err) {
+        if (err instanceof Error) console.log(err.message);
+      }
+    }
+  };
+
+  afterAll(async () => {
+    await deleteNotification(friendRequestNotification1SeedUser1);
+    await deleteNotification(friendRequestNotification1SeedUser2);
+    await deleteNotification(communityRequestNotification1);
+    if (friends1) {
+      for (const friend of friends1) {
+        await deleteFriend(friend);
+      }
+    }
+    if (friends2) {
+      for (const friend of friends2) {
+        await deleteFriend(friend);
+      }
+    }
+  });
+
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser4",
+    password: "seed@User4",
+  });
+
+  test(
+    "Return 401 authentication error when trying to perform an action on a" +
+      " friend request while being unauthenticated",
+    done => {
+      request(app)
+        .post("/friend/request")
+        .send({
+          action: "ACCEPT",
+          notificationId: `${friendRequestNotification1SeedUser1?.id}`,
+        })
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to perform the action on the friend request",
+          error: {
+            message: "You are not authenticated",
+          },
+        })
+        .expect(401, done);
+    },
+  );
+
+  test(
+    "Failed to perform an action on the friend request if the notification" +
+      " is invalid",
+    done => {
+      agent
+        .post("/friend/request")
+        .expect("Content-type", /json/)
+        .send({
+          notificationid: "testnotification1",
+          action: "ACCEPT",
+        })
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+          const notificationIdValidationErrorMsg = getValidationErrorMsg({
+            error,
+            field: "notificationid",
+          });
+
+          expect(message).toBe(
+            "Failed to perform the action on the friend request",
+          );
+          expect(notificationIdValidationErrorMsg).toBe(
+            "Friend request notification id is invalid",
+          );
+        })
+        .expect(422, done);
+    },
+  );
+
+  test(
+    "Failed to perform an action on the friend request if the action" +
+      " is neither 'REJECT' or 'ACCEPT'",
+    done => {
+      agent
+        .post("/friend/request")
+        .expect("Content-type", /json/)
+        .send({
+          notificationid: friendRequestNotification1SeedUser1?.id,
+          action: "testaction1",
+        })
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+          const actionValidationErrorMsg = getValidationErrorMsg({
+            error,
+            field: "action",
+          });
+
+          expect(message).toBe(
+            "Failed to perform the action on the friend request",
+          );
+          expect(actionValidationErrorMsg).toBe(
+            "Action must either be REJECT or ACCEPT",
+          );
+        })
+        .expect(422, done);
+    },
+  );
+
+  test(
+    "Failed to perform an action on the friend request if the notification's" +
+      " type is not FRIENDREQUEST",
+    done => {
+      agent
+        .post("/friend/request")
+        .expect("Content-type", /json/)
+        .send({
+          notificationid: communityRequestNotification1?.id,
+          action: "ACCEPT",
+        })
+        .expect({
+          message: "Failed to perform the action on the friend request",
+          error: {
+            message: "The friend request doesn't exist",
+          },
+        })
+        .expect(404, done);
+    },
+  );
+
+  test(
+    "Failed to perform an action on the friend request if the user is not" +
+      " authorised to perform the action on the friend request",
+    done => {
+      agent
+        .post("/friend/request")
+        .expect("Content-type", /json/)
+        .send({
+          notificationid: friendRequestNotification1SeedUser2?.id,
+          action: "ACCEPT",
+        })
+        .expect({
+          message: "Failed to perform the action on the friend request",
+          error: {
+            message:
+              "You are not authorised to perform any action on this" +
+              " friend request",
+          },
+        })
+        .expect(403, done);
+    },
+  );
+
+  test("Succesfully rejected the friend request if everything passed", done => {
+    agent
+      .post("/friend/request")
+      .expect("Content-type", /json/)
+      .send({
+        notificationid: friendRequestNotification1SeedUser1?.id,
+        action: "REJECT",
+      })
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const friends = res.body.friends;
+        const notification = res.body.notification;
+        const newNotification = res.body.newNotification;
+
+        expect(message).toBe("Successfully rejected the friend request");
+        expect(friends).toBeNull();
+        expect(notification.status).toBe("REJECTED");
+        expect(newNotification).toBeNull();
+      })
+      .expect(200, done);
+  });
+
+  test("Succesfully accepted the friend request if everything passed", done => {
+    agent
+      .post("/friend/request")
+      .expect("Content-type", /json/)
+      .send({
+        notificationid: friendRequestNotification2SeedUser1?.id,
+        action: "ACCEPT",
+      })
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const friends = res.body.friends;
+        const notification = res.body.notification;
+        const newNotification = res.body.newNotification;
+
+        expect(message).toBe("Successfully accepted the friend request");
+        expect(friends.length).toBe(2);
+        expect(notification.status).toBe("ACCEPTED");
+        expect(newNotification.type).toBe("REQUESTUPDATE");
       })
       .expect(200, done);
   });
