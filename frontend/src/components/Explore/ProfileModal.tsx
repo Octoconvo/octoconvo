@@ -135,7 +135,11 @@ const ProfileModal: FC<ProfileModalProps> = ({ profile, onClose }) => {
                   ></Image>
                 </figure>
                 <div className="flex justify-end gap-[16px]">
-                  <FriendshipStatusButton friendshipStatus={friendshipStatus} />
+                  <FriendshipStatusButton
+                    friendUsername={profile.username}
+                    setFriendshipStatus={setFriendshipStatus}
+                    friendshipStatus={friendshipStatus}
+                  />
                   <button
                     data-testid="message-btn"
                     className={
