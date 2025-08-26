@@ -73,6 +73,13 @@ const NotificationRequestItem = ({
         />
       )}
 
+      {notification.type === "FRIENDREQUEST" && (
+        <Payload
+          triggeredBy={notification.triggeredBy.username}
+          triggeredFor={null}
+          payload={notification.payload}
+        />
+      )}
       {(notification.status === "REJECTED" ||
         notification.status === "ACCEPTED") && (
         <p
