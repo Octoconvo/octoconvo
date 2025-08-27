@@ -91,6 +91,7 @@ app.get(
 );
 
 app.post("/friend", friendController.friend_add_post);
+app.post("/friend/request", friendController.friend_request_post);
 
 app.use(notFoundErrorMiddleware);
 app.use(errorMiddleware);
