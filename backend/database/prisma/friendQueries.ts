@@ -96,6 +96,27 @@ const addFriend = async ({ userId, friendId, payload }: AddFriend) => {
   return { friends, notification };
 };
 
+type DeleteFriendByIdsTransaction = {
+  tx: Prisma.TransactionClient;
+  friendOfId: string;
+  friendId: string;
+};
+
+const deleteFriendByIdsTransaction = ({
+  tx,
+  friendOfId,
+  friendId,
+}: DeleteFriendByIdsTransaction) => {
+  return tx.friend.delete({
+    where: {
+      friendOfId_friendId: {
+        friendOfId: friendOfId,
+        friendId: friendId,
+      },
+    },
+  });
+};
+
 type UpdateFriendByIdsTransaction = {
   tx: Prisma.TransactionClient;
   friendOfId: string;
@@ -130,4 +151,5 @@ export {
   createFriendTransaction,
   addFriend,
   updateFriendByIdsTransaction,
+  deleteFriendByIdsTransaction,
 };
