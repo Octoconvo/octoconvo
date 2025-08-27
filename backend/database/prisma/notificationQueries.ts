@@ -327,6 +327,17 @@ const updateNotificationsReadStatus = async ({
   return notifications;
 };
 
+const getFriendRequestNotificationById = async (id: string) => {
+  const notification = await prisma.notification.findUnique({
+    where: {
+      id: id,
+      type: "FRIENDREQUEST",
+    },
+  });
+
+  return notification;
+};
+
 export {
   createNotificationTransaction,
   createNotificationsTransaction,
@@ -335,4 +346,5 @@ export {
   getNotificationById,
   updateNotificationByIdTransaction,
   updateNotificationsReadStatus,
+  getFriendRequestNotificationById,
 };
