@@ -96,4 +96,38 @@ const addFriend = async ({ userId, friendId, payload }: AddFriend) => {
   return { friends, notification };
 };
 
-export { getFriendByUsername, createFriendTransaction, addFriend };
+type UpdateFriendByIdsTransaction = {
+  tx: Prisma.TransactionClient;
+  friendOfId: string;
+  friendId: string;
+  status: "ACTIVE" | "PENDING";
+  updatedAt: Date;
+};
+
+const updateFriendByIdsTransaction = ({
+  tx,
+  friendOfId,
+  friendId,
+  status,
+  updatedAt,
+}: UpdateFriendByIdsTransaction) => {
+  return tx.friend.update({
+    where: {
+      friendOfId_friendId: {
+        friendOfId: friendOfId,
+        friendId: friendId,
+      },
+    },
+    data: {
+      status: status,
+      updatedAt: updatedAt,
+    },
+  });
+};
+
+export {
+  getFriendByUsername,
+  createFriendTransaction,
+  addFriend,
+  updateFriendByIdsTransaction,
+};
