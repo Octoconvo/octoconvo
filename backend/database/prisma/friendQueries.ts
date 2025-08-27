@@ -1,6 +1,10 @@
-import { Prisma } from "@prisma/client";
+import { Friend, Prisma } from "@prisma/client";
 import prisma from "./client";
-import { createNotificationTransaction } from "./notificationQueries";
+import {
+  createNotificationTransaction,
+  updateNotificationByIdTransaction,
+} from "./notificationQueries";
+import { NotificationRes } from "../../@types/apiResponse";
 
 type GetFriendByUsername = {
   userUsername: string;
@@ -146,10 +150,92 @@ const updateFriendByIdsTransaction = ({
   });
 };
 
+type HandleFriendRequest = {
+  userId: string;
+  friendId: string;
+  notificationId: string;
+  action: "REJECT" | "ACCEPT";
+};
+
+const handleFriendRequest = async ({
+  userId,
+  friendId,
+  notificationId,
+  action,
+}: HandleFriendRequest) => {
+  const { friends, notification, newNotification } = await prisma.$transaction(
+    async tx => {
+      let friends: null | Friend[] = null;
+      let newNotification: null | NotificationRes = null;
+
+      if (action === "REJECT") {
+        await deleteFriendByIdsTransaction({
+          tx,
+          friendOfId: userId,
+          friendId: friendId,
+        });
+        await deleteFriendByIdsTransaction({
+          tx,
+          friendOfId: friendId,
+          friendId: userId,
+        });
+      }
+
+      if (action === "ACCEPT") {
+        const updatedAt = new Date();
+        const userToFriend = await updateFriendByIdsTransaction({
+          tx,
+          friendOfId: userId,
+          friendId: friendId,
+          status: "ACTIVE",
+          updatedAt: updatedAt,
+        });
+        const friendToUser = await updateFriendByIdsTransaction({
+          tx,
+          friendOfId: friendId,
+          friendId: userId,
+          status: "ACTIVE",
+          updatedAt: updatedAt,
+        });
+        friends = await Promise.all([userToFriend, friendToUser]);
+        newNotification = await createNotificationTransaction({
+          tx,
+          communityId: null,
+          type: "REQUESTUPDATE",
+          triggeredById: userId,
+          triggeredForId: friendId,
+          payload: "accepted your friend request",
+          status: "COMPLETED",
+        });
+      }
+
+      const notification = await updateNotificationByIdTransaction({
+        tx: tx,
+        id: notificationId,
+        isRead: true,
+        status:
+          action === "ACCEPT"
+            ? "ACCEPTED"
+            : action === "REJECT"
+              ? "REJECTED"
+              : null,
+      });
+
+      return {
+        friends,
+        notification,
+        newNotification,
+      };
+    },
+  );
+
+  return { friends, notification, newNotification };
+};
+
 export {
   getFriendByUsername,
   createFriendTransaction,
-  addFriend,
   updateFriendByIdsTransaction,
-  deleteFriendByIdsTransaction,
+  addFriend,
+  handleFriendRequest,
 };
