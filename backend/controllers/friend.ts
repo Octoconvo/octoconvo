@@ -7,8 +7,11 @@ import { getProfileByUsername } from "../database/prisma/profileQueries";
 import {
   addFriend,
   getFriendByUsername,
+  handleFriendRequest,
 } from "../database/prisma/friendQueries";
 import { createCheckProfileByUsernameMiddleware } from "../middlewares/profile";
+import { isUUID } from "../utils/validation";
+import { getFriendRequestNotificationById } from "../database/prisma/notificationQueries";
 
 const friendValidation = {
   usernameQuery: query("username", "Username query is required")
@@ -45,6 +48,22 @@ const friendValidation = {
       }
     })
     .escape(),
+  action: body("action").custom(val => {
+    const actionRegex = /^(REJECT|ACCEPT)$/;
+
+    if (!actionRegex.test(val)) {
+      throw new Error("Action must either be REJECT or ACCEPT");
+    }
+
+    return true;
+  }),
+  notificationId: body("notificationid").custom(val => {
+    if (!isUUID(val)) {
+      throw new Error("Friend request notification id is invalid");
+    }
+
+    return true;
+  }),
 };
 
 const userFriendshipStatusGETAuthentication = createAuthenticationMiddleware({
@@ -195,4 +214,85 @@ const friend_add_post = [
   }),
 ];
 
-export { user_friendship_status_get, friend_add_post };
+const friendRequestPOSTAuthentication = createAuthenticationMiddleware({
+  message: "Failed to perform the action on the friend request",
+  errMessage: "You are not authenticated",
+});
+const friendRequestPOSTValidationError = createValidationErrorMiddleware({
+  message: "Failed to perform the action on the friend request",
+});
+const friendRequestPOSTNotificationNotFound = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const notificationId = req.body.notificationid;
+
+  const notification = await getFriendRequestNotificationById(notificationId);
+
+  if (notification === null) {
+    res.status(404).json({
+      message: "Failed to perform the action on the friend request",
+      error: {
+        message: "The friend request doesn't exist",
+      },
+    });
+
+    return;
+  }
+
+  req.notification = notification;
+  next();
+};
+
+const friend_request_post = [
+  friendRequestPOSTAuthentication,
+  friendValidation.action,
+  friendValidation.notificationId,
+  friendRequestPOSTValidationError,
+  asyncHandler(friendRequestPOSTNotificationNotFound),
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id as string;
+    const friendId = req.notification?.triggeredById as string;
+    const notificationTriggeredForId = req.notification
+      ?.triggeredForId as string;
+    const notificationId = req.notification?.id as string;
+    const action = req.body.action;
+
+    if (userId !== notificationTriggeredForId) {
+      res.status(403).json({
+        message: "Failed to perform the action on the friend request",
+        error: {
+          message:
+            "You are not authorised to perform any action on this" +
+            " friend request",
+        },
+      });
+
+      return;
+    }
+
+    const { friends, notification, newNotification } =
+      await handleFriendRequest({
+        userId: userId,
+        friendId: friendId,
+        notificationId: notificationId,
+        action: action,
+      });
+
+    const message =
+      action === "REJECT"
+        ? "Successfully rejected the friend request"
+        : "Successfully accepted the friend request";
+
+    console.log({ notification, newNotification });
+    res.json({
+      message: message,
+      friends: friends,
+      notification,
+      newNotification,
+    });
+  }),
+];
+
+export { user_friendship_status_get, friend_add_post, friend_request_post };
