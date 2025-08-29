@@ -726,6 +726,28 @@ describe("Test friend request post controller", () => {
     }
   };
 
+  type DeleteTestNotifications = {
+    userUsername: string;
+    friendUsername: string;
+  };
+
+  const deleteTestNotifications = async ({
+    userUsername,
+    friendUsername,
+  }: DeleteTestNotifications) => {
+    await prisma.notification.deleteMany({
+      where: {
+        triggeredFor: {
+          username: friendUsername,
+        },
+        triggeredBy: {
+          username: userUsername,
+        },
+        type: "REQUESTUPDATE",
+      },
+    });
+  };
+
   afterAll(async () => {
     await deleteNotification(friendRequestNotification1SeedUser1);
     await deleteNotification(friendRequestNotification1SeedUser2);
@@ -739,6 +761,18 @@ describe("Test friend request post controller", () => {
       for (const friend of friends2) {
         await deleteFriend(friend);
       }
+    }
+
+    if (friendNONE1 && friendNONE2) {
+      await deleteTestNotifications({
+        userUsername: "seeduser4",
+        friendUsername: friendNONE1.username,
+      });
+
+      await deleteTestNotifications({
+        userUsername: "seeduser4",
+        friendUsername: friendNONE2.username,
+      });
     }
   });
 
