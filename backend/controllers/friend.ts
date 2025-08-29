@@ -285,7 +285,22 @@ const friend_request_post = [
         ? "Successfully rejected the friend request"
         : "Successfully accepted the friend request";
 
-    console.log({ notification, newNotification });
+    // trigger notification update and create for the accepted user
+    if (newNotification) {
+      req.app
+        .get("io")
+        .to(`notification:${newNotification.triggeredForId}`)
+        .emit(`notificationupdate`);
+
+      req.app
+        .get("io")
+        .to(`notification:${newNotification.triggeredForId}`)
+        .emit(`notificationcreate`, newNotification);
+    }
+
+    /// trigger notification update to the user
+    req.app.get("io").to(`notification:${userId}`).emit("notificationupdate");
+
     res.json({
       message: message,
       friends: friends,
