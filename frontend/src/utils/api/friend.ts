@@ -1,4 +1,4 @@
-import { ErrorAPI, FriendAPI } from "@/types/api";
+import { ErrorAPI, FriendAPI, NotificationAPI } from "@/types/api";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
@@ -73,8 +73,8 @@ type PostFriendRequestUpdateToAPIData = {
   status: number;
   message: string;
   error?: ErrorAPI;
-  notification?: Notification;
-  newNotification?: Notification;
+  notification?: NotificationAPI;
+  newNotification?: NotificationAPI;
 };
 
 const postFriendRequestUpdateToAPI = async ({
