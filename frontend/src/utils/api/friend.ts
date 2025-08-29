@@ -65,4 +65,41 @@ const postFriendToAPI = async ({
   };
 };
 
-export { getFriendshipStatusFromAPI, postFriendToAPI };
+type PostFriendRequestUpdateToAPI = {
+  formData: URLSearchParams;
+};
+
+type PostFriendRequestUpdateToAPIData = {
+  status: number;
+  message: string;
+  error?: ErrorAPI;
+  notification?: Notification;
+  newNotification?: Notification;
+};
+
+const postFriendRequestUpdateToAPI = async ({
+  formData,
+}: PostFriendRequestUpdateToAPI): Promise<PostFriendRequestUpdateToAPIData> => {
+  const response = await fetch(`${DOMAIN_URL}/friend/request`, {
+    method: "POST",
+    credentials: "include",
+    mode: "cors",
+    body: formData,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  });
+
+  const responseData = await response.json();
+
+  return {
+    status: response.status,
+    ...responseData,
+  };
+};
+
+export {
+  getFriendshipStatusFromAPI,
+  postFriendToAPI,
+  postFriendRequestUpdateToAPI,
+};
