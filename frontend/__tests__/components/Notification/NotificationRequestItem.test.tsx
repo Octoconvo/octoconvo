@@ -1,4 +1,4 @@
-import { screen, render, act } from "@testing-library/react";
+import { screen, render, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import NotificationRequestItem from "@/components/Notification/NotificationRequestItem";
@@ -27,16 +27,16 @@ const notification: NotificationAPI = {
 
 const updateNotificationMock = jest.fn(() => {});
 
-global.fetch = jest.fn(() =>
-  Promise.resolve().then(() => ({
+global.fetch = jest.fn(() => {
+  return Promise.resolve({
     status: 200,
     json: () =>
       Promise.resolve({
         message: "Successfully updated the notification",
         notification: notification,
       }),
-  }))
-) as jest.Mock;
+  });
+}) as jest.Mock;
 
 describe("Render NotificationRequestIem", () => {
   const user = userEvent.setup();
@@ -235,6 +235,58 @@ describe("Render NotificationRequestIem", () => {
       updateNotificationMock.mockClear();
       expect(updateNotificationMock).toHaveBeenCalledTimes(0);
       await user.click(acceptBtn);
+      expect(updateNotificationMock).toHaveBeenCalledTimes(1);
+    }
+  );
+});
+
+describe("Test NotificationRequestItem's friend request action onSubmit", () => {
+  const user = userEvent.setup();
+
+  beforeEach(async () => {
+    await act(async () => {
+      render(
+        <NotificationRequestItem
+          notification={{
+            ...notification,
+            status: "PENDING",
+            type: "FRIENDREQUEST",
+            community: null,
+            communityId: null,
+            payload: "sent a friend request",
+          }}
+          updateNotification={updateNotificationMock}
+        />
+      );
+    });
+  });
+
+  afterEach(() => {
+    updateNotificationMock.mockClear();
+  });
+
+  test(
+    "Test the accept friend request button onSubmit with a 200 success" +
+      "  response",
+    async () => {
+      const acceptButton = screen.getByRole("button", {
+        name: "Accept",
+      }) as HTMLButtonElement;
+
+      await user.click(acceptButton);
+      expect(updateNotificationMock).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  test(
+    "Test the reject friend request button onSubmit with a 200 success" +
+      "  response",
+    async () => {
+      const rejectButton = screen.getByRole("button", {
+        name: "Reject",
+      }) as HTMLButtonElement;
+
+      await user.click(rejectButton);
       expect(updateNotificationMock).toHaveBeenCalledTimes(1);
     }
   );
