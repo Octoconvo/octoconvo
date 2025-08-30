@@ -102,17 +102,25 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
       <div
         className={
           "bg-black-400 w-[480px] rounded-[inherit] border-b-solid " +
-          "border-b-brand-3 border-b-8"
+          "border-b-brand-1-2 border-b-8"
         }
       >
         <article className="rounded-[inherit]">
-          <figure className="relative h-[115px] max-w-full bg-brand-1 rounded-t-[inherit]">
+          <figure
+            className={
+              "relative h-[115px] max-w-full bg-brand-1" +
+              " rounded-t-[inherit]"
+            }
+          >
             {profile?.banner && (
               <Image
                 data-testid="banner"
                 src={profile?.banner}
                 fill
-                className="object-cover object-center rounded-[inherit] max-h-(100%)"
+                className={
+                  "object-cover object-center rounded-[inherit]" +
+                  " max-h-(100%)"
+                }
                 alt="User avatar"
               ></Image>
             )}
@@ -130,7 +138,9 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
                   src={profile?.avatar ? profile?.avatar : avatarIcon}
                   width={64}
                   height={64}
-                  className="rounded-full min-w-[64px] min-h-[64px] bg-white-200"
+                  className={
+                    "rounded-full min-w-[64px] min-h-[64px]" + " bg-white-200"
+                  }
                   alt="User avatar"
                 ></Image>
               </figure>
@@ -169,7 +179,9 @@ const ProfileModal: FC<ProfileModalProps> = ({ id, profileData }) => {
               {profile?.bio}
             </p>
             <footer>
-              <p className="text-brand-3 text-s leading-normal">Member since</p>
+              <p className="text-brand-3-d-1 text-s leading-normal">
+                Member since
+              </p>
               <p
                 data-testid="membersince"
                 className="text-white-200 text-s leading-normal font-extralight"
