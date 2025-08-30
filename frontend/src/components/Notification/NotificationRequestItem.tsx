@@ -5,6 +5,7 @@ import { capitaliseStringFirstLetter } from "@/utils/string";
 import RequestActionBtn from "./RequestActionBtn";
 import { useCallback } from "react";
 import Payload from "./Payload";
+import { postFriendRequestUpdateToAPI } from "@/utils/api/friend";
 
 const NotificationRequestItem = ({
   notification,
@@ -49,6 +50,24 @@ const NotificationRequestItem = ({
     },
     []
   );
+
+  type Action = "ACCEPT" | "REJECT";
+
+  const friendRequestUpdateOnSubmit = async (action: Action) => {
+    const formData = new URLSearchParams();
+    formData.append("notificationid", notificationId);
+    formData.append("action", action);
+
+    try {
+      const { notification } = await postFriendRequestUpdateToAPI({ formData });
+
+      if (notification) {
+        updateNotification(notification);
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
+    }
+  };
 
   return (
     <li
@@ -99,12 +118,20 @@ const NotificationRequestItem = ({
           <RequestActionBtn
             isRead={notification.isRead}
             action="ACCEPT"
-            onSubmit={communityActionOnSubmit}
+            onSubmit={
+              notification.type === "COMMUNITYREQUEST"
+                ? communityActionOnSubmit
+                : friendRequestUpdateOnSubmit
+            }
           />
           <RequestActionBtn
             isRead={notification.isRead}
             action="REJECT"
-            onSubmit={communityActionOnSubmit}
+            onSubmit={
+              notification.type === "COMMUNITYREQUEST"
+                ? communityActionOnSubmit
+                : friendRequestUpdateOnSubmit
+            }
           />
         </div>
       )}
