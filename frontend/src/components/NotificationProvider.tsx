@@ -10,7 +10,10 @@ import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
 import { NotificationAPI } from "@/types/api";
 import { NotificationModalContext } from "@/contexts/modal";
-import { getNotificationCountFromAPI } from "@/api/notification";
+import {
+  getNotificationCountFromAPI,
+  postNotificationsReadStatusesToAPI,
+} from "@/api/notification";
 import { pushBufferedNotifications } from "@/utils/notification";
 
 const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
@@ -104,6 +107,52 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
     notificationCount,
   ]);
 
+  type CreateNotificationsReadStatusesFormData = {
+    startDate: string;
+    endDate: string;
+  };
+
+  const createNotificationsReadStatusesFormData = ({
+    startDate,
+    endDate,
+  }: CreateNotificationsReadStatusesFormData) => {
+    const formData = new URLSearchParams();
+    formData.append("startdate", startDate);
+    formData.append("enddate", endDate);
+
+    return formData;
+  };
+
+  type UpdateNotificationsReadStatuses = {
+    notifications: NotificationAPI[];
+  };
+
+  const updateNotificationsReadStatuses = async ({
+    notifications,
+  }: UpdateNotificationsReadStatuses) => {
+    try {
+      const startDate = notifications[0].createdAt;
+      const endDate = notifications[notifications.length - 1].createdAt;
+
+      const formData = createNotificationsReadStatusesFormData({
+        startDate,
+        endDate,
+      });
+
+      const { status, notifications: updatedNotifications } =
+        await postNotificationsReadStatusesToAPI({ formData });
+
+      if (status >= 200 && status <= 300 && updatedNotifications) {
+        setBufferedNotifications([
+          ...bufferedNotifications,
+          ...updatedNotifications,
+        ]);
+      }
+    } catch (err) {
+      if (err instanceof Error) console.log(err.message);
+    }
+  };
+
   return (
     <NotificationModalContext
       value={{
@@ -125,6 +174,7 @@ const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
           setNotifications,
           bufferedNotifications,
           setBufferedNotifications,
+          updateNotificationsReadStatuses,
         }}
       >
         <NotificationCountContext

@@ -7,61 +7,13 @@ import {
   NotificationCountContext,
 } from "@/contexts/notification";
 import { NotificationModalContext } from "@/contexts/modal";
-import { postNotificationsReadStatusesToAPI } from "@/api/notification";
-import { NotificationAPI } from "@/types/api";
 
 const NotificationNav = () => {
   const path = usePathname();
   const { notificationCount } = useContext(NotificationCountContext);
-  const { bufferedNotifications, notifications, setBufferedNotifications } =
+  const { notifications, updateNotificationsReadStatuses } =
     useContext(NotificationContext);
   const { toggleNotificationModalView } = useContext(NotificationModalContext);
-
-  type CreateNotificationsReadStatusesFormData = {
-    startDate: string;
-    endDate: string;
-  };
-
-  const createNotificationsReadStatusesFormData = ({
-    startDate,
-    endDate,
-  }: CreateNotificationsReadStatusesFormData) => {
-    const formData = new URLSearchParams();
-    formData.append("startdate", startDate);
-    formData.append("enddate", endDate);
-
-    return formData;
-  };
-
-  type UpdateNotificationsReadStatuses = {
-    notifications: NotificationAPI[];
-  };
-
-  const updateNotificationsReadStatuses = async ({
-    notifications,
-  }: UpdateNotificationsReadStatuses) => {
-    try {
-      const startDate = notifications[0].createdAt;
-      const endDate = notifications[notifications.length - 1].createdAt;
-
-      const formData = createNotificationsReadStatusesFormData({
-        startDate,
-        endDate,
-      });
-
-      const { status, notifications: updatedNotifications } =
-        await postNotificationsReadStatusesToAPI({ formData });
-
-      if (status >= 200 && status <= 300 && updatedNotifications) {
-        setBufferedNotifications([
-          ...bufferedNotifications,
-          ...updatedNotifications,
-        ]);
-      }
-    } catch (err) {
-      if (err instanceof Error) console.log(err.message);
-    }
-  };
 
   return (
     <>

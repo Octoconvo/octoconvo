@@ -18,10 +18,26 @@ const NotificationModal = () => {
     setIsNotificationModalAnimating,
   } = useContext(NotificationModalContext);
 
-  const { notifications, setNotifications } = useContext(NotificationContext);
+  const { notifications, setNotifications, updateNotificationsReadStatuses } =
+    useContext(NotificationContext);
   const [nextCursor, setNextCursor] = useState<null | false | string>(null);
   const nextObserverRef = useRef<null | HTMLDivElement>(null);
   const { user } = useContext(UserContext);
+
+  const checkAndUpdateNotificationsReadStatuses = () => {
+    console.log({ notifications });
+    if (notifications) {
+      /* Only trigger notifications read status update if the
+              notifications contains unread notifications */
+      const containsUnreadNotifications = notifications.some(
+        (notification) => notification.isRead === false
+      );
+
+      if (containsUnreadNotifications) {
+        updateNotificationsReadStatuses({ notifications });
+      }
+    }
+  };
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -121,6 +137,7 @@ const NotificationModal = () => {
     const closeOnEsc = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isNotificationModalOpen) {
         closeModal();
+        checkAndUpdateNotificationsReadStatuses();
       }
     };
 
@@ -168,6 +185,7 @@ const NotificationModal = () => {
             if (!isChildren && notificationModal.current !== e.target) {
               setIsNotificationModalOpen(false);
               setIsNotificationModalAnimating(true);
+              checkAndUpdateNotificationsReadStatuses();
             }
           }
         }}

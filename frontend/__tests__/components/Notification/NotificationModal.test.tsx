@@ -33,9 +33,6 @@ const notification: NotificationAPI = {
 
 const updatedPayload = "YOU UPDATED THIS NOTIFICATION";
 
-const setIsNotificationModalAnimatingMock = jest.fn();
-const setIsNotificationModalOpenMock = jest.fn();
-
 global.fetch = jest
   .fn()
   .mockImplementationOnce(
@@ -113,6 +110,7 @@ describe(
                 setNotifications: jest.fn(),
                 bufferedNotifications: [],
                 setBufferedNotifications: jest.fn(),
+                updateNotificationsReadStatuses: jest.fn(),
               }}
             >
               <NotificationModalContext
@@ -205,3 +203,166 @@ describe(
     });
   }
 );
+
+const updateNotificationsReadStatusesMock = jest.fn();
+
+describe("Test onClose fn in the NotificationModal", () => {
+  const user = userEvent.setup();
+
+  beforeEach(() => {
+    updateNotificationsReadStatusesMock.mockClear();
+  });
+
+  test(
+    "UpdateNotificationReadStatuses runs when closing the modal with" +
+      " escape key and the notifications is not null and the notifications" +
+      " contains unread notifications",
+    async () => {
+      await act(async () =>
+        render(
+          <NotificationContext
+            value={{
+              notifications: [notification],
+              setNotifications: jest.fn(),
+              bufferedNotifications: [],
+              setBufferedNotifications: jest.fn(),
+              updateNotificationsReadStatuses:
+                updateNotificationsReadStatusesMock,
+            }}
+          >
+            <NotificationModalContext
+              value={{
+                notificationModal: null,
+                isNotificationModalOpen: true,
+                setIsNotificationModalOpen: jest.fn(),
+                setIsNotificationModalAnimating: jest.fn(),
+                isNotificationModalAnimating: false,
+                toggleNotificationModalView: () => {},
+              }}
+            >
+              <NotificationModal />
+            </NotificationModalContext>
+          </NotificationContext>
+        )
+      );
+
+      await user.keyboard("{Escape}");
+      expect(updateNotificationsReadStatusesMock).toHaveBeenCalledTimes(1);
+    }
+  );
+
+  test(
+    "UpdateNotificationReadStatuses doesn't run when closing the modal with" +
+      " escape key when the notifications is falsy",
+    async () => {
+      await act(async () =>
+        render(
+          <NotificationContext
+            value={{
+              notifications: [],
+              setNotifications: jest.fn(),
+              bufferedNotifications: [],
+              setBufferedNotifications: jest.fn(),
+              updateNotificationsReadStatuses:
+                updateNotificationsReadStatusesMock,
+            }}
+          >
+            <NotificationModalContext
+              value={{
+                notificationModal: null,
+                isNotificationModalOpen: true,
+                setIsNotificationModalOpen: jest.fn(),
+                setIsNotificationModalAnimating: jest.fn(),
+                isNotificationModalAnimating: false,
+                toggleNotificationModalView: () => {},
+              }}
+            >
+              <NotificationModal />
+            </NotificationModalContext>
+          </NotificationContext>
+        )
+      );
+
+      await user.keyboard("{Escape}");
+      expect(updateNotificationsReadStatusesMock).toHaveBeenCalledTimes(0);
+    }
+  );
+
+  test(
+    "UpdateNotificationReadStatuses doesn't run when closing the modal with" +
+      " escape key when the notifications doesn't contain unread notifications",
+    async () => {
+      await act(async () =>
+        render(
+          <NotificationContext
+            value={{
+              notifications: [{ ...notification, isRead: true }],
+              setNotifications: jest.fn(),
+              bufferedNotifications: [],
+              setBufferedNotifications: jest.fn(),
+              updateNotificationsReadStatuses:
+                updateNotificationsReadStatusesMock,
+            }}
+          >
+            <NotificationModalContext
+              value={{
+                notificationModal: null,
+                isNotificationModalOpen: true,
+                setIsNotificationModalOpen: jest.fn(),
+                setIsNotificationModalAnimating: jest.fn(),
+                isNotificationModalAnimating: false,
+                toggleNotificationModalView: () => {},
+              }}
+            >
+              <NotificationModal />
+            </NotificationModalContext>
+          </NotificationContext>
+        )
+      );
+
+      await user.keyboard("{Escape}");
+      expect(updateNotificationsReadStatusesMock).toHaveBeenCalledTimes(0);
+    }
+  );
+
+  test(
+    "UpdateNotificationReadStatuses runs when closing the modal with" +
+      " clicking outside of it when the notifications is not null and the" +
+      " notifications contains unread notifications",
+    async () => {
+      await act(async () =>
+        render(
+          <NotificationContext
+            value={{
+              notifications: [notification],
+              setNotifications: jest.fn(),
+              bufferedNotifications: [],
+              setBufferedNotifications: jest.fn(),
+              updateNotificationsReadStatuses:
+                updateNotificationsReadStatusesMock,
+            }}
+          >
+            <NotificationModalContext
+              value={{
+                notificationModal: {
+                  current: document.createElement("div"),
+                },
+                isNotificationModalOpen: true,
+                setIsNotificationModalOpen: jest.fn(),
+                setIsNotificationModalAnimating: jest.fn(),
+                isNotificationModalAnimating: false,
+                toggleNotificationModalView: () => {},
+              }}
+            >
+              <NotificationModal />
+            </NotificationModalContext>
+          </NotificationContext>
+        )
+      );
+
+      const notificationModalContainer = screen.getByTestId("ntfctn-mdl-cntr");
+      await user.click(notificationModalContainer);
+      expect(updateNotificationsReadStatusesMock).toHaveBeenCalledTimes(1);
+    }
+  );
+});

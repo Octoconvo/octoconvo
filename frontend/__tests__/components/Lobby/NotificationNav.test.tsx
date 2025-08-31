@@ -70,6 +70,7 @@ describe("Render NotificationNav", () => {
             setNotifications: jest.fn(),
             bufferedNotifications: [],
             setBufferedNotifications: jest.fn(),
+            updateNotificationsReadStatuses: jest.fn(),
           }}
         >
           <NotificationCountContext
@@ -95,6 +96,7 @@ describe("Render NotificationNav", () => {
           setNotifications: jest.fn(),
           bufferedNotifications: [],
           setBufferedNotifications: jest.fn(),
+          updateNotificationsReadStatuses: jest.fn(),
         }}
       >
         <NotificationCountContext
@@ -135,6 +137,7 @@ describe("Render NotificationNav", () => {
             setNotifications: jest.fn(),
             bufferedNotifications: [],
             setBufferedNotifications: jest.fn(),
+            updateNotificationsReadStatuses: jest.fn(),
           }}
         >
           <NotificationCountContext
@@ -171,6 +174,7 @@ describe("Render NotificationNav", () => {
               setNotifications: jest.fn(),
               bufferedNotifications: [],
               setBufferedNotifications: jest.fn(),
+              updateNotificationsReadStatuses: jest.fn(),
             }}
           >
             <NotificationCountContext
@@ -210,6 +214,7 @@ describe("Render NotificationNav", () => {
               setNotifications: setNotificationsMock,
               bufferedNotifications: [],
               setBufferedNotifications: setBufferedNotificationMock,
+              updateNotificationsReadStatuses: jest.fn(),
             }}
           >
             <NotificationCountContext
@@ -249,6 +254,7 @@ describe("Render NotificationNav", () => {
                 setNotifications: setNotificationsMock,
                 bufferedNotifications: [notification],
                 setBufferedNotifications: setBufferedNotificationMock,
+                updateNotificationsReadStatuses: jest.fn(),
               }}
             >
               <NotificationCountContext
@@ -293,6 +299,9 @@ describe("Render NotificationNav", () => {
                 setNotifications: setNotificationsMock,
                 bufferedNotifications: [notification],
                 setBufferedNotifications: setBufferedNotificationMock,
+                updateNotificationsReadStatuses: jest.fn(() =>
+                  setBufferedNotificationMock()
+                ),
               }}
             >
               <NotificationCountContext
