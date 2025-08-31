@@ -261,7 +261,7 @@ describe("Test NotificationRequestItem's friend request action onSubmit", () => 
     });
   });
 
-  afterEach(() => {
+  beforeEach(() => {
     updateNotificationMock.mockClear();
   });
 
