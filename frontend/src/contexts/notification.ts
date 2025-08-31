@@ -20,6 +20,11 @@ type NotificationContext = {
   setBufferedNotifications: React.Dispatch<
     React.SetStateAction<NotificationAPI[]>
   >;
+  updateNotificationsReadStatuses: ({
+    notifications,
+  }: {
+    notifications: NotificationAPI[];
+  }) => void;
 };
 
 const NotificationContext = createContext<NotificationContext>({
@@ -27,6 +32,7 @@ const NotificationContext = createContext<NotificationContext>({
   setNotifications: () => {},
   bufferedNotifications: [],
   setBufferedNotifications: () => {},
+  updateNotificationsReadStatuses: ({ notifications }) => {},
 });
 
 export { NotificationContext, NotificationCountContext };
