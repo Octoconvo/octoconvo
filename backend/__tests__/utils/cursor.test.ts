@@ -1,13 +1,13 @@
 import { generateUsernameCursor } from "../../utils/cursor";
 
 describe("Test generateUsernameCursor function", () => {
-  test("The usernameCursor should return ar", () => {
+  test("The usernameCursor should return ab", () => {
     const username = generateUsernameCursor({
       firstUsername: "aaron",
-      lastUsername: "ar",
+      lastUsername: "ab",
     });
 
-    expect(username).toBe("ar");
+    expect(username).toBe("ab");
   });
 
   test("The usernameCursor should return username1", () => {
@@ -28,19 +28,19 @@ describe("Test generateUsernameCursor function", () => {
     expect(username).toBe("b");
   });
 
-  test("The usernameCursor should return ar", () => {
+  test("The usernameCursor should return aa", () => {
     const username = generateUsernameCursor({
       firstUsername: "adrianne",
-      lastUsername: "aryan",
+      lastUsername: "aaron",
     });
 
-    expect(username).toBe("ar");
+    expect(username).toBe("aa");
   });
 
   test("The usernameCursor should return A", () => {
     const username = generateUsernameCursor({
-      firstUsername: "aryan",
-      lastUsername: "Aryan",
+      firstUsername: "aaron",
+      lastUsername: "Aaron",
     });
 
     expect(username).toBe("A");
