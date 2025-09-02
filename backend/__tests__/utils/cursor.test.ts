@@ -1,4 +1,7 @@
-import { generateUsernameCursor } from "../../utils/cursor";
+import {
+  deconstructFriendCursor,
+  generateUsernameCursor,
+} from "../../utils/cursor";
 
 describe("Test generateUsernameCursor function", () => {
   test("The usernameCursor should return ab", () => {
@@ -44,5 +47,34 @@ describe("Test generateUsernameCursor function", () => {
     });
 
     expect(username).toBe("A");
+  });
+});
+
+describe("Test deconstructFriendCursor function", () => {
+  test("Return id and username properties", () => {
+    const friendCursor = deconstructFriendCursor("testid1_testusername1");
+
+    expect(friendCursor).toStrictEqual({
+      id: "testid1",
+      username: "testusername1",
+    });
+  });
+
+  test("Return empty username", () => {
+    const friendCursor = deconstructFriendCursor("testid1");
+
+    expect(friendCursor).toStrictEqual({
+      id: "testid1",
+      username: "",
+    });
+  });
+
+  test("Return empty id and username", () => {
+    const friendCursor = deconstructFriendCursor("");
+
+    expect(friendCursor).toStrictEqual({
+      id: "",
+      username: "",
+    });
   });
 });
