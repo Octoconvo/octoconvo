@@ -18,4 +18,18 @@ const generateUsernameCursor = ({
   return username;
 };
 
-export { generateUsernameCursor };
+type FriendCursor = {
+  id: string;
+  username: string;
+};
+
+const deconstructFriendCursor = (string: string): FriendCursor => {
+  const cursorValues = string.split("_");
+
+  return {
+    id: cursorValues[0] || "",
+    username: cursorValues[1] || "",
+  };
+};
+
+export { generateUsernameCursor, deconstructFriendCursor };
