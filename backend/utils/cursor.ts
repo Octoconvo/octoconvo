@@ -32,4 +32,20 @@ const deconstructFriendCursor = (string: string): FriendCursor => {
   };
 };
 
-export { generateUsernameCursor, deconstructFriendCursor };
+type ConstructFriendCursor = {
+  id: string;
+  username: string;
+};
+
+const constructFriendCursor = ({
+  id,
+  username,
+}: ConstructFriendCursor): string => {
+  return `${id}_${username}`;
+};
+
+export {
+  generateUsernameCursor,
+  deconstructFriendCursor,
+  constructFriendCursor,
+};
