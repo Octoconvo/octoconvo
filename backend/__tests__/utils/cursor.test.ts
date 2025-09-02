@@ -1,4 +1,5 @@
 import {
+  constructFriendCursor,
   deconstructFriendCursor,
   generateUsernameCursor,
 } from "../../utils/cursor";
@@ -76,5 +77,25 @@ describe("Test deconstructFriendCursor function", () => {
       id: "",
       username: "",
     });
+  });
+});
+
+describe("Test constructFriendCursor function", () => {
+  test("Friend cursor should be testid1_testusername1", () => {
+    const friendCursor = constructFriendCursor({
+      id: "testid1",
+      username: "testusername1",
+    });
+
+    expect(friendCursor).toBe("testid1_testusername1");
+  });
+
+  test("friend cursor should be testid2_testusername2", () => {
+    const friendCursor = constructFriendCursor({
+      id: "testid2",
+      username: "testusername2",
+    });
+
+    expect(friendCursor).toBe("testid2_testusername2");
   });
 });
