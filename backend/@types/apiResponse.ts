@@ -1,4 +1,5 @@
 import { Notification, User } from "@prisma/client";
+import { UserFriendData } from "./database";
 
 type CommunityPOST = {
   name: string;
@@ -24,4 +25,10 @@ type NotificationRes = Notification & {
 
 type ProfileRes = Omit<User, "password">;
 
-export { CommunityPOST, NotificationRes, ProfileRes };
+type UserFriendsGETResponse = {
+  message: string;
+  friends: UserFriendData[];
+  nextCursor: false | string;
+};
+
+export { CommunityPOST, NotificationRes, ProfileRes, UserFriendsGETResponse };
