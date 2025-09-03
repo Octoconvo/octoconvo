@@ -251,8 +251,12 @@ const populateDB = async () => {
           username: {
             startsWith: "seeduser",
           },
+          NOT: {
+            AND: [{ username: "seeduser1" }],
+          },
         },
         take: 100,
+        orderBy: { username: "asc" },
       });
 
       const community1 = await prisma.community.findUnique({
@@ -360,6 +364,33 @@ const populateDB = async () => {
       if (user1 && user3) {
         createFriendsRelationship({ user1, user2: user3, status: "PENDING" });
       }
+
+      const generateFriends = users.map(async (user, index) => {
+        return new Promise((resolve): void => {
+          const status = (index + 1) % 2 === 0 ? "ACTIVE" : "PENDING";
+
+          if (
+            user1 &&
+            user.username !== user2?.username &&
+            user.username !== user3?.username
+          ) {
+            console.log(
+              `\x1b[36mCreated friends ${status} relationship between` +
+                `${user1.username}` +
+                ` and ${user.username}`,
+            );
+            createFriendsRelationship({
+              user1: user1,
+              user2: user,
+              status,
+            });
+          }
+
+          resolve(1);
+        });
+      });
+
+      await Promise.all(generateFriends);
     };
 
     await populateDatabaseWithSeedData();
