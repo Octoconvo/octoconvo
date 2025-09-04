@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { Community, Inbox, User } from "@prisma/client";
-import prisma from "./database/prisma/client";
+import prisma from "../database/prisma/client";
 import bcrypt from "bcrypt";
 
 // Populate database for testing purposes

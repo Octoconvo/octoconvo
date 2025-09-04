@@ -9,10 +9,10 @@
     "serverstart": "DEBUG=backend:* & npm run devstart",
     "test": "NODE_ENV=test && jest",
     "test-watch": "NODE_ENV=test && jest --watchAll",
-    "populate": "ts-node populateDB.ts",
-    "unpopulate": "ts-node unpopulateDB.ts",
-    "populateClient": "ts-node clientPopulateDB.ts",
-    "unpopulateClient": "ts-node clientUnpopulateDB.ts",
+    "populate": "ts-node scripts/populateDB.ts",
+    "unpopulate": "ts-node scripts/unpopulateDB.ts",
+    "populateClient": "ts-node scripts/clientPopulateDB.ts",
+    "unpopulateClient": "ts-node scripts/clientUnpopulateDB.ts",
     "data-migration:add-community-participantsCount-column": "ts-node ./prisma/migrations/20250714160939_add_community_participants_count_column/data-migration.ts"
   },
   "dependencies": {

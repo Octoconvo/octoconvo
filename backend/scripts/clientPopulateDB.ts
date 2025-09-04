@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { User } from "@prisma/client";
-import prisma from "./database/prisma/client";
+import prisma from "../database/prisma/client";
 import bcrypt from "bcrypt";
 // Populate database for testing purposes
 const populateDB = async () => {
