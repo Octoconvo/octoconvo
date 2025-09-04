@@ -232,10 +232,64 @@ const handleFriendRequest = async ({
   return { friends, notification, newNotification };
 };
 
+type FriendCursor = {
+  id: string;
+  username: string;
+};
+
+type GetUserFriendsWithCursor = {
+  cursor: FriendCursor;
+  userId: string;
+  limit: number;
+};
+
+const getUserFriendsWithCursor = async ({
+  cursor,
+  userId,
+  limit,
+}: GetUserFriendsWithCursor) => {
+  const friends = await prisma.friend.findMany({
+    where: {
+      friendOfId: userId,
+      OR: [
+        {
+          friend: {
+            username: {
+              gt: cursor.username,
+            },
+          },
+        },
+        {
+          friend: {
+            username: {
+              gte: cursor.username,
+            },
+            id: {
+              gt: cursor.id,
+            },
+          },
+        },
+      ],
+    },
+    orderBy: [{ friend: { username: "asc" } }, { friend: { id: "asc" } }],
+    take: limit,
+    include: {
+      friend: {
+        select: {
+          username: true,
+        },
+      },
+    },
+  });
+
+  return friends;
+};
+
 export {
   getFriendByUsername,
   createFriendTransaction,
   updateFriendByIdsTransaction,
   addFriend,
   handleFriendRequest,
+  getUserFriendsWithCursor,
 };

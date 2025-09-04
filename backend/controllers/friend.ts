@@ -7,11 +7,19 @@ import { getProfileByUsername } from "../database/prisma/profileQueries";
 import {
   addFriend,
   getFriendByUsername,
+  getUserFriendsWithCursor,
   handleFriendRequest,
 } from "../database/prisma/friendQueries";
 import { createCheckProfileByUsernameMiddleware } from "../middlewares/profile";
 import { isUUID } from "../utils/validation";
 import { getFriendRequestNotificationById } from "../database/prisma/notificationQueries";
+import {
+  constructFriendCursor,
+  deconstructFriendCursor,
+} from "../utils/cursor";
+import { getLastItemInTheArray } from "../utils/array";
+import { UserFriendData } from "../@types/database";
+import { UserFriendsGETResponse } from "../@types/apiResponse";
 
 const friendValidation = {
   usernameQuery: query("username", "Username query is required")
@@ -64,6 +72,35 @@ const friendValidation = {
 
     return true;
   }),
+  limit: query("limit")
+    .optional({ values: "falsy" })
+    .bail()
+    .isInt({
+      min: 1,
+      max: 100,
+      allow_leading_zeroes: false,
+    })
+    .withMessage("Limit must be an integer and between 1 and 100"),
+  cursor: query("cursor")
+    .trim()
+    .optional({
+      values: "falsy",
+    })
+    .bail()
+    .custom(value => {
+      const cursor = value;
+      const id = cursor ? cursor.split("_")[0] : null;
+      const username = cursor ? cursor.split("_")[1] : null;
+      const usernameRegex = new RegExp("^[a-zA-Z0-9_]+$");
+      const isUsername = usernameRegex.test(username);
+
+      // validate cusor's createdAt and id fields
+      if (!(isUUID(id) && isUsername)) {
+        throw new Error("Cursor value is invalid");
+      }
+
+      return true;
+    }),
 };
 
 const userFriendshipStatusGETAuthentication = createAuthenticationMiddleware({
@@ -310,4 +347,61 @@ const friend_request_post = [
   }),
 ];
 
-export { user_friendship_status_get, friend_add_post, friend_request_post };
+const userFriendsGETErrorMessage = "Failed to fetch user's friends";
+
+const userFriendsGETAuthentication = createAuthenticationMiddleware({
+  message: userFriendsGETErrorMessage,
+  errMessage: "You are not authenticated",
+});
+
+const userFriendsGETValidationError = createValidationErrorMiddleware({
+  message: userFriendsGETErrorMessage,
+});
+
+const user_friends_get = [
+  userFriendsGETAuthentication,
+  friendValidation.limit,
+  friendValidation.cursor,
+  userFriendsGETValidationError,
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.user?.id as string;
+    const limit = req.query.limit ? Number(req.query.limit) : 30;
+    const cursorString = req.query.cursor as string;
+    const cursorObject = cursorString
+      ? deconstructFriendCursor(cursorString)
+      : { id: "", username: "" };
+
+    const userFriends = await getUserFriendsWithCursor({
+      cursor: cursorObject,
+      userId,
+      limit,
+    });
+
+    const lastFriendOnTheList =
+      getLastItemInTheArray<UserFriendData>(userFriends);
+    let nextCursor: string | false = false;
+
+    console.log({ lastFriendOnTheList });
+    if (lastFriendOnTheList) {
+      nextCursor = constructFriendCursor({
+        id: lastFriendOnTheList.friendId,
+        username: lastFriendOnTheList.friend.username,
+      });
+    }
+
+    const responseData: UserFriendsGETResponse = {
+      message: "Successfully fetched user's friends",
+      friends: userFriends,
+      nextCursor,
+    };
+
+    res.json(responseData);
+  }),
+];
+
+export {
+  user_friendship_status_get,
+  friend_add_post,
+  friend_request_post,
+  user_friends_get,
+};
