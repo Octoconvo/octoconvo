@@ -4,6 +4,8 @@ import { getValidationErrorMsg, login } from "../../utils/testUtils";
 import prisma from "../../database/prisma/client";
 import { Friend, User } from "@prisma/client";
 import { NotificationRes } from "../../@types/apiResponse";
+import { UserFriendData } from "../../@types/database";
+import { constructFriendCursor } from "../../utils/cursor";
 
 describe("Test user's friendship status get controller with seeduser1", () => {
   test(
@@ -951,4 +953,271 @@ describe("Test friend request post controller", () => {
       })
       .expect(200, done);
   });
+});
+
+describe("Test user_friends_get controller", () => {
+  let userFriends: UserFriendData[] = [];
+
+  beforeAll(async () => {
+    userFriends = await prisma.friend.findMany({
+      where: {
+        friendOf: {
+          username: "seeduser1",
+        },
+      },
+      orderBy: [{ friend: { username: "asc" } }, { friend: { id: "asc" } }],
+      include: {
+        friend: {
+          select: {
+            username: true,
+          },
+        },
+      },
+    });
+  });
+
+  test(
+    "Return 401 authentication error when trying to get user's friends while" +
+      " being unauthenticated",
+    done => {
+      request(app)
+        .get("/friends")
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to fetch user's friends",
+          error: {
+            message: "You are not authenticated",
+          },
+        })
+        .expect(401, done);
+    },
+  );
+
+  const agent = request.agent(app);
+  login(agent, {
+    username: "seeduser1",
+    password: "seed@User1",
+  });
+
+  test(
+    "Failed to fetch user's friends when the cursor's username is" + " invalid",
+    done => {
+      agent
+        .get(`/friends?cursor=${userFriends[0].friendId}_test@username`)
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+          const cursorValidationErrorMessage = getValidationErrorMsg({
+            error,
+            field: "cursor",
+          });
+
+          expect(message).toBe("Failed to fetch user's friends");
+          expect(cursorValidationErrorMessage).toBe("Cursor value is invalid");
+        })
+        .expect(422, done);
+    },
+  );
+
+  test(
+    "Failed to fetch user's friends when the cursor's id is" + " invalid",
+    done => {
+      agent
+        .get(`/friends?cursor=testid1_${userFriends[0].friend.username}`)
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message = res.body.message;
+          const error = res.body.error;
+          const cursorValidationErrorMessage = getValidationErrorMsg({
+            error,
+            field: "cursor",
+          });
+
+          expect(message).toBe("Failed to fetch user's friends");
+          expect(cursorValidationErrorMessage).toBe("Cursor value is invalid");
+        })
+        .expect(422, done);
+    },
+  );
+
+  test("Failed to fetch user's friends when the limit is not a number", done => {
+    agent
+      .get("/friends?limit=testlimit1")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+        const limitValidationErrorMessage = getValidationErrorMsg({
+          error,
+          field: "limit",
+        });
+
+        expect(message).toBe("Failed to fetch user's friends");
+        expect(limitValidationErrorMessage).toBe(
+          "Limit must be an integer and between 1 and 100",
+        );
+      })
+      .expect(422, done);
+  });
+
+  test("Failed to fetch user's friends when the limit is a decimal", done => {
+    agent
+      .get("/friends?limit=1.0")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+        const limitValidationErrorMessage = getValidationErrorMsg({
+          error,
+          field: "limit",
+        });
+
+        expect(message).toBe("Failed to fetch user's friends");
+        expect(limitValidationErrorMessage).toBe(
+          "Limit must be an integer and between 1 and 100",
+        );
+      })
+      .expect(422, done);
+  });
+
+  test("Failed to fetch user's friends when the limit is less than 1", done => {
+    agent
+      .get("/friends?limit=0")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+        const limitValidationErrorMessage = getValidationErrorMsg({
+          error,
+          field: "limit",
+        });
+
+        expect(message).toBe("Failed to fetch user's friends");
+        expect(limitValidationErrorMessage).toBe(
+          "Limit must be an integer and between 1 and 100",
+        );
+      })
+      .expect(422, done);
+  });
+
+  test("Failed to fetch user's friends when the limit is more than 100", done => {
+    agent
+      .get("/friends?limit=101")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        const error = res.body.error;
+        const limitValidationErrorMessage = getValidationErrorMsg({
+          error,
+          field: "limit",
+        });
+
+        expect(message).toBe("Failed to fetch user's friends");
+        expect(limitValidationErrorMessage).toBe(
+          "Limit must be an integer and between 1 and 100",
+        );
+      })
+      .expect(422, done);
+  });
+
+  test("Successfully fetch user's friends if validation passed", done => {
+    agent
+      .get("/friends")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message = res.body.message;
+        expect(message).toBe("Successfully fetched user's friends");
+      })
+      .expect(200, done);
+  });
+
+  test("Return 30 friends if limit query is empty", done => {
+    agent
+      .get("/friends")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const friends = res.body.friends;
+        expect(friends.length).toBe(30);
+      })
+      .expect(200, done);
+  });
+
+  test("Return 2 friends if limit query is 2", done => {
+    agent
+      .get("/friends?limit=2")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const friends = res.body.friends;
+        expect(friends.length).toBe(2);
+      })
+      .expect(200, done);
+  });
+
+  test("Return the correct cursor", done => {
+    agent
+      .get("/friends?limit=10")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const cursor = res.body.nextCursor;
+        const friendCursor = constructFriendCursor({
+          id: userFriends[9].friendId,
+          username: userFriends[9].friend.username,
+        });
+        expect(cursor).toBe(friendCursor);
+      })
+      .expect(200, done);
+  });
+
+  test(
+    "The returned friends's usernames must be bigger the query's cursor's" +
+      " username",
+    done => {
+      const currentFriend = userFriends[10];
+      const cursorQuery = constructFriendCursor({
+        id: currentFriend.friendId,
+        username: currentFriend.friend.username,
+      });
+
+      agent
+        .get(`/friends?limit=10&cursor=${cursorQuery}`)
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const friends: UserFriendData[] = res.body.friends;
+
+          for (const friend of friends) {
+            expect(
+              friend.friend.username >= currentFriend.friend.username,
+            ).toBeTruthy();
+          }
+        })
+        .expect(200, done);
+    },
+  );
+
+  test(
+    "The returned friends's ids should be bigger than query cursor's id" +
+      " if the friend's username is equal to query cursor's username",
+    done => {
+      const currentFriend = userFriends[10];
+      const cursorQuery = constructFriendCursor({
+        id: currentFriend.friendId,
+        username: currentFriend.friend.username,
+      });
+
+      agent
+        .get(`/friends?limit=10&cursor=${cursorQuery}`)
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const friends: UserFriendData[] = res.body.friends;
+
+          for (const friend of friends) {
+            if (friend.friend.username === currentFriend.friend.username) {
+              expect(friend.friendId >= currentFriend.friendId).toBeTruthy();
+            }
+          }
+        })
+        .expect(200, done);
+    },
+  );
 });
