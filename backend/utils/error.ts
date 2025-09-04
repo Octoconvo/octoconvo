@@ -15,4 +15,13 @@ const createValidationErrObj = (err: Result, message: string) => {
   };
 };
 
-export { createValidationErrObj };
+const logErrorMessage = (
+  // eslint-disable-next-line
+  error: any,
+) => {
+  if (error instanceof Error) {
+    console.log(error.message);
+  }
+};
+
+export { createValidationErrObj, logErrorMessage };
