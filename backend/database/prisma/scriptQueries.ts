@@ -96,10 +96,34 @@ const getSeedUsersToPopulateFriends = () => {
   return users;
 };
 
+const getSeedCommunities = async () => {
+  const communities = await prisma.community.findMany({
+    where: {
+      name: {
+        startsWith: "seedcommunity",
+      },
+    },
+  });
+
+  return communities;
+};
+
+const deleteCommunityMessages = async (communityId: string) => {
+  await prisma.message.deleteMany({
+    where: {
+      inbox: {
+        communityId: communityId,
+      },
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
   getSeedUsersToPopulateFriends,
   deleteUserFriends,
   createFriendsRelationship,
+  getSeedCommunities,
+  deleteCommunityMessages,
 };
