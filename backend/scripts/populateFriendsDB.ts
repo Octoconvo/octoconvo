@@ -71,3 +71,5 @@ const populateFriendsDB = async () => {
 };
 
 populateFriendsDB();
+
+export { populateFriends };

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-import { Community, Inbox, User } from "@prisma/client";
+import { Community, Inbox } from "@prisma/client";
 import prisma from "../database/prisma/client";
 import bcrypt from "bcrypt";
+import { populateFriends } from "./populateFriendsDB";
 
 // Populate database for testing purposes
 type SeedUser = {
@@ -234,18 +235,6 @@ const populateDB = async () => {
         },
       });
 
-      const user2 = await prisma.user.findUnique({
-        where: {
-          username: "seeduser2",
-        },
-      });
-
-      const user3 = await prisma.user.findUnique({
-        where: {
-          username: "seeduser3",
-        },
-      });
-
       const users = await prisma.user.findMany({
         where: {
           username: {
@@ -295,102 +284,7 @@ const populateDB = async () => {
         });
       }
 
-      type FriendsStatus = "PENDING" | "ACTIVE";
-
-      type CreateFriends = {
-        friendOfId: string;
-        friendId: string;
-        status: FriendsStatus;
-      };
-
-      const createFriends = async ({
-        friendOfId,
-        friendId,
-        status,
-      }: CreateFriends) => {
-        await prisma.friend.create({
-          data: {
-            friendOf: {
-              connect: {
-                id: friendOfId,
-              },
-            },
-            friend: {
-              connect: {
-                id: friendId,
-              },
-            },
-            status: status,
-          },
-        });
-      };
-
-      type CreateFriendsRelationship = {
-        user1: User;
-        user2: User;
-        status: FriendsStatus;
-      };
-
-      const createFriendsRelationship = async ({
-        user1,
-        user2,
-        status,
-      }: CreateFriendsRelationship) => {
-        await createFriends({
-          friendOfId: user1.id,
-          friendId: user2.id,
-          status: status,
-        });
-
-        await createFriends({
-          friendOfId: user2.id,
-          friendId: user1.id,
-          status: status,
-        });
-
-        console.log(
-          `\x1b[36mCreated friends ${status} relationship between` +
-            `${user1.username}` +
-            ` and ${user2.username}`,
-        );
-      };
-
-      // Create active friends
-      if (user1 && user2) {
-        createFriendsRelationship({ user1, user2, status: "ACTIVE" });
-      }
-
-      // Create pending friends
-      if (user1 && user3) {
-        createFriendsRelationship({ user1, user2: user3, status: "PENDING" });
-      }
-
-      const generateFriends = users.map(async (user, index) => {
-        return new Promise((resolve): void => {
-          const status = (index + 1) % 2 === 0 ? "ACTIVE" : "PENDING";
-
-          if (
-            user1 &&
-            user.username !== user2?.username &&
-            user.username !== user3?.username
-          ) {
-            console.log(
-              `\x1b[36mCreated friends ${status} relationship between` +
-                `${user1.username}` +
-                ` and ${user.username}`,
-            );
-            createFriendsRelationship({
-              user1: user1,
-              user2: user,
-              status,
-            });
-          }
-
-          resolve(1);
-        });
-      });
-
-      await Promise.all(generateFriends);
+      await populateFriends({ friends: users });
     };
 
     await populateDatabaseWithSeedData();
