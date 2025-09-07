@@ -18,6 +18,6 @@ describe("Test logPopulateMessage function", () => {
 
   test("Log the HELLO! with the correct colour", () => {
     logPopulateMessage("HELLO!");
-    expect(console.log).toHaveBeenCalledWith("\x1b[36HELLO!");
+    expect(console.log).toHaveBeenCalledWith("\x1b[36mHELLO!");
   });
 });

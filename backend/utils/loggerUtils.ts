@@ -1,5 +1,5 @@
 const logPopulateMessage = (message: string) => {
-  console.log(`\x1b[36${message}`);
+  console.log(`\x1b[36m${message}`);
 };
 
 export { logPopulateMessage };
