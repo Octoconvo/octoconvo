@@ -5,4 +5,6 @@ type CommunityWithOwnerAndInbox = Community & {
   owner?: User | null;
 };
 
-export type { CommunityWithOwnerAndInbox };
+type CommunitiesWithOwnerAndIInbox = CommunityWithOwnerAndInbox[];
+
+export type { CommunityWithOwnerAndInbox, CommunitiesWithOwnerAndIInbox };
