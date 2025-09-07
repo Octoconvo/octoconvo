@@ -578,7 +578,7 @@ describe("Test friend request post controller", () => {
     try {
       friendNONE1 = await prisma.user.findFirst({
         where: {
-          NOT: { AND: [{ username: "seeduser1" }, { username: "seeduser2" }] },
+          NOT: { OR: [{ username: "seeduser1" }, { username: "seeduser2" }] },
           friendsOf: {
             every: {
               friend: {
