@@ -1,6 +1,7 @@
 import {
   floorNumberToInteger,
   getBiggestPowerOfTen,
+  getLastIndexToBase10,
   isEven,
 } from "../../utils/numberUtils";
 
@@ -67,5 +68,43 @@ describe("Test floorNumberToInteger", () => {
 
   test("100000.333666 should return 1000000", () => {
     expect(floorNumberToInteger(100000.333666)).toBe(100000);
+  });
+});
+
+describe("Test getLastIndexToBase10", () => {
+  test("length 0 return -1", () => {
+    expect(getLastIndexToBase10(0)).toBe(-1);
+  });
+
+  test("length 1 return 0", () => {
+    expect(getLastIndexToBase10(1)).toBe(0);
+  });
+
+  test("length 9 return 9", () => {
+    expect(getLastIndexToBase10(9)).toBe(8);
+  });
+
+  test("length 20 return 19", () => {
+    expect(getLastIndexToBase10(20)).toBe(19);
+  });
+
+  test("length 101 return 99", () => {
+    expect(getLastIndexToBase10(101)).toBe(99);
+  });
+
+  test("length 550 return 499", () => {
+    expect(getLastIndexToBase10(550)).toBe(499);
+  });
+
+  test("length 999 return 899", () => {
+    expect(getLastIndexToBase10(999)).toBe(899);
+  });
+
+  test("length 1500 return 999", () => {
+    expect(getLastIndexToBase10(1000)).toBe(999);
+  });
+
+  test("length 9999 return 8999", () => {
+    expect(getLastIndexToBase10(9999)).toBe(8999);
   });
 });
