@@ -18,4 +18,8 @@ const getBiggestPowerOfTen = (number: number) => {
   return power;
 };
 
-export { isEven, getBiggestPowerOfTen };
+const floorNumberToInteger = (number: number) => {
+  return Math.floor(number);
+};
+
+export { isEven, getBiggestPowerOfTen, floorNumberToInteger };
