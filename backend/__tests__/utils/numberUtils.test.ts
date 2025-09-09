@@ -1,4 +1,8 @@
-import { getBiggestPowerOfTen, isEven } from "../../utils/numberUtils";
+import {
+  floorNumberToInteger,
+  getBiggestPowerOfTen,
+  isEven,
+} from "../../utils/numberUtils";
 
 describe("Test isEven function", () => {
   test("1 is odd, return false", () => {
@@ -45,5 +49,23 @@ describe("Test getBiggestPowerOfTen", () => {
 
   test("1336699 should return 6", () => {
     expect(getBiggestPowerOfTen(1336699)).toBe(6);
+  });
+});
+
+describe("Test floorNumberToInteger", () => {
+  test("0.01 should return 0", () => {
+    expect(floorNumberToInteger(0.001)).toBe(0);
+  });
+
+  test("4.56 should return 4.56", () => {
+    expect(floorNumberToInteger(4.56)).toBe(4);
+  });
+
+  test("100.9999999 should return 100", () => {
+    expect(floorNumberToInteger(100.999999)).toBe(100);
+  });
+
+  test("100000.333666 should return 1000000", () => {
+    expect(floorNumberToInteger(100000.333666)).toBe(100000);
   });
 });
