@@ -22,4 +22,16 @@ const floorNumberToInteger = (number: number) => {
   return Math.floor(number);
 };
 
-export { isEven, getBiggestPowerOfTen, floorNumberToInteger };
+const getLastIndexToBase10 = (length: number) => {
+  const base = Math.pow(10, getBiggestPowerOfTen(length));
+  const biggestIntegerDivisor = floorNumberToInteger(length / base);
+
+  return base * biggestIntegerDivisor - 1;
+};
+
+export {
+  isEven,
+  getBiggestPowerOfTen,
+  floorNumberToInteger,
+  getLastIndexToBase10,
+};
