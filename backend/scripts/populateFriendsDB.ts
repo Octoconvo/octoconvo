@@ -40,14 +40,12 @@ type GenerateUserFriends = {
 };
 
 const populateUserFriends = async ({ user, friends }: GenerateUserFriends) => {
-  const createFriendsPromises = friends.map((friend: User, index: number) => {
-    const status = isEven(index + 1) ? "PENDING" : "ACTIVE";
-
-    return new Promise(resolve => {
-      generateUserFriend({ user, friend, status });
-      resolve(1);
-    });
-  });
+  const createFriendsPromises = friends.map(
+    async (friend: User, index: number) => {
+      const status = isEven(index + 1) ? "PENDING" : "ACTIVE";
+      await generateUserFriend({ user, friend, status });
+    },
+  );
 
   await Promise.all(createFriendsPromises);
 };
