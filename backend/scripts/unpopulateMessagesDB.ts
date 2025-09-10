@@ -5,6 +5,7 @@ import {
 } from "../database/prisma/scriptQueries";
 import { logErrorMessage } from "../utils/error";
 import { logUnpopulateMessage } from "../utils/loggerUtils";
+import { breakArrayIntoSubArrays } from "../utils/array";
 
 const destroyCommunityMessages = async (community: Community) => {
   try {
@@ -16,14 +17,18 @@ const destroyCommunityMessages = async (community: Community) => {
 };
 
 const unpopulateCommunitiesMessages = async (communities: Community[]) => {
-  const deleteMessagesPromises = communities.map(community => {
-    return new Promise(resolve => {
-      destroyCommunityMessages(community);
-      resolve(1);
-    });
+  const subCommunitiesArrays = breakArrayIntoSubArrays({
+    array: communities,
+    subArraySize: 10,
   });
 
-  await Promise.all(deleteMessagesPromises);
+  for (const subCommunitiesArray of subCommunitiesArrays) {
+    const deleteMessagesPromises = subCommunitiesArray.map(async community => {
+      await destroyCommunityMessages(community);
+    });
+
+    await Promise.all(deleteMessagesPromises);
+  }
 };
 
 const unpopulateMessagesDB = async () => {
