@@ -1,5 +1,6 @@
-import { User, FriendsStatus } from "@prisma/client";
+import { User, FriendsStatus, Community, Inbox } from "@prisma/client";
 import prisma from "./client";
+import { CommunitiesWithOwnerAndIInbox } from "../../@types/scriptTypes";
 
 const getUserByUsername = async (username: string): Promise<User | null> => {
   return await prisma.user.findUnique({
@@ -108,12 +109,76 @@ const getSeedCommunities = async () => {
   return communities;
 };
 
+const getCommunityOwner = async (communityId: string): Promise<User | null> => {
+  const owner = await prisma.participant.findFirst({
+    where: {
+      communityId: communityId,
+      role: "OWNER",
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  return owner?.user || null;
+};
+
+const getSeedCommunitiesWithOwnerAndInbox =
+  async (): Promise<CommunitiesWithOwnerAndIInbox> => {
+    type CommunityAndInbox = Community & {
+      inbox: Inbox | null;
+      owner?: User | null;
+    };
+
+    const communities: CommunityAndInbox[] = await prisma.community.findMany({
+      where: {
+        name: {
+          startsWith: "seedcommunity",
+        },
+      },
+      include: {
+        inbox: true,
+      },
+    });
+
+    const getCommunitiesOwnerPromises = communities.map(
+      async (community: CommunityAndInbox, index: number) => {
+        const owner = await getCommunityOwner(community.id);
+        communities[index] = { ...communities[index], owner };
+      },
+    );
+
+    await Promise.all(getCommunitiesOwnerPromises);
+
+    return communities;
+  };
+
 const deleteCommunityMessages = async (communityId: string) => {
   await prisma.message.deleteMany({
     where: {
       inbox: {
         communityId: communityId,
       },
+    },
+  });
+};
+
+type CreateCommunitySeedMessage = {
+  number: number;
+  inboxId: string;
+  authorId: string;
+};
+
+const createCommunitySeedMessage = async ({
+  number,
+  inboxId,
+  authorId,
+}: CreateCommunitySeedMessage) => {
+  await prisma.message.create({
+    data: {
+      content: `seedmessage${number}`,
+      inboxId: inboxId,
+      authorId: authorId,
     },
   });
 };
@@ -125,5 +190,7 @@ export {
   deleteUserFriends,
   createFriendsRelationship,
   getSeedCommunities,
+  getSeedCommunitiesWithOwnerAndInbox,
   deleteCommunityMessages,
+  createCommunitySeedMessage,
 };
