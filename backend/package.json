@@ -15,6 +15,7 @@
     "unpopulateClient": "ts-node scripts/clientUnpopulateDB.ts",
     "friendsPopulate": "ts-node scripts/populateFriendsDB.ts",
     "friendsUnpopulate": "ts-node scripts/unpopulateFriendsDB.ts",
+    "messagesPopulate": "ts-node scripts/populateMessagesDB.ts",
     "messagesUnpopulate": "ts-node scripts/unpopulateMessagesDB.ts",
     "data-migration:add-community-participantsCount-column": "ts-node ./prisma/migrations/20250714160939_add_community_participants_count_column/data-migration.ts"
   },
