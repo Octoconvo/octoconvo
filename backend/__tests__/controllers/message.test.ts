@@ -5,6 +5,7 @@ import prisma from "../../database/prisma/client";
 import { console } from "node:inspector";
 import { Community, Inbox, Message } from "@prisma/client";
 import { deleteAllMessageByContent } from "../../database/prisma/messageQueries";
+import { getLastIndexToBase10 } from "../../utils/numberUtils";
 
 jest.mock("../../database/supabase/supabaseQueries", () => ({
   uploadFile: async ({
@@ -641,6 +642,8 @@ describe("Test messages get controller", () => {
   });
 
   test("Return correct cursor when the direction query is backward", done => {
+    const lastIndex = getLastIndexToBase10(messages1.length);
+
     agent
       .get(`/inbox/${community1?.inbox.id}/messages?direction=backward&limit=2`)
       .type("form")
@@ -649,12 +652,17 @@ describe("Test messages get controller", () => {
         const prevCursor = res.body.prevCursor;
         const nextCursor = res.body.nextCursor;
 
+        // expect(lastMessage.content).toBe(res.body.messagesData[0].content);
         expect(prevCursor).toBe(
-          `${messages1[18].id}_${new Date(messages1[18].createdAt).toISOString()}`,
+          `${messages1[lastIndex - 1].id}` +
+            "_" +
+            `${new Date(messages1[lastIndex - 1].createdAt).toISOString()}`,
         );
 
         expect(nextCursor).toBe(
-          `${messages1[19].id}_${new Date(messages1[19].createdAt).toISOString()}`,
+          `${messages1[lastIndex].id}` +
+            "_" +
+            `${new Date(messages1[lastIndex].createdAt).toISOString()}`,
         );
       })
       .expect(200)
@@ -705,9 +713,9 @@ describe("Test messages get controller", () => {
 
   test("Return null next cursor when messages data less than limit", done => {
     const cursor =
-      `${messages1[18].id}` +
+      `${messages1[messages1.length - 2].id}` +
       "_" +
-      `${new Date(messages1[18].createdAt).toISOString()}`;
+      `${new Date(messages1[messages1.length - 2].createdAt).toISOString()}`;
 
     agent
       .get(
