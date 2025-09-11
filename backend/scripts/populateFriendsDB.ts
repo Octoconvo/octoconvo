@@ -77,8 +77,7 @@ const populateFriends = async ({ friends }: PopulateFriends) => {
 };
 
 const populateFriendsDB = async () => {
-  const seedUsers: User[] = await getSeedUsersToPopulateFriends();
-
+  const seedUsers: User[] = await getSeedUsersToPopulateFriends({ limit: 98 });
   await populateFriends({ friends: seedUsers });
 };
 

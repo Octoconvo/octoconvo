@@ -82,15 +82,31 @@ const createFriendsRelationship = async ({
   await prisma.$transaction([userOneToUserTwo, userTwoToUserOne]);
 };
 
-const getSeedUsersToPopulateFriends = () => {
+type GetSeedUsersToPopulateFriends = {
+  limit: number;
+};
+
+const getSeedUsersToPopulateFriends = ({
+  limit,
+}: GetSeedUsersToPopulateFriends) => {
   const users = prisma.user.findMany({
     where: {
       username: {
         startsWith: "seeduser",
       },
-      NOT: { username: "seeduser1" },
+      NOT: [
+        {
+          username: "seeduser1",
+        },
+        {
+          username: "seeduser2",
+        },
+        {
+          username: "seeduser3",
+        },
+      ],
     },
-    take: 100,
+    take: limit,
     orderBy: { username: "asc" },
   });
 
