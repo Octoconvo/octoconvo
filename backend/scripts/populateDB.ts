@@ -4,6 +4,7 @@ import prisma from "../database/prisma/client";
 import bcrypt from "bcrypt";
 import { populateFriendsDB } from "./populateFriendsScript";
 import { populateMessagesDB } from "./populateMessagesScript";
+import { generateArrayOfSeedUsers } from "../utils/scriptUtils";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
@@ -16,38 +17,12 @@ const modeSizes = {
 };
 
 // Populate database for testing purposes
-type SeedUser = {
-  username: string;
-  displayName: string;
-  password: string;
-  community: string;
-};
-
-const seedUsers: SeedUser[] = [];
 
 const populateDB = async (size: number) => {
   console.log(`\x1b[36mPopulating database...`);
 
   try {
-    // push users to the seedUsers
-    const createAndPushToSeedUsers = async (size: number) => {
-      return new Promise(resolve => {
-        for (let i = 1; i <= size; i++) {
-          const user = {
-            username: `seeduser${i}`,
-            displayName: `seeduser${i}`,
-            password: `seed@User${i}`,
-            community: `seedcommunity${i}`,
-          };
-
-          seedUsers.push(user);
-        }
-
-        resolve(1);
-      });
-    };
-
-    await createAndPushToSeedUsers(size);
+    const seedUsers = generateArrayOfSeedUsers(size);
 
     const populateDatabaseWithSeedData = async () => {
       const createSeedUserAndItsData = seedUsers.map(async seedUser => {
