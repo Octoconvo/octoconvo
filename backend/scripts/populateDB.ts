@@ -2,7 +2,7 @@
 import { Community, Inbox } from "@prisma/client";
 import prisma from "../database/prisma/client";
 import bcrypt from "bcrypt";
-import { populateFriendsDB } from "./populateFriendsDB";
+import { populateFriendsDB } from "./populateFriendsScript";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
