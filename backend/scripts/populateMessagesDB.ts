@@ -17,8 +17,9 @@ const generateCommunityMessages = async ({
 }: GenerateCommunityMessages) => {
   try {
     for (let i = 1; i <= messageCount; i++) {
-      await new Promise(resolve => setTimeout(resolve, 250));
       if (community.inbox && community.owner) {
+        await new Promise(resolve => setTimeout(resolve, 250));
+
         logPopulateMessage(
           `Creating seedmessage${messageCount} for ${community.name}`,
         );
