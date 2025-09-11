@@ -2,7 +2,7 @@
 import { Community, Inbox } from "@prisma/client";
 import prisma from "../database/prisma/client";
 import bcrypt from "bcrypt";
-import { populateFriends } from "./populateFriendsDB";
+import { populateFriendsDB } from "./populateFriendsDB";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
@@ -293,11 +293,10 @@ const populateDB = async (size: number) => {
           communityId: community1.id,
         });
       }
-
-      await populateFriends({ friends: users });
     };
 
     await populateDatabaseWithSeedData();
+    await populateFriendsDB();
   } catch (err) {
     if (err instanceof Error) console.log(err.message);
   } finally {

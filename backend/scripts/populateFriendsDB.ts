@@ -83,4 +83,4 @@ const populateFriendsDB = async () => {
 
 populateFriendsDB();
 
-export { populateFriends };
+export { populateFriendsDB };
