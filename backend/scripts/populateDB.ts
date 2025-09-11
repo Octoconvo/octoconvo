@@ -26,61 +26,64 @@ const populateDB = async (size: number) => {
 
     const populateDatabaseWithSeedData = async () => {
       const createSeedUserAndItsData = seedUsers.map(async seedUser => {
-        bcrypt.hash(seedUser.password, 10, async (err, hashedPassword) => {
-          if (err) {
-            if (err instanceof Error) console.log(err.message);
-          }
+        return new Promise((resolve): void =>
+          bcrypt.hash(seedUser.password, 10, async (err, hashedPassword) => {
+            if (err) {
+              if (err instanceof Error) console.log(err.message);
+            }
 
-          const createUser = async () => {
-            const user = await prisma.user.create({
-              data: {
-                username: seedUser.username,
-                displayName: seedUser.username,
-                password: hashedPassword,
-              },
-            });
+            const createUser = async () => {
+              const user = await prisma.user.create({
+                data: {
+                  username: seedUser.username,
+                  displayName: seedUser.username,
+                  password: hashedPassword,
+                },
+              });
 
-            console.log(`\x1b[36mCreated user ${user.username}...`);
+              console.log(`\x1b[36mCreated user ${user.username}...`);
 
-            return user;
-          };
+              return user;
+            };
 
-          const user = await createUser();
+            const user = await createUser();
 
-          type CommunityWithInbox = Community & { inbox: Inbox };
+            type CommunityWithInbox = Community & { inbox: Inbox };
 
-          const createCommunity = async (): Promise<CommunityWithInbox> => {
-            const community = await prisma.community.create({
-              data: {
-                name: seedUser.community,
-                bio: seedUser.community,
-                inbox: {
-                  create: {
-                    inboxType: "COMMUNITY",
+            const createCommunity = async (): Promise<CommunityWithInbox> => {
+              const community = await prisma.community.create({
+                data: {
+                  name: seedUser.community,
+                  bio: seedUser.community,
+                  inbox: {
+                    create: {
+                      inboxType: "COMMUNITY",
+                    },
+                  },
+                  participantsCount: 1,
+                  participants: {
+                    create: {
+                      userId: user.id,
+                      role: "OWNER",
+                      status: "ACTIVE",
+                      memberSince: new Date(),
+                    },
                   },
                 },
-                participantsCount: 1,
-                participants: {
-                  create: {
-                    userId: user.id,
-                    role: "OWNER",
-                    status: "ACTIVE",
-                    memberSince: new Date(),
-                  },
+                include: {
+                  inbox: true,
                 },
-              },
-              include: {
-                inbox: true,
-              },
-            });
+              });
 
-            console.log(`\x1b[36mCreated community ${seedUser.community}...`);
+              console.log(`\x1b[36mCreated community ${seedUser.community}...`);
 
-            return community as CommunityWithInbox;
-          };
+              return community as CommunityWithInbox;
+            };
 
-          await createCommunity();
-        });
+            await createCommunity();
+            resolve(1);
+          }),
+        );
       });
 
       await Promise.all(createSeedUserAndItsData);
@@ -247,6 +250,10 @@ const populateDB = async (size: number) => {
           triggeredForId: user1.id,
           communityId: community1.id,
         });
+      } else {
+        throw new Error(
+          `user1 && community is false: user1: ${user1} | community: ${community1}`,
+        );
       }
     };
 
