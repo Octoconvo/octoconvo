@@ -4,6 +4,16 @@ import prisma from "../database/prisma/client";
 import bcrypt from "bcrypt";
 import { populateFriends } from "./populateFriendsDB";
 
+type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
+
+const mode: Mode = (process.env.SEED_MODE as Mode) || "COMPACT";
+
+const modeSizes = {
+  COMPACT: 125,
+  BALANCED: 500,
+  EXTENSIVE: 1000,
+};
+
 // Populate database for testing purposes
 type SeedUser = {
   username: string;
@@ -14,14 +24,14 @@ type SeedUser = {
 
 const seedUsers: SeedUser[] = [];
 
-const populateDB = async () => {
+const populateDB = async (size: number) => {
   console.log(`\x1b[36mPopulating database...`);
 
   try {
     // push users to the seedUsers
-    const createAndPushToSeedUsers = async ({ count }: { count: number }) => {
+    const createAndPushToSeedUsers = async (size: number) => {
       return new Promise(resolve => {
-        for (let i = 1; i <= count; i++) {
+        for (let i = 1; i <= size; i++) {
           const user = {
             username: `seeduser${i}`,
             displayName: `seeduser${i}`,
@@ -36,7 +46,7 @@ const populateDB = async () => {
       });
     };
 
-    await createAndPushToSeedUsers({ count: 1000 });
+    await createAndPushToSeedUsers(size);
 
     const populateDatabaseWithSeedData = async () => {
       const createSeedUserAndItsData = seedUsers.map(seedUser => {
@@ -295,4 +305,6 @@ const populateDB = async () => {
   }
 };
 
-populateDB();
+const size = modeSizes[mode];
+
+populateDB(size);
