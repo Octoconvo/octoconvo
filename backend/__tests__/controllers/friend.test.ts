@@ -8,6 +8,30 @@ import { UserFriendData } from "../../@types/database";
 import { constructFriendCursor } from "../../utils/cursor";
 
 describe("Test user's friendship status get controller with seeduser1", () => {
+  let friendNONE: null | User = null;
+
+  beforeAll(async () => {
+    friendNONE = await prisma.user.findFirst({
+      where: {
+        NOT: { OR: [{ username: "seeduser1" }, { username: "seeduser2" }] },
+        friendsOf: {
+          every: {
+            friend: {
+              username: "seeduser4",
+            },
+          },
+        },
+        friends: {
+          every: {
+            friendOf: {
+              username: "seeduser4",
+            },
+          },
+        },
+      },
+    });
+  });
+
   test(
     "Return 401 unauthorized if user tries to get friendship status" +
       " without being unauthenticated",
@@ -153,7 +177,7 @@ describe("Test user's friendship status get controller with seeduser1", () => {
   );
 
   test("Return NONE friendship status", done => {
-    const usernameQuery = "seeduser4";
+    const usernameQuery = friendNONE?.username;
     agent
       .get(`/friend/friendship-status?username=${usernameQuery}`)
       .expect("Content-type", /json/)
