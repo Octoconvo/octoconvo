@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import { populateFriendsDB } from "./populateFriendsScript";
 import { populateMessagesDB } from "./populateMessagesScript";
 import { generateArrayOfSeedUsers } from "../utils/scriptUtils";
+import { createTimer } from "../utils/timeUtils";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
@@ -17,9 +18,9 @@ const modeSizes = {
 };
 
 // Populate database for testing purposes
-
 const populateDB = async (size: number) => {
   console.log(`\x1b[36mPopulating database...`);
+  const timer = createTimer();
 
   try {
     const seedUsers = generateArrayOfSeedUsers(size);
@@ -263,7 +264,10 @@ const populateDB = async (size: number) => {
   } catch (err) {
     if (err instanceof Error) console.log(err.message);
   } finally {
-    console.log(`\x1b[36mFinished populating database...`);
+    timer.stopTimer();
+    const timeInSecond = timer.timeInSecond;
+    console.log(`\x1b[32mFinished populating database`);
+    console.log(`\x1b[32m${timeInSecond} s`);
   }
 };
 
