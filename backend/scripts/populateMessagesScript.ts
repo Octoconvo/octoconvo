@@ -16,14 +16,13 @@ const generateCommunityMessages = async ({
   messageCount,
 }: GenerateCommunityMessages) => {
   try {
+    const messageInflection = messageCount > 1 ? "messages" : "message";
+    logPopulateMessage(
+      `Creating ${messageCount} ${messageInflection} for ${community.name}`,
+    );
     for (let i = 1; i <= messageCount; i++) {
       if (community.inbox && community.owner) {
         await new Promise(resolve => setTimeout(resolve, 250));
-
-        logPopulateMessage(
-          `Creating seedmessage${messageCount} for ${community.name}`,
-        );
-
         await createCommunitySeedMessage({
           number: i,
           inboxId: community.inbox.id,
@@ -31,6 +30,10 @@ const generateCommunityMessages = async ({
         });
       }
     }
+
+    logPopulateMessage(
+      `\x1b[32mCreated ${messageCount} ${messageInflection} for ${community.name}`,
+    );
   } catch (err) {
     logErrorMessage(err);
   }
@@ -49,7 +52,7 @@ const populateCommunitiesMessages = async (
 const populateMessagesDB = async () => {
   try {
     const seedCommunities = await getSeedCommunitiesWithOwnerAndInbox();
-    populateCommunitiesMessages(seedCommunities);
+    await populateCommunitiesMessages(seedCommunities);
   } catch (err) {
     logErrorMessage(err);
   }
