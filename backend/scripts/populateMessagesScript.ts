@@ -4,7 +4,10 @@ import {
   createCommunitySeedMessage,
 } from "../database/prisma/scriptQueries";
 import { logErrorMessage } from "../utils/error";
-import { logPopulateMessage } from "../utils/loggerUtils";
+import {
+  logPopulateMessage,
+  logPopulateSuccessMessage,
+} from "../utils/loggerUtils";
 
 type GenerateCommunityMessages = {
   community: CommunityWithOwnerAndInbox;
@@ -31,8 +34,9 @@ const generateCommunityMessages = async ({
       }
     }
 
-    logPopulateMessage(
-      `\x1b[32mCreated ${messageCount} ${messageInflection} for ${community.name}`,
+    logPopulateSuccessMessage(
+      `Successfully created ${messageCount} ${messageInflection}` +
+        ` for ${community.name}`,
     );
   } catch (err) {
     logErrorMessage(err);

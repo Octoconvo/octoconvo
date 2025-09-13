@@ -6,7 +6,10 @@ import {
 } from "../database/prisma/scriptQueries";
 import { isEven } from "../utils/numberUtils";
 import { logErrorMessage } from "../utils/error";
-import { logPopulateMessage } from "../utils/loggerUtils";
+import {
+  logPopulateMessage,
+  logPopulateSuccessMessage,
+} from "../utils/loggerUtils";
 
 type GenerateUserFriend = {
   user: User;
@@ -29,6 +32,10 @@ const generateUserFriend = async ({
       userTwoId: friend.id,
       status,
     });
+    logPopulateSuccessMessage(
+      `Successfully created friend relationsHips between ${user.username}` +
+        ` and ${friend.username}`,
+    );
   } catch (err) {
     logErrorMessage(err);
   }
@@ -78,7 +85,6 @@ const populateFriends = async ({ friends }: PopulateFriends) => {
 
 const populateFriendsDB = async () => {
   const seedUsers: User[] = await getSeedUsersToPopulateFriends({ limit: 98 });
-  console.log("GENERATING FRIENDS");
   await populateFriends({ friends: seedUsers });
 };
 
