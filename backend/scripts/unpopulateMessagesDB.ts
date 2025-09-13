@@ -4,13 +4,19 @@ import {
   getSeedCommunities,
 } from "../database/prisma/scriptQueries";
 import { logErrorMessage } from "../utils/error";
-import { logUnpopulateMessage } from "../utils/loggerUtils";
+import {
+  logUnpopulateMessage,
+  logUnpopulateSuccessMessage,
+} from "../utils/loggerUtils";
 import { breakArrayIntoSubArrays } from "../utils/array";
 
 const destroyCommunityMessages = async (community: Community) => {
   try {
     logUnpopulateMessage(`Deleting ${community.name}'s messages`);
     await deleteCommunityMessages(community.id);
+    logUnpopulateSuccessMessage(
+      `Successfully deleted ${community.name}'s messages`,
+    );
   } catch (err) {
     logErrorMessage(err);
   }
