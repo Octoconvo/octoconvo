@@ -16,15 +16,19 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         NOT: { OR: [{ username: "seeduser1" }, { username: "seeduser2" }] },
         friendsOf: {
           every: {
-            friend: {
-              username: "seeduser4",
+            NOT: {
+              friend: {
+                username: "seeduser4",
+              },
             },
           },
         },
         friends: {
           every: {
-            friendOf: {
-              username: "seeduser4",
+            NOT: {
+              friendOf: {
+                username: "seeduser4",
+              },
             },
           },
         },
