@@ -207,6 +207,42 @@ const deleteUserNotifications = async (userId: string) => {
   });
 };
 
+type CreateCommunityNotification = {
+  communityId: string;
+  triggeredById: string;
+  triggeredForId: string;
+};
+
+const createCommunityNotification = async ({
+  communityId,
+  triggeredById,
+  triggeredForId,
+}: CreateCommunityNotification) => {
+  await prisma.notification.create({
+    data: {
+      triggeredById: triggeredById,
+      triggeredForId: triggeredForId,
+      communityId: communityId,
+      isRead: false,
+      payload: "requested to join",
+      type: "COMMUNITYREQUEST",
+    },
+  });
+};
+
+const getSeedUsersWithLimit = async (limit: number) => {
+  const user = await prisma.user.findMany({
+    where: {
+      username: {
+        startsWith: "seeduser",
+      },
+    },
+    take: limit,
+  });
+
+  return user;
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -218,4 +254,6 @@ export {
   deleteCommunityMessages,
   createCommunitySeedMessage,
   deleteUserNotifications,
+  createCommunityNotification,
+  getSeedUsersWithLimit,
 };
