@@ -199,6 +199,14 @@ const createCommunitySeedMessage = async ({
   });
 };
 
+const deleteUserNotifications = async (userId: string) => {
+  await prisma.notification.deleteMany({
+    where: {
+      OR: [{ triggeredById: userId }, { triggeredForId: userId }],
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -209,4 +217,5 @@ export {
   getSeedCommunitiesWithOwnerAndInbox,
   deleteCommunityMessages,
   createCommunitySeedMessage,
+  deleteUserNotifications,
 };
