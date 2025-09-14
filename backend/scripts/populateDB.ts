@@ -6,6 +6,7 @@ import { populateFriendsDB } from "./populateFriendsScript";
 import { populateMessagesDB } from "./populateMessagesScript";
 import { generateArrayOfSeedUsers } from "../utils/scriptUtils";
 import { createTimer } from "../utils/timeUtils";
+import { populateNotificationsDB } from "./populateNotificationsScript";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
@@ -196,70 +197,11 @@ const populateDB = async (size: number) => {
         start: 0 + seedUsers.length / 4,
         end: seedUsers.length - seedUsers.length / 4,
       });
-
-      // Create community requests notification for seeduser1
-      const user1 = await prisma.user.findUnique({
-        where: {
-          username: "seeduser1",
-        },
-      });
-
-      const users = await prisma.user.findMany({
-        where: {
-          username: {
-            startsWith: "seeduser",
-          },
-          NOT: {
-            AND: [{ username: "seeduser1" }],
-          },
-        },
-        take: 100,
-        orderBy: { username: "asc" },
-      });
-
-      const community1 = await prisma.community.findUnique({
-        where: {
-          name: "seedcommunity1",
-        },
-      });
-
-      const createCommunityReqNotifications = async ({
-        triggeredForId,
-        communityId,
-      }: {
-        triggeredForId: string;
-        communityId: string;
-      }) => {
-        for (const user of users) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          await prisma.notification.create({
-            data: {
-              triggeredById: user.id,
-              triggeredForId: triggeredForId,
-              isRead: false,
-              payload: "requested to join",
-              type: "COMMUNITYREQUEST",
-              communityId: communityId,
-            },
-          });
-        }
-      };
-
-      if (user1 && community1) {
-        await createCommunityReqNotifications({
-          triggeredForId: user1.id,
-          communityId: community1.id,
-        });
-      } else {
-        throw new Error(
-          `user1 && community is false: user1: ${user1} | community: ${community1}`,
-        );
-      }
     };
 
     await populateDatabaseWithSeedData();
     await populateMessagesDB();
+    await populateNotificationsDB();
     await populateFriendsDB();
   } catch (err) {
     if (err instanceof Error) console.log(err.message);
