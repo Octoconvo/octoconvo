@@ -9,26 +9,31 @@ import {
   logUnpopulateSuccessMessage,
 } from "../utils/loggerUtils";
 
-const deleteAllUsersFriends = async (users: User[]) => {
+const destroyUserFriends = async (user: User) => {
+  try {
+    logUnpopulateMessage(`\x1b[31mDeleting user ${user.username}'s friends...`);
+    await deleteUserFriends(user.id);
+    logUnpopulateSuccessMessage(
+      `Successfully deleted user ${user.username}'s friends`,
+    );
+  } catch (error) {
+    logErrorMessage(error);
+  }
+};
+
+const unpopulateUsersFriends = async (users: User[]) => {
   for (const user of users) {
-    try {
-      logUnpopulateMessage(
-        `\x1b[31mDeleting user ${user.username}'s friends...`,
-      );
-      await deleteUserFriends(user.id);
-      logUnpopulateSuccessMessage(
-        `Successfully deleted user ${user.username}'s friends`,
-      );
-    } catch (error) {
-      logErrorMessage(error);
-    }
+    destroyUserFriends(user);
   }
 };
 
 const unpopulateFriendsDB = async () => {
-  const seedUsers: User[] = await getSeedUsers();
-
-  await deleteAllUsersFriends(seedUsers);
+  try {
+    const seedUsers: User[] = await getSeedUsers();
+    await unpopulateUsersFriends(seedUsers);
+  } catch (err) {
+    logErrorMessage(err);
+  }
 };
 
 unpopulateFriendsDB();
