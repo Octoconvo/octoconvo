@@ -243,6 +243,14 @@ const getSeedUsersWithLimit = async (limit: number) => {
   return user;
 };
 
+const deleteCommunityParticipants = async (communityId: string) => {
+  await prisma.participant.deleteMany({
+    where: {
+      communityId: communityId,
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -256,4 +264,5 @@ export {
   deleteUserNotifications,
   createCommunityNotification,
   getSeedUsersWithLimit,
+  deleteCommunityParticipants,
 };
