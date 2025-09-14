@@ -19,6 +19,7 @@
     "messagesUnpopulate": "ts-node scripts/unpopulateMessagesDB.ts",
     "notificationsPopulate": "ts-node scripts/populateNotificationsDB.ts",
     "notificationsUnpopulate": "ts-node scripts/unpopulateNotificationsDB.ts",
+    "participantsUnpopulate": "ts-node scripts/unpopulateParticipantsDB.ts",
     "data-migration:add-community-participantsCount-column": "ts-node ./prisma/migrations/20250714160939_add_community_participants_count_column/data-migration.ts"
   },
   "dependencies": {
