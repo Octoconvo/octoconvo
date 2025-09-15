@@ -1,11 +1,6 @@
-type SeedUser = {
-  username: string;
-  displayName: string;
-  password: string;
-  community: string;
-};
+import { SeedUserGenerator } from "../@types/scriptTypes";
 
-const generateArrayOfSeedUsers = (size: number): SeedUser[] => {
+const generateArrayOfSeedUsers = (size: number): SeedUserGenerator[] => {
   const seedUsers = [];
 
   for (let i = 1; i <= size; i++) {

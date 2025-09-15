@@ -7,4 +7,15 @@ type CommunityWithOwnerAndInbox = Community & {
 
 type CommunitiesWithOwnerAndIInbox = CommunityWithOwnerAndInbox[];
 
-export type { CommunityWithOwnerAndInbox, CommunitiesWithOwnerAndIInbox };
+type SeedUserGenerator = {
+  username: string;
+  displayName: string;
+  password: string;
+  community: string;
+};
+
+export type {
+  CommunityWithOwnerAndInbox,
+  CommunitiesWithOwnerAndIInbox,
+  SeedUserGenerator,
+};
