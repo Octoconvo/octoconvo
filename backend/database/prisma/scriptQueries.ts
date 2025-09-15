@@ -252,8 +252,8 @@ const getSeedUsersWithLimit = async (limit: number) => {
   return user;
 };
 
-const deleteCommunityParticipants = async (communityId: string) => {
-  await prisma.participant.deleteMany({
+const deleteCommunityParticipants = (communityId: string) => {
+  return prisma.participant.deleteMany({
     where: {
       communityId: communityId,
       role: "MEMBER",
@@ -342,6 +342,31 @@ const getCommunityWithOwnerAndInboxByName = async (
   return community;
 };
 
+const deleteCommunityOwner = (communityId: string) => {
+  return prisma.participant.deleteMany({
+    where: {
+      communityId: communityId,
+      role: "OWNER",
+    },
+  });
+};
+
+const deleteCommunity = (communityId: string) => {
+  return prisma.community.delete({
+    where: {
+      id: communityId,
+    },
+  });
+};
+
+const deleteCommunityAndItsData = (communityId: string) => {
+  return prisma.$transaction([
+    deleteCommunityOwner(communityId),
+    deleteCommunityParticipants(communityId),
+    deleteCommunity(communityId),
+  ]);
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -358,4 +383,5 @@ export {
   deleteCommunityParticipants,
   addMemberToCommunity,
   getCommunityWithOwnerAndInboxByName,
+  deleteCommunityAndItsData,
 };
