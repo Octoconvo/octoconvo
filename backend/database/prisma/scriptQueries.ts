@@ -247,6 +247,7 @@ const deleteCommunityParticipants = async (communityId: string) => {
   await prisma.participant.deleteMany({
     where: {
       communityId: communityId,
+      role: "MEMBER",
     },
   });
 };
