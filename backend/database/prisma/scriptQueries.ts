@@ -1,6 +1,15 @@
-import { User, FriendsStatus, Community, Inbox } from "@prisma/client";
+import {
+  User,
+  FriendsStatus,
+  Community,
+  Inbox,
+  ParticipantStatus,
+} from "@prisma/client";
 import prisma from "./client";
-import { CommunitiesWithOwnerAndIInbox } from "../../@types/scriptTypes";
+import {
+  CommunitiesWithOwnerAndIInbox,
+  CommunityWithOwnerAndInbox,
+} from "../../@types/scriptTypes";
 
 const getUserByUsername = async (username: string): Promise<User | null> => {
   return await prisma.user.findUnique({
@@ -252,6 +261,87 @@ const deleteCommunityParticipants = async (communityId: string) => {
   });
 };
 
+type CreateCommunityMember = {
+  communityId: string;
+  userId: string;
+  status: ParticipantStatus;
+};
+const createCommunityMember = ({
+  status,
+  userId,
+  communityId,
+}: CreateCommunityMember) => {
+  return prisma.participant.create({
+    data: {
+      role: "MEMBER",
+      status: status,
+      communityId: communityId,
+      userId: userId,
+    },
+  });
+};
+
+type IncrementCommunityParticipantsCount = {
+  communityId: string;
+  count: number;
+};
+
+const incrementCommunityParticipantsCount = ({
+  communityId,
+  count,
+}: IncrementCommunityParticipantsCount) => {
+  return prisma.community.update({
+    where: {
+      id: communityId,
+    },
+    data: {
+      participantsCount: {
+        increment: count,
+      },
+    },
+  });
+};
+
+type AddMemberToCommunity = {
+  communityId: string;
+  userId: string;
+  status: ParticipantStatus;
+  count: number;
+};
+
+const addMemberToCommunity = async ({
+  communityId,
+  userId,
+  status,
+  count,
+}: AddMemberToCommunity) => {
+  prisma.$transaction([
+    createCommunityMember({ communityId, userId, status }),
+    incrementCommunityParticipantsCount({ communityId, count }),
+  ]);
+};
+
+const getCommunityWithOwnerAndInboxByName = async (
+  name: string,
+): Promise<CommunityWithOwnerAndInbox | null> => {
+  const community: CommunityWithOwnerAndInbox | null =
+    await prisma.community.findFirst({
+      where: {
+        name: name,
+      },
+      include: {
+        inbox: true,
+      },
+    });
+
+  if (community) {
+    const owner = await getCommunityOwner(community.id);
+    community.owner = owner;
+  }
+
+  return community;
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -266,4 +356,6 @@ export {
   createCommunityNotification,
   getSeedUsersWithLimit,
   deleteCommunityParticipants,
+  addMemberToCommunity,
+  getCommunityWithOwnerAndInboxByName,
 };
