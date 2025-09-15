@@ -178,8 +178,8 @@ const getSeedCommunitiesWithOwnerAndInbox =
     return communities;
   };
 
-const deleteCommunityMessages = async (communityId: string) => {
-  await prisma.message.deleteMany({
+const deleteCommunityMessages = (communityId: string) => {
+  return prisma.message.deleteMany({
     where: {
       inbox: {
         communityId: communityId,
@@ -351,6 +351,22 @@ const deleteCommunityOwner = (communityId: string) => {
   });
 };
 
+const deleteCommunityNotifications = (communityId: string) => {
+  return prisma.notification.deleteMany({
+    where: {
+      communityId: communityId,
+    },
+  });
+};
+
+const deleteCommunityInbox = (communityId: string) => {
+  return prisma.inbox.deleteMany({
+    where: {
+      communityId: communityId,
+    },
+  });
+};
+
 const deleteCommunity = (communityId: string) => {
   return prisma.community.delete({
     where: {
@@ -363,6 +379,9 @@ const deleteCommunityAndItsData = (communityId: string) => {
   return prisma.$transaction([
     deleteCommunityOwner(communityId),
     deleteCommunityParticipants(communityId),
+    deleteCommunityMessages(communityId),
+    deleteCommunityInbox(communityId),
+    deleteCommunityNotifications(communityId),
     deleteCommunity(communityId),
   ]);
 };
