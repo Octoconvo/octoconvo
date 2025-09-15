@@ -7,6 +7,7 @@ import { populateMessagesDB } from "./populateMessagesScript";
 import { generateArrayOfSeedUsers } from "../utils/scriptUtils";
 import { createTimer } from "../utils/timeUtils";
 import { populateNotificationsDB } from "./populateNotificationsScript";
+import { populateParticipantsDB } from "./populateParticipantsScript";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
@@ -89,117 +90,10 @@ const populateDB = async (size: number) => {
       });
 
       await Promise.all(createSeedUserAndItsData);
-
-      const populateCommunitiesWithParticipants = async ({
-        start,
-        end,
-      }: {
-        start: number;
-        end: number;
-      }) => {
-        seedUsers.map(async (seedUser, index) => {
-          if (index > start && index <= end) {
-            console.log(`\x1b[36mAdding participants to ${seedUser.community}`);
-            const community = await prisma.community.findUnique({
-              where: {
-                name: seedUser.community,
-              },
-            });
-
-            if (community) {
-              for (let i = 0; i < index - 2; i++) {
-                if (i !== index) {
-                  const user = await prisma.user.findUnique({
-                    where: {
-                      username: seedUsers[i].username,
-                    },
-                  });
-
-                  type ParticipantStatus = "PENDING" | "ACTIVE";
-
-                  type AddParticipant = {
-                    status: ParticipantStatus;
-                    userId: string;
-                  };
-
-                  const createAddParticipant = ({
-                    status,
-                    userId,
-                  }: AddParticipant) =>
-                    prisma.participant.create({
-                      data: {
-                        role: "MEMBER",
-                        status: status,
-                        communityId: community?.id,
-                        userId: userId,
-                      },
-                    });
-
-                  type CreateIncrementParticipantsCount = {
-                    status: ParticipantStatus;
-                  };
-
-                  const createIncrementParticipantsCount = ({
-                    status,
-                  }: CreateIncrementParticipantsCount) =>
-                    prisma.community.update({
-                      where: {
-                        id: community.id,
-                      },
-                      data: {
-                        participantsCount: {
-                          increment: status === "ACTIVE" ? 1 : 0,
-                        },
-                      },
-                    });
-
-                  if (user) {
-                    const addParticipantToTheCommunity = async () => {
-                      const status =
-                        (i + index) % 2 === 0 ? "PENDING" : "ACTIVE";
-
-                      console.log(
-                        `\x1b[36mAdding ${user.username} as a` +
-                          ` ${community.name}'s ${status} participant`,
-                      );
-
-                      const addParticipant = createAddParticipant({
-                        status,
-                        userId: user.id,
-                      });
-
-                      const incrementParticipantsCount =
-                        createIncrementParticipantsCount({ status });
-
-                      await prisma.$transaction([
-                        addParticipant,
-                        incrementParticipantsCount,
-                      ]);
-                    };
-
-                    await addParticipantToTheCommunity();
-                  }
-                }
-              }
-            }
-          }
-        });
-      };
-
-      /* 
-        Add participants to communities starting in the middle to simulate
-        different participants density with higher density in the community
-        positioned in the middle the array to improve the cursor based testing.
-        This way we can test the fetching communities with equal participants
-        with communities created before and after our cursor's createdAt.
-      */
-      await populateCommunitiesWithParticipants({
-        start: 0 + seedUsers.length / 4,
-        end: seedUsers.length - seedUsers.length / 4,
-      });
     };
 
     await populateDatabaseWithSeedData();
+    await populateParticipantsDB(size);
     await populateMessagesDB();
     await populateNotificationsDB();
     await populateFriendsDB();
