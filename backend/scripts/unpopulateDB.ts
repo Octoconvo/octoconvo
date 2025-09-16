@@ -11,6 +11,14 @@ const unpopulateDB = async () => {
     },
   });
 
+  const seedLoneUsers = await prisma.user.findMany({
+    where: {
+      username: {
+        startsWith: "seedloneuser",
+      },
+    },
+  });
+
   const deleteUserData = async ({ user }: { user: User }) => {
     console.log(`\x1b[33mDeleting ${user.username}'s associated data`);
     type CommunityWithInbox = Community & {
@@ -131,6 +139,10 @@ const unpopulateDB = async () => {
 
     for (const user of seedUsers) {
       await deleteUser({ username: user.username });
+    }
+
+    for (const seedLoneUser of seedLoneUsers) {
+      await deleteUser({ username: seedLoneUser.username });
     }
   } catch (err) {
     if (err instanceof Error) {
