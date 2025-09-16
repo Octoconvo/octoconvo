@@ -1,6 +1,6 @@
 import { SeedUserGenerator } from "../@types/scriptTypes";
 
-const generateArrayOfSeedUsers = (size: number): SeedUserGenerator[] => {
+const generateSeedUserGenerators = (size: number): SeedUserGenerator[] => {
   const seedUsers = [];
 
   for (let i = 1; i <= size; i++) {
@@ -17,4 +17,4 @@ const generateArrayOfSeedUsers = (size: number): SeedUserGenerator[] => {
   return seedUsers;
 };
 
-export { generateArrayOfSeedUsers };
+export { generateSeedUserGenerators };

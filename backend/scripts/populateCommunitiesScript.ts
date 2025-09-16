@@ -8,7 +8,7 @@ import {
   logPopulateMessage,
   logPopulateSuccessMessage,
 } from "../utils/loggerUtils";
-import { generateArrayOfSeedUsers } from "../utils/scriptUtils";
+import { generateSeedUserGenerators } from "../utils/scriptUtils";
 
 type GenerateUserCommunity = {
   name: string;
@@ -42,8 +42,8 @@ const generateUserCommunity = async ({
   }
 };
 
-const populateCommunities = async (users: SeedUserGenerator[]) => {
-  for (const user of users) {
+const populateCommunities = async (seedUserGenerators: SeedUserGenerator[]) => {
+  for (const user of seedUserGenerators) {
     await generateUserCommunity({
       name: user.community,
       bio: user.community,
@@ -53,8 +53,8 @@ const populateCommunities = async (users: SeedUserGenerator[]) => {
 };
 
 const populateCommunitiesDB = async (size: number) => {
-  const seedUsersArrays = generateArrayOfSeedUsers(size);
-  await populateCommunities(seedUsersArrays);
+  const seedUserGenerators = generateSeedUserGenerators(size);
+  await populateCommunities(seedUserGenerators);
 };
 
 export { populateCommunitiesDB };

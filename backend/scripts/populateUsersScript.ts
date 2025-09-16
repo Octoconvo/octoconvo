@@ -5,7 +5,7 @@ import {
   createUser,
 } from "../database/prisma/scriptQueries";
 import { SeedUserGenerator } from "../@types/scriptTypes";
-import { generateArrayOfSeedUsers } from "../utils/scriptUtils";
+import { generateSeedUserGenerators } from "../utils/scriptUtils";
 import {
   logPopulateMessage,
   logPopulateSuccessMessage,
@@ -48,8 +48,8 @@ const generateSeedUser = async ({
   }
 };
 
-const populateUsers = async (users: SeedUserGenerator[]) => {
-  const createUsersPromises = users.map(user => {
+const populateUsers = async (seedUserGenerators: SeedUserGenerator[]) => {
+  const createUsersPromises = seedUserGenerators.map(user => {
     return bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
       if (err) {
         logErrorMessage(err);
@@ -67,10 +67,10 @@ const populateUsers = async (users: SeedUserGenerator[]) => {
 };
 
 const populateUsersDB = async (size: number) => {
-  const seedUsersGenerators = generateArrayOfSeedUsers(size);
+  const seedUserGenerators = generateSeedUserGenerators(size);
 
   try {
-    await populateUsers(seedUsersGenerators);
+    await populateUsers(seedUserGenerators);
     await generateSeedLoneUser({
       index: 1,
     });

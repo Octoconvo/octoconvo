@@ -13,7 +13,7 @@ import {
   logPopulateMessage,
   logPopulateSuccessMessage,
 } from "../utils/loggerUtils";
-import { generateArrayOfSeedUsers } from "../utils/scriptUtils";
+import { generateSeedUserGenerators } from "../utils/scriptUtils";
 
 const isNotOwner = (userId: string, ownerId: string): boolean => {
   return userId !== ownerId;
@@ -178,15 +178,15 @@ type GetUsersAndCommunitiesData = {
 };
 
 const getUsersAndCommunities = async (
-  seedUsers: SeedUserGenerator[],
+  seedUserGenerators: SeedUserGenerator[],
 ): Promise<GetUsersAndCommunitiesData> => {
   const users: User[] = [];
   const communities: CommunityWithOwnerAndInbox[] = [];
 
-  for (const seedUser of seedUsers) {
-    const user = await getUserByUsername(seedUser.username);
+  for (const seedUserGenerator of seedUserGenerators) {
+    const user = await getUserByUsername(seedUserGenerator.username);
     const community = await getCommunityWithOwnerAndInboxByName(
-      seedUser.community,
+      seedUserGenerator.community,
     );
 
     if (user) {
@@ -206,11 +206,10 @@ const getUsersAndCommunities = async (
 
 const populateParticipantsDB = async (size: number) => {
   try {
-    const seedUsersArrays = generateArrayOfSeedUsers(size);
+    const seedUserGenerators = generateSeedUserGenerators(size);
     const { users: seedUsers, communities: seedCommunities } =
-      await getUsersAndCommunities(seedUsersArrays);
+      await getUsersAndCommunities(seedUserGenerators);
 
-    console.log({ seedUsers, seedCommunities });
     await populateCommunitiesParticipants({
       communities: seedCommunities,
       users: seedUsers,
