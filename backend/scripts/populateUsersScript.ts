@@ -41,7 +41,25 @@ const generateSeedUser = async ({
 }: GenerateSeedUser) => {
   try {
     logPopulateMessage(`Creating ${username}...`);
-    await createUser({ username, displayName, password });
+    const createUserPromise = async () =>
+      new Promise((resolve, reject) => {
+        bcrypt.hash(password, 10, async (err, hashedPassword) => {
+          if (err) {
+            logErrorMessage(err);
+            reject(err);
+          } else {
+            await createUser({
+              username,
+              displayName,
+              password: hashedPassword,
+            });
+            resolve(1);
+          }
+        });
+      });
+
+    await createUserPromise();
+
     logPopulateSuccessMessage(`Successfully created ${username}`);
   } catch (err) {
     logErrorMessage(err);
@@ -49,21 +67,13 @@ const generateSeedUser = async ({
 };
 
 const populateUsers = async (seedUserGenerators: SeedUserGenerator[]) => {
-  const createUsersPromises = seedUserGenerators.map(user => {
-    return bcrypt.hash(user.password, 10, async (err, hashedPassword) => {
-      if (err) {
-        logErrorMessage(err);
-      } else {
-        await generateSeedUser({
-          username: user.username,
-          displayName: user.displayName,
-          password: hashedPassword,
-        });
-      }
+  for (const seedUserGenerator of seedUserGenerators) {
+    await generateSeedUser({
+      username: seedUserGenerator.username,
+      displayName: seedUserGenerator.displayName,
+      password: seedUserGenerator.password,
     });
-  });
-
-  await Promise.all(createUsersPromises);
+  }
 };
 
 const populateUsersDB = async (size: number) => {
