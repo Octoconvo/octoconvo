@@ -386,6 +386,34 @@ const deleteCommunityAndItsData = (communityId: string) => {
   ]);
 };
 
+type CreateCommunity = {
+  name: string;
+  bio: string;
+  ownerId: string;
+};
+
+const createCommunity = ({ name, bio, ownerId }: CreateCommunity) => {
+  return prisma.community.create({
+    data: {
+      name: name,
+      bio: bio,
+      inbox: {
+        create: {
+          inboxType: "COMMUNITY",
+        },
+      },
+      participantsCount: 1,
+      participants: {
+        create: {
+          userId: ownerId,
+          role: "OWNER",
+          status: "ACTIVE",
+        },
+      },
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -403,4 +431,5 @@ export {
   addMemberToCommunity,
   getCommunityWithOwnerAndInboxByName,
   deleteCommunityAndItsData,
+  createCommunity,
 };
