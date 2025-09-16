@@ -7,7 +7,7 @@ const logUnpopulateMessage = (message: string) => {
 };
 
 const logUnpopulateSuccessMessage = (message: string) => {
-  console.log(`\x1b[31m[${message}`);
+  console.log(`\x1b[31m${message}`);
 };
 
 const logPopulateSuccessMessage = (message: string) => {
