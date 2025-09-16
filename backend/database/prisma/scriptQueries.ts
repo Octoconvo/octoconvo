@@ -446,6 +446,24 @@ const createUser = async ({ username, displayName, password }: CreateUser) => {
   });
 };
 
+const getSeedLoneUsers = async () => {
+  return prisma.user.findMany({
+    where: {
+      username: {
+        startsWith: "seedloneuser",
+      },
+    },
+  });
+};
+
+const deleteUser = async (id: string) => {
+  return prisma.user.delete({
+    where: {
+      id: id,
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -466,4 +484,6 @@ export {
   createCommunity,
   createSeedLoneUser,
   createUser,
+  getSeedLoneUsers,
+  deleteUser,
 };
