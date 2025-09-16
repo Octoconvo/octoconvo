@@ -8,6 +8,7 @@ import { createTimer } from "../utils/timeUtils";
 import { populateNotificationsDB } from "./populateNotificationsScript";
 import { populateParticipantsDB } from "./populateParticipantsScript";
 import { populateCommunitiesDB } from "./populateCommunitiesScript";
+import { generateSeedLoneUser } from "./populateUsersScript";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
@@ -59,6 +60,7 @@ const populateDB = async (size: number) => {
     };
 
     await populateDatabaseWithSeedData();
+    await generateSeedLoneUser({ index: 1 });
     await populateCommunitiesDB(size);
     await populateParticipantsDB(size);
     await populateMessagesDB();
