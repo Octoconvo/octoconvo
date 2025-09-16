@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import { Community, Inbox } from "@prisma/client";
 import prisma from "../database/prisma/client";
 import bcrypt from "bcrypt";
 import { populateFriendsDB } from "./populateFriendsScript";
@@ -8,6 +7,7 @@ import { generateArrayOfSeedUsers } from "../utils/scriptUtils";
 import { createTimer } from "../utils/timeUtils";
 import { populateNotificationsDB } from "./populateNotificationsScript";
 import { populateParticipantsDB } from "./populateParticipantsScript";
+import { populateCommunitiesDB } from "./populateCommunitiesScript";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
@@ -49,41 +49,7 @@ const populateDB = async (size: number) => {
               return user;
             };
 
-            const user = await createUser();
-
-            type CommunityWithInbox = Community & { inbox: Inbox };
-
-            const createCommunity = async (): Promise<CommunityWithInbox> => {
-              const community = await prisma.community.create({
-                data: {
-                  name: seedUser.community,
-                  bio: seedUser.community,
-                  inbox: {
-                    create: {
-                      inboxType: "COMMUNITY",
-                    },
-                  },
-                  participantsCount: 1,
-                  participants: {
-                    create: {
-                      userId: user.id,
-                      role: "OWNER",
-                      status: "ACTIVE",
-                      memberSince: new Date(),
-                    },
-                  },
-                },
-                include: {
-                  inbox: true,
-                },
-              });
-
-              console.log(`\x1b[36mCreated community ${seedUser.community}...`);
-
-              return community as CommunityWithInbox;
-            };
-
-            await createCommunity();
+            await createUser();
             resolve(1);
           }),
         );
@@ -93,6 +59,7 @@ const populateDB = async (size: number) => {
     };
 
     await populateDatabaseWithSeedData();
+    await populateCommunitiesDB(size);
     await populateParticipantsDB(size);
     await populateMessagesDB();
     await populateNotificationsDB();
