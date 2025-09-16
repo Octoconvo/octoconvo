@@ -414,6 +414,21 @@ const createCommunity = ({ name, bio, ownerId }: CreateCommunity) => {
   });
 };
 
+// Create a special seecuser who does not have any relations
+type CreateSeedLoneUser = {
+  index: number;
+  password: string;
+};
+const createSeedLoneUser = async ({ index, password }: CreateSeedLoneUser) => {
+  await prisma.user.create({
+    data: {
+      username: `seedloneuser${index}`,
+      displayName: `seedloneuser${index}`,
+      password: password,
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -432,4 +447,5 @@ export {
   getCommunityWithOwnerAndInboxByName,
   deleteCommunityAndItsData,
   createCommunity,
+  createSeedLoneUser,
 };
