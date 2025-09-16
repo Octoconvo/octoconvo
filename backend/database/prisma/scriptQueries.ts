@@ -419,11 +419,28 @@ type CreateSeedLoneUser = {
   index: number;
   password: string;
 };
+
 const createSeedLoneUser = async ({ index, password }: CreateSeedLoneUser) => {
-  await prisma.user.create({
+  return prisma.user.create({
     data: {
       username: `seedloneuser${index}`,
       displayName: `seedloneuser${index}`,
+      password: password,
+    },
+  });
+};
+
+type CreateUser = {
+  username: string;
+  displayName: string;
+  password: string;
+};
+
+const createUser = async ({ username, displayName, password }: CreateUser) => {
+  return prisma.user.create({
+    data: {
+      username: username,
+      displayName: displayName,
       password: password,
     },
   });
@@ -448,4 +465,5 @@ export {
   deleteCommunityAndItsData,
   createCommunity,
   createSeedLoneUser,
+  createUser,
 };
