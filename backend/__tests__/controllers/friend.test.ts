@@ -227,6 +227,7 @@ describe("Test friend add post controller", () => {
 
       friendNONE = await prisma.user.findFirst({
         where: {
+          NOT: { username: "seeduser1" },
           friendsOf: {
             every: {
               NOT: {
@@ -238,6 +239,7 @@ describe("Test friend add post controller", () => {
           },
         },
       });
+      console.log({ friendNONE });
     } catch (err) {
       console.error(err);
     }
