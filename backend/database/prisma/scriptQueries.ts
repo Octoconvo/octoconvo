@@ -464,6 +464,14 @@ const deleteUser = async (id: string) => {
   });
 };
 
+const deleteUserMessages = async (id: string) => {
+  return prisma.message.deleteMany({
+    where: {
+      authorId: id,
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -486,4 +494,5 @@ export {
   createUser,
   getSeedLoneUsers,
   deleteUser,
+  deleteUserMessages,
 };
