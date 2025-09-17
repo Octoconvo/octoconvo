@@ -16,4 +16,7 @@ const createTimer = () => {
   };
 };
 
-export { createTimer };
+const pause = (miliSecond: number) =>
+  new Promise(resolve => setTimeout(resolve, miliSecond));
+
+export { createTimer, pause };
