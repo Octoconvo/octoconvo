@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import prisma from "./database/prisma/client";
+import prisma from "../database/prisma/client";
 
 const unpopulateDB = async () => {
   const clientUsers = [

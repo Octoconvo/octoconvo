@@ -153,7 +153,7 @@ describe("Test user's friendship status get controller with seeduser1", () => {
   );
 
   test("Return NONE friendship status", done => {
-    const usernameQuery = "seeduser4";
+    const usernameQuery = "seedloneuser1";
     agent
       .get(`/friend/friendship-status?username=${usernameQuery}`)
       .expect("Content-type", /json/)
@@ -227,6 +227,7 @@ describe("Test friend add post controller", () => {
 
       friendNONE = await prisma.user.findFirst({
         where: {
+          NOT: { username: "seeduser1" },
           friendsOf: {
             every: {
               NOT: {
@@ -238,13 +239,14 @@ describe("Test friend add post controller", () => {
           },
         },
       });
+      console.log({ friendNONE });
     } catch (err) {
       console.error(err);
     }
   });
 
   afterEach(async () => {
-    if (friendNONE) {
+    if (friendNONE?.username && seedUser1?.username) {
       try {
         const friends = await prisma.friend.findMany({
           where: {
@@ -578,7 +580,13 @@ describe("Test friend request post controller", () => {
     try {
       friendNONE1 = await prisma.user.findFirst({
         where: {
-          NOT: { AND: [{ username: "seeduser1" }, { username: "seeduser2" }] },
+          NOT: {
+            OR: [
+              { username: "seeduser1" },
+              { username: "seeduser2" },
+              { username: "seeduser4" },
+            ],
+          },
           friendsOf: {
             every: {
               friend: {

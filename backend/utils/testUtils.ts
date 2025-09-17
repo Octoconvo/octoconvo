@@ -44,4 +44,14 @@ const getValidationErrorMsg = ({
   return msg;
 };
 
-export { login, getValidationErrorMsg };
+const generateArrayOfInts = (size: number): number[] => {
+  const array: number[] = [];
+
+  for (let i = 0; i < size; i++) {
+    array.push(i + 1);
+  }
+
+  return array;
+};
+
+export { login, getValidationErrorMsg, generateArrayOfInts };

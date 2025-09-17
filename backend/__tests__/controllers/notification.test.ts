@@ -95,7 +95,7 @@ describe(
     });
 
     test(
-      "The returned unread notification count should be 0 if the user is" +
+      "The returned unread notification count should be 100 if the user is" +
         " authenticated",
       done => {
         agent
@@ -104,7 +104,7 @@ describe(
           .expect((res: Response) => {
             const unreadNotificationCount = res.body.unreadNotificationCount;
 
-            expect(unreadNotificationCount).toBe(0);
+            expect(unreadNotificationCount).toBe(100);
           })
           .expect(200, done);
       },
