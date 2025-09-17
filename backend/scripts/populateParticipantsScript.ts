@@ -1,19 +1,17 @@
-import { ParticipantStatus, User } from "@prisma/client";
+import { ParticipantStatus } from "@prisma/client";
 import {
   addMemberToCommunity,
   getCommunityWithOwnerAndInboxByName,
   getUserByUsername,
 } from "../database/prisma/scriptQueries";
 import { logErrorMessage } from "../utils/error";
-import {
-  CommunityWithOwnerAndInbox,
-  SeedUserGenerator,
-} from "../@types/scriptTypes";
+import { SeedUserGenerator } from "../@types/scriptTypes";
 import {
   logPopulateMessage,
   logPopulateSuccessMessage,
 } from "../utils/loggerUtils";
 import { generateSeedUserGenerators } from "../utils/scriptUtils";
+import { breakArrayIntoSubArrays } from "../utils/array";
 
 const isNotOwner = (userId: string, ownerId: string): boolean => {
   return userId !== ownerId;
@@ -81,27 +79,29 @@ const incrementActiveParticipantsCount = ({
 };
 
 type GenerateCommunityParticipants = {
-  users: User[];
-  community: CommunityWithOwnerAndInbox;
+  seedUserGenerators: SeedUserGenerator[];
+  communityName: string;
   size: number;
 };
 
 const generateCommunityParticipants = async ({
-  users,
-  community,
+  seedUserGenerators,
+  communityName,
   size,
 }: GenerateCommunityParticipants) => {
+  logPopulateMessage(`Creating ${size} participants for ${communityName}...`);
   let activeParticipantsCount = 0;
   let pendingParticipantsCount = 0;
 
-  logPopulateMessage(`Creating ${size} participants for ${community.name}...`);
+  const community = await getCommunityWithOwnerAndInboxByName(communityName);
   for (let i = 0; i < size; i++) {
-    const userId: string = users[i].id;
-    const ownerId: string = community.owner?.id || "";
+    const user = await getUserByUsername(seedUserGenerators[i].username);
+    const userId: string = user?.id || "";
+    const ownerId: string = community?.owner?.id || "";
     const status: ParticipantStatus = i % 2 === 0 ? "PENDING" : "ACTIVE";
     const count = status === "ACTIVE" ? 1 : 0;
 
-    if (ownerId && isNotOwner(userId, ownerId)) {
+    if (ownerId && userId && community && isNotOwner(userId, ownerId)) {
       await generateCommunityParticipant({
         userId,
         communityId: community.id,
@@ -127,7 +127,7 @@ const generateCommunityParticipants = async ({
   logPopulateSuccessMessage(
     `Successfully created ${activeParticipantsCount} active participants and` +
       ` ${pendingParticipantsCount} pending participants for` +
-      ` ${community.name}. \nTOTAL: ${totalParticipantsCount}`,
+      ` ${communityName}. \nTOTAL: ${totalParticipantsCount}`,
   );
 };
 
@@ -145,74 +145,58 @@ const isWithinBoundary = ({
   return toCompare > start && toCompare <= end;
 };
 
+type CreateCreateParticipantsPromises = {
+  seedUserGenerators: SeedUserGenerator[];
+  seedUserGeneratorsSubArray: SeedUserGenerator[];
+};
+
+const createCreateParticipantsPromises = ({
+  seedUserGenerators,
+  seedUserGeneratorsSubArray,
+}: CreateCreateParticipantsPromises) => {
+  return seedUserGeneratorsSubArray.map(async seedUserGenerator => {
+    const start = Math.floor(seedUserGenerators.length / 4);
+    const end = seedUserGenerators.length - start;
+    const currentIndex = seedUserGenerators.findIndex(
+      item => item.community === seedUserGenerator.community,
+    );
+    if (isWithinBoundary({ start, end, toCompare: currentIndex })) {
+      await generateCommunityParticipants({
+        seedUserGenerators,
+        communityName: seedUserGenerator.community,
+        size: currentIndex,
+      });
+    }
+  });
+};
+
 type PopulateCommunitiesParticipants = {
-  communities: CommunityWithOwnerAndInbox[];
-  users: User[];
+  seedUserGenerators: SeedUserGenerator[];
 };
 
 const populateCommunitiesParticipants = async ({
-  communities,
-  users,
+  seedUserGenerators,
 }: PopulateCommunitiesParticipants) => {
-  const start = Math.floor(users.length / 4);
-  const end = users.length - start;
+  const seedUserGeneratorsSubArrays = breakArrayIntoSubArrays({
+    array: seedUserGenerators,
+    subArraySize: 100,
+  });
 
-  const createCommunitiesParticipantsPromises = communities.map(
-    async (community, index) => {
-      if (isWithinBoundary({ start, end, toCompare: index })) {
-        await generateCommunityParticipants({
-          users,
-          community,
-          size: index,
-        });
-      }
-    },
-  );
-
-  await Promise.all(createCommunitiesParticipantsPromises);
-};
-
-type GetUsersAndCommunitiesData = {
-  users: User[];
-  communities: CommunityWithOwnerAndInbox[];
-};
-
-const getUsersAndCommunities = async (
-  seedUserGenerators: SeedUserGenerator[],
-): Promise<GetUsersAndCommunitiesData> => {
-  const users: User[] = [];
-  const communities: CommunityWithOwnerAndInbox[] = [];
-
-  for (const seedUserGenerator of seedUserGenerators) {
-    const user = await getUserByUsername(seedUserGenerator.username);
-    const community = await getCommunityWithOwnerAndInboxByName(
-      seedUserGenerator.community,
+  for (const seedUserGeneratorsSubArray of seedUserGeneratorsSubArrays) {
+    await Promise.all(
+      createCreateParticipantsPromises({
+        seedUserGenerators,
+        seedUserGeneratorsSubArray,
+      }),
     );
-
-    if (user) {
-      users.push(user);
-    }
-
-    if (community) {
-      communities.push(community);
-    }
   }
-
-  return {
-    users,
-    communities,
-  };
 };
 
 const populateParticipantsDB = async (size: number) => {
   try {
     const seedUserGenerators = generateSeedUserGenerators(size);
-    const { users: seedUsers, communities: seedCommunities } =
-      await getUsersAndCommunities(seedUserGenerators);
-
     await populateCommunitiesParticipants({
-      communities: seedCommunities,
-      users: seedUsers,
+      seedUserGenerators,
     });
   } catch (err) {
     logErrorMessage(err);
