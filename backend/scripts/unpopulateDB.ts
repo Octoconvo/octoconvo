@@ -15,6 +15,7 @@ import {
   logUnpopulateSuccessMessage,
 } from "../utils/loggerUtils";
 import { createTimer } from "../utils/timeUtils";
+import { breakArrayIntoSubArrays } from "../utils/array";
 
 const destroyCommunity = async (community: Community) => {
   try {
@@ -28,9 +29,20 @@ const destroyCommunity = async (community: Community) => {
   }
 };
 
-const unpopulateCommunities = async (communities: Community[]) => {
-  for (const community of communities) {
+const createDeleteCommunitiesPromises = (communities: Community[]) => {
+  return communities.map(async community => {
     await destroyCommunity(community);
+  });
+};
+
+const unpopulateCommunities = async (communities: Community[]) => {
+  const communitiesSubArrays = breakArrayIntoSubArrays({
+    array: communities,
+    subArraySize: 10,
+  });
+
+  for (const communitiesSubArray of communitiesSubArrays) {
+    await Promise.all(createDeleteCommunitiesPromises(communitiesSubArray));
   }
 };
 
@@ -48,9 +60,20 @@ const destroyUser = async (user: User) => {
   }
 };
 
-const unpopulateUsers = async (users: User[]) => {
-  for (const user of users) {
+const createDeleteUsersPromises = (users: User[]) => {
+  return users.map(async user => {
     await destroyUser(user);
+  });
+};
+
+const unpopulateUsers = async (users: User[]) => {
+  const usersSubArrays = breakArrayIntoSubArrays({
+    array: users,
+    subArraySize: 10,
+  });
+
+  for (const usersSubArray of usersSubArrays) {
+    await Promise.all(createDeleteUsersPromises(usersSubArray));
   }
 };
 
