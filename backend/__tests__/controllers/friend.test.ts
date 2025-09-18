@@ -239,7 +239,6 @@ describe("Test friend add post controller", () => {
           },
         },
       });
-      console.log({ friendNONE });
     } catch (err) {
       console.error(err);
     }

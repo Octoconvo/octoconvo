@@ -72,7 +72,6 @@ const deleteParticipantByIdTransaction = async ({
   tx: Prisma.TransactionClient;
   id: string;
 }) => {
-  console.log({ id }, "delete participant");
   return tx.participant.delete({
     where: { id: id },
   });

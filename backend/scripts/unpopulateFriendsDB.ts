@@ -3,7 +3,7 @@ import {
   deleteUserFriends,
 } from "../database/prisma/scriptQueries";
 import { User } from "@prisma/client";
-import { logErrorMessage } from "../utils/error";
+import { logErrorMessage } from "../utils/loggerUtils";
 import {
   logUnpopulateMessage,
   logUnpopulateSuccessMessage,

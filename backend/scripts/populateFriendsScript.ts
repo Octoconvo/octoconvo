@@ -5,7 +5,7 @@ import {
   getSeedUsersToPopulateFriends,
 } from "../database/prisma/scriptQueries";
 import { isEven } from "../utils/numberUtils";
-import { logErrorMessage } from "../utils/error";
+import { logErrorMessage } from "../utils/loggerUtils";
 import {
   logPopulateMessage,
   logPopulateSuccessMessage,

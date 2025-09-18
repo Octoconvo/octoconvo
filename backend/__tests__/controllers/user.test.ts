@@ -192,7 +192,6 @@ describe("Test user login using local strategy", () => {
         const message = res.body.message;
         const error = res.body.error.validationError;
 
-        console.log(error);
         expect(message).toEqual("Failed to log in");
         expect(error[0].msg).toEqual(
           "Username must only contain alphanumeric characters and underscores",

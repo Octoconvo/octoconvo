@@ -110,9 +110,7 @@ const user_sign_up_post = [
           },
         });
       } catch (err) {
-        console.log(err);
         if (err instanceof PrismaClientKnownRequestError) {
-          console.log(err.code);
           if (err.code.toLowerCase() === "p2002") {
             res.status(422).json({
               message: "Failed to create a new account",
@@ -148,8 +146,6 @@ const user_log_in_post = [
   userValidation.password,
   asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
-
-    console.log(errors.array());
 
     errors.array().map((error: ValidationError) => {
       if (error.type === "field" && error.path === "password") {

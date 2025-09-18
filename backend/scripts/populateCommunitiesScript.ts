@@ -3,7 +3,7 @@ import {
   createCommunity,
   getUserByUsername,
 } from "../database/prisma/scriptQueries";
-import { logErrorMessage } from "../utils/error";
+import { logErrorMessage } from "../utils/loggerUtils";
 import {
   logPopulateMessage,
   logPopulateSuccessMessage,

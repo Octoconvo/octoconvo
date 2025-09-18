@@ -381,7 +381,6 @@ const user_friends_get = [
       getLastItemInTheArray<UserFriendData>(userFriends);
     let nextCursor: string | false = false;
 
-    console.log({ lastFriendOnTheList });
     if (lastFriendOnTheList) {
       nextCursor = constructFriendCursor({
         id: lastFriendOnTheList.friendId,

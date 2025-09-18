@@ -1,6 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import logger from "morgan";
+import pinoHttp from "pino-http";
 import session from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
 import prisma from "./database/prisma/client";
@@ -19,14 +19,29 @@ import exploreRouter from "./routes/explore";
 import notificationRouter from "./routes/notification";
 import friendRouter from "./routes/friend";
 
+const NODE_ENV = process.env.NODE_ENV;
+const isDev = NODE_ENV?.toLowerCase() == "development";
+
+const logger = pinoHttp(
+  isDev
+    ? {
+        transport: {
+          target: "pino-pretty",
+          options: {
+            colorarize: true,
+          },
+        },
+      }
+    : {},
+);
 const app = express();
-app.use(logger("dev"));
 app.use(
   cors({
     origin: process.env.ORIGIN,
     credentials: true,
   }),
 );
+app.use(logger);
 app.use(
   session({
     cookie: {

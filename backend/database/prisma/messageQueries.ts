@@ -84,11 +84,6 @@ const getMessages = async ({
   limit: number | null;
   direction: "forward" | "backward";
 }) => {
-  console.log({
-    limit,
-    cursor,
-    direction,
-  });
   const messages = await prisma.message.findMany({
     where: {
       inboxId: inboxId,

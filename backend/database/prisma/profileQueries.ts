@@ -75,10 +75,6 @@ const searchProfiles = async ({
   };
   limit: number;
 }) => {
-  console.log({
-    cursor,
-    name,
-  });
   const profiles = await prisma.user.findMany({
     where: {
       ...(name

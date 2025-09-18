@@ -33,11 +33,6 @@ const notificationValidation = {
 
       // validate cusor's createdAt and id fields
       if (!(isUUID(id) && isISOString(createdAt))) {
-        console.log({
-          isUUID: isUUID(id),
-          isISOString: isISOString(createdAt),
-          cursor,
-        });
         throw new Error("Cursor value is invalid");
       }
 
