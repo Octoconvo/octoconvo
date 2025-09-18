@@ -3,7 +3,7 @@ import {
   getSeedUsers,
 } from "../database/prisma/scriptQueries";
 import { breakArrayIntoSubArrays } from "../utils/array";
-import { logErrorMessage } from "../utils/error";
+import { logErrorMessage } from "../utils/loggerUtils";
 import { User } from "@prisma/client";
 import {
   logUnpopulateMessage,

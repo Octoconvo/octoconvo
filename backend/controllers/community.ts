@@ -304,8 +304,6 @@ const community_post = [
         includeParticipant: true,
       });
 
-      console.log({ updatedCommunity });
-
       req.app.get("io").to(`communities:${id}`).emit("communitycreate");
 
       res.json({
@@ -434,10 +432,6 @@ const community_participation_status_get = [
     const userId = req.user?.id as string;
     const communityId = req.params.communityid;
 
-    console.log({
-      communityId,
-    });
-
     const community = await getCommunityById(communityId);
 
     if (community === null) {
@@ -493,9 +487,7 @@ const community_join_post = [
 
     const community = await getCommunityById(communityId);
 
-    console.log({ communityId, community });
     if (community === null) {
-      console.log(`Is community === null?: ${community === null}`);
       res.status(404).json({
         message: "Failed to send a join request to the community",
         error: {

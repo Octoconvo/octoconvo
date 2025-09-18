@@ -3,7 +3,7 @@ import {
   deleteCommunityAndItsData,
   getSeedCommunities,
 } from "../database/prisma/scriptQueries";
-import { logErrorMessage } from "../utils/error";
+import { logErrorMessage } from "../utils/loggerUtils";
 import {
   logUnpopulateMessage,
   logUnpopulateSuccessMessage,

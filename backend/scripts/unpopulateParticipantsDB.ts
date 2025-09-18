@@ -4,7 +4,7 @@ import {
 } from "../database/prisma/scriptQueries";
 import { Community } from "@prisma/client";
 import { breakArrayIntoSubArrays } from "../utils/array";
-import { logErrorMessage } from "../utils/error";
+import { logErrorMessage } from "../utils/loggerUtils";
 import {
   logUnpopulateMessage,
   logUnpopulateSuccessMessage,

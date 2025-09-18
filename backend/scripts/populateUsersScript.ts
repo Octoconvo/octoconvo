@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import { logErrorMessage } from "../utils/error";
+import { logErrorMessage } from "../utils/loggerUtils";
 import {
   createSeedLoneUser,
   createUser,

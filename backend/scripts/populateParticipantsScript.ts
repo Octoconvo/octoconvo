@@ -4,7 +4,7 @@ import {
   getCommunityWithOwnerAndInboxByName,
   getUserByUsername,
 } from "../database/prisma/scriptQueries";
-import { logErrorMessage } from "../utils/error";
+import { logErrorMessage } from "../utils/loggerUtils";
 import { SeedUserGenerator } from "../@types/scriptTypes";
 import {
   logPopulateMessage,

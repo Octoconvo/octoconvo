@@ -298,7 +298,6 @@ describe("Test community post controller", () => {
         .attach("banner", __dirname + "/../assets/test-img-valid-01.jpg")
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
-          console.log(res.body);
           const participants = res.body.community.participants;
 
           expect(participants).toBeDefined();

@@ -42,9 +42,19 @@ const logUnpopulateSuccessMessage = (message: string) => {
   logger.info(`${ANSI.brightRed}${ANSI.bold}${message}${ANSI.reset}`);
 };
 
+const logErrorMessage = (
+  // eslint-disable-next-line
+  error: any,
+) => {
+  if (error instanceof Error) {
+    logger.error(`${ANSI.red}${ANSI.bold}${error.message}${ANSI.reset}`);
+  }
+};
+
 export {
   logPopulateMessage,
   logUnpopulateMessage,
   logUnpopulateSuccessMessage,
   logPopulateSuccessMessage,
+  logErrorMessage,
 };
