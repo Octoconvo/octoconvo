@@ -23,7 +23,7 @@ const ANSI = {
   brightRed: `\x1b[38:5:196m`,
   red: `\x1b[38:5:160m`,
   reset: `\x1b[0m`,
-  bold: `\x1b[1]`,
+  bold: `\x1b[1m`,
 };
 
 const logPopulateMessage = (message: string) => {
