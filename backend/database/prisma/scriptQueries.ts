@@ -33,6 +33,16 @@ const getSeedUsers = async (): GetSeedUsersData => {
   return user;
 };
 
+const getClientUsers = () => {
+  return prisma.user.findMany({
+    where: {
+      username: {
+        startsWith: "clientuser",
+      },
+    },
+  });
+};
+
 const deleteUserFriends = async (userId: string) => {
   await prisma.friend.deleteMany({
     where: {
@@ -132,6 +142,16 @@ const getSeedCommunities = async () => {
   });
 
   return communities;
+};
+
+const getClientCommunities = async () => {
+  return prisma.community.findMany({
+    where: {
+      name: {
+        startsWith: "clientcommunity",
+      },
+    },
+  });
 };
 
 const getCommunityOwner = async (communityId: string): Promise<User | null> => {
@@ -266,6 +286,7 @@ type CreateCommunityMember = {
   userId: string;
   status: ParticipantStatus;
 };
+
 const createCommunityMember = ({
   status,
   userId,
@@ -472,14 +493,32 @@ const deleteUserMessages = async (id: string) => {
   });
 };
 
+type CreateCommunityMessage = CreateCommunitySeedMessage;
+
+const createCommunityMessage = async ({
+  number,
+  inboxId,
+  authorId,
+}: CreateCommunityMessage) => {
+  await prisma.message.create({
+    data: {
+      content: `seedmessage${number}`,
+      inboxId: inboxId,
+      authorId: authorId,
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
+  getClientUsers,
   getSeedUsersToPopulateFriends,
   deleteUserFriends,
   createFriendsRelationship,
   getSeedCommunities,
   getSeedCommunitiesWithOwnerAndInbox,
+  getClientCommunities,
   deleteCommunityMessages,
   createCommunitySeedMessage,
   deleteUserNotifications,
@@ -495,4 +534,5 @@ export {
   getSeedLoneUsers,
   deleteUser,
   deleteUserMessages,
+  createCommunityMessage,
 };

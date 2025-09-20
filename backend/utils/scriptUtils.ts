@@ -17,4 +17,21 @@ const generateSeedUserGenerators = (size: number): SeedUserGenerator[] => {
   return seedUsers;
 };
 
-export { generateSeedUserGenerators };
+const generateClientUserGenerators = (size: number): SeedUserGenerator[] => {
+  const clientUsers = [];
+
+  for (let i = 1; i <= size; i++) {
+    const user = {
+      username: `clientuser${i}`,
+      displayName: `clientuser${i}`,
+      password: `client@User${i}`,
+      community: `clientcommunity${i}`,
+    };
+
+    clientUsers.push(user);
+  }
+
+  return clientUsers;
+};
+
+export { generateSeedUserGenerators, generateClientUserGenerators };
