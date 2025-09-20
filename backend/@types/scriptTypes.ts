@@ -14,8 +14,11 @@ type SeedUserGenerator = {
   community: string;
 };
 
+type ClientUserGenerator = SeedUserGenerator;
+
 export type {
   CommunityWithOwnerAndInbox,
   CommunitiesWithOwnerAndIInbox,
   SeedUserGenerator,
+  ClientUserGenerator,
 };
