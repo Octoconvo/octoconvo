@@ -11,6 +11,7 @@ import {
 } from "@/contexts/modal";
 import { usePathname } from "next/navigation";
 import NotificationNav from "./NotificationNav";
+import { hasPath } from "@/utils/string";
 
 const LobbyNav = () => {
   const path = usePathname();
@@ -32,13 +33,9 @@ const LobbyNav = () => {
             data-testid="friends-l"
             href={`/lobby/friends`}
             className={
-              "flex relative items-center justify-center h-12 transition-all" +
-              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
-              "  hover:transition-all" +
-              (path && path.split("/").includes("friends")
-                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
-                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
+              "main-nav-link" +
+              (hasPath({ path, toCompare: "friends" })
+                ? " main-nav-link-active"
                 : "")
             }
           >
@@ -52,13 +49,9 @@ const LobbyNav = () => {
             data-testid="dm-l"
             href={`lobby/dm`}
             className={
-              "flex relative items-center justify-center h-12 translation-all" +
-              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
-              "  hover:transition-all" +
-              (path && path.split("/").includes("dm")
-                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
-                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
+              "main-nav-link" +
+              (hasPath({ path, toCompare: "dm" })
+                ? " main-nav-link-active"
                 : "")
             }
           >
@@ -72,13 +65,9 @@ const LobbyNav = () => {
             data-testid="communities-l"
             href={`/lobby/communities`}
             className={
-              "flex relative items-center justify-center h-12 translation-all" +
-              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px]" +
-              "  hover:transition-all" +
-              (path && path.split("/").includes("communities")
-                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
-                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
+              " main-nav-link" +
+              (hasPath({ path, toCompare: "communities" })
+                ? " main-nav-link-active"
                 : "")
             }
           >
@@ -94,14 +83,10 @@ const LobbyNav = () => {
             data-testid="explore-l"
             href={`/lobby/explore`}
             className={
-              "flex relative items-center justify-center h-12" +
-              " before:rounded-[8px] transition-all hover:transition-all" +
-              " hover:shadow-[0_0.25rem_0_0_var(--brand-4)] hover:rounded-[8px] " +
-              (path && path.split("/").includes("explore")
-                ? " before:bg-gr-brand-1-3-d-1-b before:w-full before:h-full" +
-                  " before:rounded-[8px] before:scale-110 hover:shadow-none" +
-                  " hover:before:bg-gr-brand-1-2-3-d-1-t hover:before:scale-110"
-                : "")
+              "main-nav-link" +
+              (hasPath({ path, toCompare: "explore" })
+                ? " main-nav-link-active"
+                : " ")
             }
           >
             <span
