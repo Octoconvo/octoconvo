@@ -35,4 +35,22 @@ const capitaliseStringFirstLetter = (input: string) => {
     })
     .join("");
 };
-export { unescapeString, createHTMLNewLine, capitaliseStringFirstLetter };
+
+type HasPath = {
+  path: string | null;
+  toCompare: string;
+};
+
+const hasPath = ({ path, toCompare }: HasPath): boolean => {
+  if (path === null) {
+    return false;
+  }
+  return path.split("/").includes(toCompare);
+};
+
+export {
+  unescapeString,
+  createHTMLNewLine,
+  capitaliseStringFirstLetter,
+  hasPath,
+};
