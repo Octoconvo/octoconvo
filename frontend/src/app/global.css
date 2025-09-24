@@ -331,6 +331,22 @@
     @apply main-nav-link main-nav-link-active-before main-nav-link-active-hover;
   }
 
+  .main-nav-btn-base {
+    @apply flex relative items-center justify-center h-12 transition-all;
+  }
+
+  .main-nav-btn-before {
+    @apply before:w-full before:h-full before:rounded-full before:bg-brand-1;
+  }
+
+  .main-nav-btn-hover {
+    @apply hover:transition-all hover:before:scale-105 hover:before:rounded-[1rem];
+  }
+
+  .main-nav-btn {
+    @apply main-nav-btn-base main-nav-btn-before main-nav-btn-hover;
+  }
+
   @keyframes spinner {
     to {
       transform: rotate(1turn);
