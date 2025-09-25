@@ -123,6 +123,14 @@ type FriendAPI = {
   friendId: string;
 };
 
+type UserFriendAPI = FriendAPI & {
+  friend: {
+    username: string;
+    displayName: string;
+    avatar: string | null;
+  };
+};
+
 export type {
   CommunityAPI,
   CommunityExploreAPI,
@@ -134,4 +142,5 @@ export type {
   ProfilesAPI,
   ErrorAPI,
   FriendAPI,
+  UserFriendAPI,
 };
