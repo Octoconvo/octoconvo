@@ -1,4 +1,8 @@
-import { createMockURL, UserFriendMock } from "@/utils/tests/mocks";
+import {
+  createMockURL,
+  generateUserFriendMocks,
+  UserFriendMock,
+} from "@/utils/tests/mocks";
 import { stat } from "fs";
 
 describe("Test createMockURL function", () => {
@@ -64,5 +68,12 @@ describe("Test UserFriendMock Class", () => {
     });
 
     expect(userFriendMock.friend.avatar).toContain(avatarMock);
+  });
+});
+
+describe("Test generateUserFriendsMocks", () => {
+  test("Return 10 UserFriendMocks", () => {
+    const userFriends = generateUserFriendMocks(10);
+    expect(userFriends.length).toBe(10);
   });
 });
