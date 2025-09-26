@@ -3,7 +3,6 @@ import {
   generateUserFriendMocks,
   UserFriendMock,
 } from "@/utils/tests/mocks";
-import { stat } from "fs";
 
 describe("Test createMockURL function", () => {
   test("createMockURL should return the correct link format", () => {
