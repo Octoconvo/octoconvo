@@ -37,4 +37,17 @@ class UserFriendMock implements UserFriendMockI {
   }
 }
 
-export { createMockURL, UserFriendMock };
+const generateUserFriendMocks = (size: number): UserFriendMockI[] => {
+  const userFriends = [];
+
+  for (let i = 0; i < size; i++) {
+    const username = `username${i}`;
+    const displayName = `diplayName${i}`;
+    const userFriend = new UserFriendMock({ displayName, username });
+    userFriends.push(userFriend);
+  }
+
+  return userFriends;
+};
+
+export { createMockURL, UserFriendMock, generateUserFriendMocks };
