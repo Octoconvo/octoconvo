@@ -25,4 +25,44 @@ interface UserFriendConstructor {
   avatar?: string | null;
 }
 
-export type { Friend, FriendStatus, UserFriendConstructor, UserFriendMockI };
+interface ConfigMock {
+  method?: "POST" | "GET";
+  mode?: "no-cors" | "cors";
+  credentials?: "include";
+  body?: FormData;
+}
+
+interface ResponseDataMock<Data> {
+  status: number;
+  data: Data;
+}
+
+interface ErrorMock {
+  error: string | null;
+}
+
+interface GetData<Data> {
+  (url?: string, config?: ConfigMock): ResponseDataMock<Data>;
+}
+
+interface GetError {
+  (url?: string, config?: ConfigMock): ErrorMock;
+}
+
+interface ResponseMock<Data> {
+  getData: GetData<Data>;
+  getError: GetError;
+}
+
+export type {
+  Friend,
+  FriendStatus,
+  UserFriendConstructor,
+  UserFriendMockI,
+  ResponseDataMock,
+  ResponseMock,
+  ConfigMock,
+  ErrorMock,
+  GetError,
+  GetData,
+};

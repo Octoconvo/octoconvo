@@ -1,4 +1,13 @@
 import {
+  ConfigMock,
+  ErrorMock,
+  GetData,
+  GetError,
+  ResponseDataMock,
+  ResponseMock,
+} from "@/types/tests/mocks";
+import {
+  createFetchMock,
   createMockURL,
   generateUserFriendMocks,
   UserFriendMock,
@@ -70,9 +79,76 @@ describe("Test UserFriendMock Class", () => {
   });
 });
 
-describe("Test generateUserFriendsMocks", () => {
+describe("Test generateUserFriendsMocks function", () => {
   test("Return 10 UserFriendMocks", () => {
     const userFriends = generateUserFriendMocks(10);
     expect(userFriends.length).toBe(10);
+  });
+});
+
+describe("Test createFetchMock function", () => {
+  interface DataMock {
+    message: string;
+  }
+
+  const dataMock: DataMock = {
+    message: "Successfully sended a message",
+  };
+  const errorMock = "Failed to connect";
+
+  const getData: GetData<DataMock> = <DataMock>(
+    url?: string,
+    config?: ConfigMock
+  ) => {
+    const responseData: ResponseDataMock<DataMock> = {
+      status: 200,
+      data: dataMock as DataMock,
+    };
+    return responseData;
+  };
+
+  const getError: GetError = (url?: string, config?: ConfigMock) => {
+    return {
+      error: null,
+    };
+  };
+
+  test("Return status 200 if response.getError returns null", async () => {
+    const response: ResponseMock<DataMock> = {
+      getData: getData,
+      getError,
+    };
+    const { status } = await createFetchMock<DataMock>(response)();
+    expect(status).toBe(200);
+  });
+
+  test("Return data if response.getError returns true", async () => {
+    const response: ResponseMock<DataMock> = {
+      getData: getData,
+      getError,
+    };
+    const { json } = await createFetchMock<DataMock>(response)();
+    const data = await json();
+    expect(data.message).toBe(dataMock.message);
+  });
+
+  test("Throw error if response.getError returns an error string", async () => {
+    const getError: GetError = (url?: string, config?: ConfigMock) => {
+      return {
+        error: errorMock,
+      };
+    };
+    const response: ResponseMock<DataMock> = {
+      getData: getData,
+      getError,
+    };
+
+    try {
+      const { json } = await createFetchMock<DataMock>(response)();
+      const data = await json();
+      expect(data.message).toBe(dataMock.message);
+    } catch (err) {
+      expect(err).toBe(errorMock);
+    }
   });
 });
