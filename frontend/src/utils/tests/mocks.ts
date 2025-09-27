@@ -55,8 +55,7 @@ const generateUserFriendMocks = (size: number): UserFriendMockI[] => {
 const createFetchMock = <Data>(response: ResponseMock<Data>): jest.Mock => {
   return jest.fn().mockImplementation(
     jest.fn((url?: string, config?: ConfigMock) => {
-      const { status, data } = response.getData(url, config);
-      const { error } = response.getError(url, config);
+      const { status, data, error } = response.getData(url, config);
 
       if (error) {
         return Promise.reject(error);

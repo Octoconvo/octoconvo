@@ -35,9 +35,6 @@ interface ConfigMock {
 interface ResponseDataMock<Data> {
   status: number;
   data: Data;
-}
-
-interface ErrorMock {
   error: string | null;
 }
 
@@ -45,13 +42,8 @@ interface GetData<Data> {
   (url?: string, config?: ConfigMock): ResponseDataMock<Data>;
 }
 
-interface GetError {
-  (url?: string, config?: ConfigMock): ErrorMock;
-}
-
 interface ResponseMock<Data> {
   getData: GetData<Data>;
-  getError: GetError;
 }
 
 export type {
@@ -62,7 +54,5 @@ export type {
   ResponseDataMock,
   ResponseMock,
   ConfigMock,
-  ErrorMock,
-  GetError,
   GetData,
 };

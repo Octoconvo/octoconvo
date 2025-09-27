@@ -1,8 +1,6 @@
 import {
   ConfigMock,
-  ErrorMock,
   GetData,
-  GetError,
   ResponseDataMock,
   ResponseMock,
 } from "@/types/tests/mocks";
@@ -103,20 +101,15 @@ describe("Test createFetchMock function", () => {
     const responseData: ResponseDataMock<DataMock> = {
       status: 200,
       data: dataMock as DataMock,
-    };
-    return responseData;
-  };
-
-  const getError: GetError = (url?: string, config?: ConfigMock) => {
-    return {
       error: null,
     };
+
+    return responseData;
   };
 
   test("Return status 200 if response.getError returns null", async () => {
     const response: ResponseMock<DataMock> = {
       getData: getData,
-      getError,
     };
     const { status } = await createFetchMock<DataMock>(response)();
     expect(status).toBe(200);
@@ -125,7 +118,6 @@ describe("Test createFetchMock function", () => {
   test("Return data if response.getError returns true", async () => {
     const response: ResponseMock<DataMock> = {
       getData: getData,
-      getError,
     };
     const { json } = await createFetchMock<DataMock>(response)();
     const data = await json();
@@ -133,14 +125,20 @@ describe("Test createFetchMock function", () => {
   });
 
   test("Throw error if response.getError returns an error string", async () => {
-    const getError: GetError = (url?: string, config?: ConfigMock) => {
-      return {
+    const getData: GetData<DataMock> = <DataMock>(
+      url?: string,
+      config?: ConfigMock
+    ) => {
+      const responseData: ResponseDataMock<DataMock> = {
+        status: 200,
+        data: dataMock as DataMock,
         error: errorMock,
       };
+
+      return responseData;
     };
     const response: ResponseMock<DataMock> = {
       getData: getData,
-      getError,
     };
 
     try {
