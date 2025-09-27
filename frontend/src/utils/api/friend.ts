@@ -1,4 +1,9 @@
-import { ErrorAPI, FriendAPI, NotificationAPI } from "@/types/api";
+import {
+  ErrorAPI,
+  FriendAPI,
+  NotificationAPI,
+  UserFriendAPI,
+} from "@/types/api";
 
 const DOMAIN_URL = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
@@ -98,8 +103,30 @@ const postFriendRequestUpdateToAPI = async ({
   };
 };
 
+type GetUserFriendsFromAPIData = {
+  status: number;
+  message: string;
+  error?: ErrorAPI;
+  friends?: UserFriendAPI[];
+  nextCursor?: false | string;
+};
+
+const getUserFriendsFromAPI = async (): Promise<GetUserFriendsFromAPIData> => {
+  const response = await fetch(`${DOMAIN_URL}/friends`, {
+    method: "GET",
+    credentials: "include",
+    mode: "cors",
+  });
+  const data = await response.json();
+  return {
+    status: response.status,
+    ...data,
+  };
+};
+
 export {
   getFriendshipStatusFromAPI,
   postFriendToAPI,
   postFriendRequestUpdateToAPI,
+  getUserFriendsFromAPI,
 };
