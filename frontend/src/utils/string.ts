@@ -6,26 +6,6 @@ function unescapeString(input: string): string {
   return decodedInput;
 }
 
-const createHTMLNewLine = (input: string) => {
-  const strings = input.split("\n");
-  const newlines = [...input.matchAll(/\n/g)];
-
-  const content = strings.map((string, index) => {
-    if (index < newlines.length) {
-      return (
-        <p key={index}>
-          {string}
-          <br key={index} />
-        </p>
-      );
-    } else {
-      return <p key={index}>{string}</p>;
-    }
-  });
-
-  return <>{content}</>;
-};
-
 const capitaliseStringFirstLetter = (input: string) => {
   return input
     .toLowerCase()
@@ -48,9 +28,4 @@ const hasPath = ({ path, toCompare }: HasPath): boolean => {
   return path.split("/").includes(toCompare);
 };
 
-export {
-  unescapeString,
-  createHTMLNewLine,
-  capitaliseStringFirstLetter,
-  hasPath,
-};
+export { unescapeString, capitaliseStringFirstLetter, hasPath };
