@@ -277,6 +277,8 @@ const getUserFriendsWithCursor = async ({
       friend: {
         select: {
           username: true,
+          displayName: true,
+          avatar: true,
         },
       },
     },
