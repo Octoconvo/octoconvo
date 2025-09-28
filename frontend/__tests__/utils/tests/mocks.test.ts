@@ -92,19 +92,15 @@ describe("Test createFetchMock function", () => {
   const dataMock: DataMock = {
     message: "Successfully sended a message",
   };
+
   const errorMock = "Failed to connect";
 
-  const getData: GetData<DataMock> = <DataMock>(
-    url?: string,
-    config?: ConfigMock
-  ) => {
-    const responseData: ResponseDataMock<DataMock> = {
+  const getData: GetData<DataMock> = (url?: string, config?: ConfigMock) => {
+    return {
       status: 200,
-      data: dataMock as DataMock,
+      data: dataMock,
       error: null,
     };
-
-    return responseData;
   };
 
   test("Return status 200 if response.getError returns null", async () => {
@@ -125,18 +121,14 @@ describe("Test createFetchMock function", () => {
   });
 
   test("Throw error if response.getError returns an error string", async () => {
-    const getData: GetData<DataMock> = <DataMock>(
-      url?: string,
-      config?: ConfigMock
-    ) => {
-      const responseData: ResponseDataMock<DataMock> = {
+    const getData: GetData<DataMock> = (url?: string, config?: ConfigMock) => {
+      return {
         status: 200,
-        data: dataMock as DataMock,
+        data: dataMock,
         error: errorMock,
       };
-
-      return responseData;
     };
+
     const response: ResponseMock<DataMock> = {
       getData: getData,
     };

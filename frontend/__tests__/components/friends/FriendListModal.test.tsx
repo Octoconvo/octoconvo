@@ -27,18 +27,15 @@ interface UserFriendResponse {
   friends: UserFriendMock[];
 }
 
-const getData: GetData<UserFriendResponse> = <Data,>(
+const getData: GetData<UserFriendResponse> = (
   url?: string,
   config?: ConfigMock
 ) => {
-  const friends: Data =
-    counter.count === 0 ? (friendsMock as Data) : ([] as Data);
-
   return {
     status: 200,
     data: {
       message: "Successfully fetched user's friends",
-      friends,
+      friends: counter.count === 0 ? friendsMock : [],
     },
     error: null,
   };
