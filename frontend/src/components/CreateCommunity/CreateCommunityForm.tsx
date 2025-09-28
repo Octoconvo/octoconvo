@@ -13,18 +13,13 @@ import {
   communityBioValidation,
   avatarValidation,
   bannerValidation,
-} from "@/utils/form";
+} from "@/utils/formUtils";
 import {
   ActiveModalsContext,
   CreateCommunityModalContext,
 } from "@/contexts/modal";
-import {
-  previewFile,
-  previewImage,
-  selectFile,
-  validateFiles,
-} from "@/utils/file";
-import { triggerInputClick } from "@/utils/controller";
+import { previewImage, validateFiles } from "@/utils/fileUtils";
+import { triggerInputClick } from "@/utils/controllerUtils";
 import ValidationError from "@/components/ValidationError";
 
 const CreateCommunityForm = ({

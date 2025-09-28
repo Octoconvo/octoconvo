@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { ProfileAPI } from "@/types/api";
-import { fr } from "date-fns/locale";
 
 const profile: ProfileAPI = {
   id: "testprofile1",

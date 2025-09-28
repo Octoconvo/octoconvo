@@ -1,7 +1,7 @@
 import { UserFriendAPI } from "@/types/api";
 import { FC } from "react";
 import Avatar from "../Avatar";
-import { unescapeString } from "@/utils/string";
+import { unescapeString } from "@/utils/stringUtils";
 import testIds from "@/utils/tests/testIds";
 
 interface FriendItemProps {

@@ -1,4 +1,4 @@
-import { screen, render, act, waitFor } from "@testing-library/react";
+import { screen, render, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import "@testing-library/jest-dom";
 import NotificationRequestItem from "@/components/Notification/NotificationRequestItem";

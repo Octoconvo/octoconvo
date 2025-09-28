@@ -1,8 +1,12 @@
-import { createSignupOnSubmit, createOnSubmit } from "@/utils/form";
+import { createSignupOnSubmit, createOnSubmit } from "@/utils/formUtils";
 import { SignupForm as SignupFormType } from "@/types/form";
-import SignupForm from "@/components/SignupForm";
+import SignupForm from "@/components/Signup/SignupForm";
 import { User } from "@/types/user";
-import { avatarValidation, bannerValidation, getFormData } from "@/utils/form";
+import {
+  avatarValidation,
+  bannerValidation,
+  getFormData,
+} from "@/utils/formUtils";
 import { ValidationError } from "@/types/form";
 
 const errorObj = {
@@ -112,7 +116,7 @@ describe("Test createSignupOnSubmit function", () => {
 });
 
 describe("Test createOnSubmit function", () => {
-  const getFormDataMock = jest.fn(<SignupFormType,>(data: SignupFormType) => {
+  const getFormDataMock = jest.fn(<SignupFormType>(data: SignupFormType) => {
     const formData = new URLSearchParams();
 
     for (const prop in data) {

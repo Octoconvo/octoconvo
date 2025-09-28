@@ -1,6 +1,6 @@
 "use client";
 
-import { capitaliseStringFirstLetter } from "@/utils/string";
+import { capitaliseStringFirstLetter } from "@/utils/stringUtils";
 
 const RequestActionBtn = ({
   isRead,

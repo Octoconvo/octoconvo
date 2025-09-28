@@ -1,4 +1,4 @@
-import { pushBufferedNotifications } from "@/utils/notification";
+import { pushBufferedNotifications } from "@/utils/notificationUtils";
 import { NotificationAPI } from "@/types/api";
 
 const notifications: NotificationAPI[] = [

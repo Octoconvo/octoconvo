@@ -4,9 +4,9 @@ import {
   CommunityMessageForm,
   ValidationError as ValidationErrorType,
 } from "@/types/form";
-import { triggerInputClick } from "@/utils/controller";
-import { communityMessageValidation } from "@/utils/form";
-import { previewImage, validateFiles } from "@/utils/file";
+import { triggerInputClick } from "@/utils/controllerUtils";
+import { communityMessageValidation } from "@/utils/formUtils";
+import { previewImage, validateFiles } from "@/utils/fileUtils";
 import ImagePreviewBox from "./ImagePreviewBox";
 import ValidationError from "@/components/ValidationError";
 import Loader from "@/components/loader";

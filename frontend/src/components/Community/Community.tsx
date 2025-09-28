@@ -1,7 +1,7 @@
 "use client";
 
 import { UserContext } from "@/contexts/user";
-import { Attachment, CommunityAPI, InboxMessageAPI } from "@/types/api";
+import { AttachmentAPI, CommunityAPI, InboxMessageAPI } from "@/types/api";
 import { useContext, useEffect, useRef, useState } from "react";
 import MessageBox from "../MessageBox/MessageBox";
 import Image from "next/image";
@@ -9,7 +9,8 @@ import socket from "@/socket/socket";
 import { connectToRoom } from "@/socket/eventHandler";
 import AttachmentBox from "../AttachmentBox/AttachmentBox";
 import ZoomedImageModal from "../ZoomedImageModal/ZoomedImagedModal";
-import { unescapeString, createHTMLNewLine } from "@/utils/string";
+import { unescapeString } from "@/utils/stringUtils";
+import { createHTMLNewLine } from "@/utils/HTMLUtils";
 
 const Community = ({ id }: { id: string | null }) => {
   const [community, setCommunity] = useState<null | CommunityAPI>(null);
@@ -20,7 +21,7 @@ const Community = ({ id }: { id: string | null }) => {
   const messageListRef = useRef<null | HTMLUListElement>(null);
   const [scrollHeight, setScrollHeight] = useState<number>(0);
   const [scrollToBottom, setScrolltoBottom] = useState<boolean>(false);
-  const [zoomedImage, setZoomedImage] = useState<Attachment | null>(null);
+  const [zoomedImage, setZoomedImage] = useState<AttachmentAPI | null>(null);
 
   useEffect(() => {
     const fetchCommunity = async () => {
@@ -296,7 +297,7 @@ const Community = ({ id }: { id: string | null }) => {
                     {message.attachments?.length ? (
                       <AttachmentBox
                         attachments={message.attachments}
-                        zoomImage={(attachment: Attachment) =>
+                        zoomImage={(attachment: AttachmentAPI) =>
                           setZoomedImage(attachment)
                         }
                       />

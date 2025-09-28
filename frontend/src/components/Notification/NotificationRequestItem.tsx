@@ -1,7 +1,7 @@
 "use client";
 
 import { NotificationAPI } from "@/types/api";
-import { capitaliseStringFirstLetter } from "@/utils/string";
+import { capitaliseStringFirstLetter } from "@/utils/stringUtils";
 import RequestActionBtn from "./RequestActionBtn";
 import { useCallback } from "react";
 import Payload from "./Payload";

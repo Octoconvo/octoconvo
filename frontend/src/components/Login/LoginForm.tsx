@@ -8,7 +8,7 @@ import type {
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import VisibilityButton from "@/components/VisibilityButton";
 import { useState } from "react";
-import { usernameValidation, passwordValidation } from "@/utils/form";
+import { usernameValidation, passwordValidation } from "@/utils/formUtils";
 
 const LoginForm = ({
   onSubmit,

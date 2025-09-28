@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { User } from "@/types/user";
 import { UserContext } from "@/contexts/user";
-import { checkAuthStatus } from "@/utils/authentication";
+import { checkAuthStatus } from "@/utils/authUtils";
 import socket from "@/socket/socket";
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {

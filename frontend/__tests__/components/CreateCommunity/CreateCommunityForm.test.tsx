@@ -2,8 +2,7 @@ import CreateCommunityForm from "@/components/CreateCommunity/CreateCommunityFor
 import "@testing-library/jest-dom";
 import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { previewFile, selectFile, validateFiles } from "@/utils/file";
-import { triggerInputClick } from "@/utils/controller";
+import { triggerInputClick } from "@/utils/controllerUtils";
 
 const onSubmit = jest.fn();
 
@@ -11,14 +10,14 @@ const imageFile = new File(["a".repeat(1024)], "image-test", {
   type: "image/png",
 });
 
-jest.mock("@/utils/file", () => ({
+jest.mock("@/utils/fileUtils", () => ({
   selectFile: jest.fn(),
   previewFile: jest.fn(),
   validateFiles: jest.fn(() => ["testimage1"]),
   previewImage: jest.fn(() => "buffer:testimagepreviewurl1"),
 }));
 
-jest.mock("@/utils/controller", () => ({
+jest.mock("@/utils/controllerUtils", () => ({
   triggerInputClick: jest.fn(),
 }));
 

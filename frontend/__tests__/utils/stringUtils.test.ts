@@ -2,7 +2,7 @@ import {
   unescapeString,
   capitaliseStringFirstLetter,
   hasPath,
-} from "@/utils/string";
+} from "@/utils/stringUtils";
 
 test("Test unescape input return value", () => {
   const string = unescapeString("&#39;&#60;&#62;");

@@ -11,7 +11,7 @@ import {
 } from "@/contexts/modal";
 import { usePathname } from "next/navigation";
 import NotificationNav from "./NotificationNav";
-import { hasPath } from "@/utils/string";
+import { hasPath } from "@/utils/stringUtils";
 
 const LobbyNav = () => {
   const path = usePathname();

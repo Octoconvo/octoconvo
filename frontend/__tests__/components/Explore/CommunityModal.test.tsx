@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CommunityExploreAPI } from "@/types/api";
-import { on } from "node:stream";
 
 const community1: CommunityExploreAPI = {
   id: "testid1",

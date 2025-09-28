@@ -11,10 +11,10 @@ import {
   bannerValidation,
   displayNameValidation,
   bioValidation,
-} from "@/utils/form";
-import { previewFile, selectFile } from "@/utils/file";
+} from "@/utils/formUtils";
+import { previewFile, selectFile } from "@/utils/fileUtils";
 import { ActiveModalsContext, EditProfileModalContext } from "@/contexts/modal";
-import { triggerInputClick } from "@/utils/controller";
+import { triggerInputClick } from "@/utils/controllerUtils";
 
 const EditProfileForm = ({
   onSubmit,

@@ -1,5 +1,5 @@
 import { SearchBarForm } from "@/types/form";
-import { searchBarNameValidation } from "@/utils/form";
+import { searchBarNameValidation } from "@/utils/formUtils";
 import { useState, useRef } from "react";
 import { FormProvider, SubmitHandler, useForm } from "react-hook-form";
 

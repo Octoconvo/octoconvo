@@ -1,5 +1,5 @@
 import { CommunityExploreAPI } from "@/types/api";
-import { unescapeString } from "@/utils/string";
+import { unescapeString } from "@/utils/stringUtils";
 import { ActiveExploreCommunity } from "@/contexts/community";
 import { useContext } from "react";
 

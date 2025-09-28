@@ -1,9 +1,7 @@
 "use client";
 
 import { UserContext } from "@/contexts/user";
-import { onConnect } from "@/socket/eventHandler";
 import socket from "@/socket/socket";
-import { set } from "date-fns";
 import { useContext, useEffect, useState } from "react";
 
 const SocketWrapper = ({ children }: { children: React.ReactNode }) => {

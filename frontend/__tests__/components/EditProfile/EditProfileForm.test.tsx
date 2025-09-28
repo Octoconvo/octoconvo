@@ -4,8 +4,8 @@ import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { UserProfileContext } from "@/contexts/user";
 import { UserProfile } from "@/types/user";
-import { previewFile, selectFile } from "@/utils/file";
-import { triggerInputClick } from "@/utils/controller";
+import { previewFile, selectFile } from "@/utils/fileUtils";
+import { triggerInputClick } from "@/utils/controllerUtils";
 
 const onSubmit = jest.fn();
 
@@ -25,12 +25,12 @@ const imageFile = new File(["a".repeat(1024)], "image-test", {
   type: "image/png",
 });
 
-jest.mock("@/utils/file", () => ({
+jest.mock("@/utils/fileUtils", () => ({
   selectFile: jest.fn(),
   previewFile: jest.fn(),
 }));
 
-jest.mock("@/utils/controller", () => ({
+jest.mock("@/utils/controllerUtils", () => ({
   triggerInputClick: jest.fn(),
 }));
 
@@ -138,7 +138,7 @@ describe("Render EditProfileForm and reset mock to test previewFile", () => {
   const user = userEvent.setup();
 
   beforeEach(async () => {
-    const originalModule = jest.requireActual("@/utils/file");
+    const originalModule = jest.requireActual("@/utils/fileUtils");
     (selectFile as jest.Mock).mockImplementationOnce(originalModule.selectFile);
 
     await act(async () =>
