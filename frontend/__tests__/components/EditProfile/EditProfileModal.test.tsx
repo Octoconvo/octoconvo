@@ -5,6 +5,7 @@ import { ActiveModalsContext } from "@/contexts/modal";
 import ActiveModalProvider from "@/components/ActiveModalProvider";
 import EditProfileModalProvider from "@/components/EditProfile/EditProfileModalProvider";
 import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
+import QueryProvider from "@/components/QueryProvider";
 
 const openModalMock = jest.fn();
 const closeModalMock = jest.fn();
@@ -14,15 +15,17 @@ describe("Render EditProfileModal", () => {
 
   beforeEach(() => {
     render(
-      <ActiveModalsContext.Provider
-        value={{
-          activeModals: [],
-          openModal: openModalMock,
-          closeModal: closeModalMock,
-        }}
-      >
-        <EditProfileModal></EditProfileModal>
-      </ActiveModalsContext.Provider>
+      <QueryProvider>
+        <ActiveModalsContext.Provider
+          value={{
+            activeModals: [],
+            openModal: openModalMock,
+            closeModal: closeModalMock,
+          }}
+        >
+          <EditProfileModal></EditProfileModal>
+        </ActiveModalsContext.Provider>
+      </QueryProvider>
     );
   });
 
@@ -43,11 +46,13 @@ describe("Render EditProfileModal", () => {
   beforeEach(async () => {
     await act(async () => {
       render(
-        <ActiveModalProvider>
-          <EditProfileModalProvider>
-            <LobbyNavWrapper></LobbyNavWrapper>
-          </EditProfileModalProvider>
-        </ActiveModalProvider>
+        <QueryProvider>
+          <ActiveModalProvider>
+            <EditProfileModalProvider>
+              <LobbyNavWrapper></LobbyNavWrapper>
+            </EditProfileModalProvider>
+          </ActiveModalProvider>
+        </QueryProvider>
       );
     });
   });

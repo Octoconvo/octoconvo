@@ -6,6 +6,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import React from "react";
 import ActiveModalProvider from "@/components/ActiveModalProvider";
+import QueryProvider from "@/components/QueryProvider";
 
 const userProfile: UserProfile = {
   id: "513c920c-3921-48b2-88d7-5b8156b9e6b8",
@@ -23,16 +24,18 @@ describe("Test Active modal provider", () => {
   const user = userEvent.setup();
   beforeEach(() => {
     render(
-      <div data-testid="wrapper" className="w-full h-full">
-        <UserProfileContext.Provider
-          value={{ userProfile, setUserProfile: jest.fn(() => {}) }}
-        >
-          <ActiveModalProvider>
-            <div data-testid="not-modal"></div>
-            <LobbyNavWrapper />
-          </ActiveModalProvider>
-        </UserProfileContext.Provider>
-      </div>
+      <QueryProvider>
+        <div data-testid="wrapper" className="w-full h-full">
+          <UserProfileContext.Provider
+            value={{ userProfile, setUserProfile: jest.fn(() => {}) }}
+          >
+            <ActiveModalProvider>
+              <div data-testid="not-modal"></div>
+              <LobbyNavWrapper />
+            </ActiveModalProvider>
+          </UserProfileContext.Provider>
+        </div>
+      </QueryProvider>
     );
   });
 

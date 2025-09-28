@@ -6,6 +6,8 @@ import { UserProfile } from "@/types/user";
 import React, { act } from "react";
 import { UserContext } from "@/contexts/user";
 import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
+import QueryProvider from "@/components/QueryProvider";
+import { Counter } from "@/utils/tests/helpers";
 
 const userProfile: UserProfile = {
   id: "513c920c-3921-48b2-88d7-5b8156b9e6b8",
@@ -31,31 +33,35 @@ const failedObj = {
   },
 };
 
-global.fetch = jest
-  .fn()
-  .mockImplementationOnce(
-    jest.fn(() => {
-      return Promise.resolve({
-        status: 200,
-        json: () => Promise.resolve().then(() => successObj),
-      });
-    })
-  )
-  .mockImplementationOnce(
-    jest.fn(() => {
-      return Promise.resolve({
-        status: 400,
-        json: () => Promise.resolve().then(() => failedObj),
-      });
-    })
-  )
-  .mockImplementationOnce(
-    jest.fn(() => {
-      return Promise.resolve().then(() => {
-        throw new TypeError("Network Error");
-      });
-    })
-  ) as jest.Mock;
+const counter = new Counter();
+
+global.fetch = jest.fn().mockImplementation(
+  jest.fn((url) => {
+    const paths: string[] = url ? url.split("/") : [];
+    const isProfile =
+      paths.includes("profile") && paths.includes(userProfile.id);
+    let data = {};
+    let status = 200;
+
+    if (counter.count == 0) {
+      data = successObj;
+    } else if (counter.count == 1) {
+      status = 400;
+      data = failedObj;
+    } else {
+      throw new TypeError("Network Error");
+    }
+
+    if (isProfile) {
+      counter.increment();
+    }
+
+    return Promise.resolve({
+      status: status,
+      json: () => Promise.resolve(data),
+    });
+  })
+) as jest.Mock;
 
 describe("Test UserProfileProvider", () => {
   // const user = userEvent.setup();
@@ -64,14 +70,22 @@ describe("Test UserProfileProvider", () => {
     await act(() =>
       render(
         <div data-testid="wrapper" className="w-full h-full">
-          <UserContext value={{ user: { id: "1" }, setUser: () => {} }}>
-            <UserProfileProvider>
-              <LobbyNavWrapper />
-            </UserProfileProvider>
-          </UserContext>
+          <QueryProvider>
+            <UserContext
+              value={{ user: { id: userProfile.id }, setUser: () => {} }}
+            >
+              <UserProfileProvider>
+                <LobbyNavWrapper />
+              </UserProfileProvider>
+            </UserContext>
+          </QueryProvider>
         </div>
       )
     );
+  });
+
+  afterAll(() => {
+    counter.reset();
   });
 
   test("Fetch user profile if user exists", () => {

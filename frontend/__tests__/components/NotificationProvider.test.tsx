@@ -5,6 +5,8 @@ import { UserContext } from "@/contexts/user";
 import { NotificationAPI } from "@/types/api";
 import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
 import userEvent from "@testing-library/user-event";
+import NotificationModal from "@/components/Notification/NotificationModal";
+import QueryProvider from "@/components/QueryProvider";
 
 const successObj = {
   message: "Successfully fetched user's unread notification count",
@@ -67,63 +69,74 @@ global.fetch = jest.fn().mockImplementation(
   })
 );
 
-// describe("Test NotificationProvider", () => {
-//   test("Do not fetch unread notification count if user is null", async () => {
-//     await act(() =>
-//       render(
-//         <NotificationProvider>
-//           <NotificationNav />
-//         </NotificationProvider>
-//       )
-//     );
+describe("Test NotificationProvider", () => {
+  const user = userEvent.setup();
+  test("Do not fetch unread notification count if user is null", async () => {
+    await act(() =>
+      render(
+        <QueryProvider>
+          <NotificationProvider>
+            <NotificationModal />
+          </NotificationProvider>
+        </QueryProvider>
+      )
+    );
 
-//     const unreadNotificationIndicator = screen.queryByTestId(
-//       "nrd-ntfctn-cnt-indicator"
-//     );
-//     expect(unreadNotificationIndicator).not.toBeInTheDocument();
-//   });
+    const unreadNotificationIndicator = screen.queryByTestId(
+      "nrd-ntfctn-cnt-indicator"
+    );
+    expect(unreadNotificationIndicator).not.toBeInTheDocument();
+  });
 
-//   test("Fetch unread notification count if user is not null", async () => {
-//     await act(() =>
-//       render(
-//         <UserContext
-//           value={{
-//             user: {
-//               id: "1",
-//             },
-//             setUser: jest.fn(),
-//           }}
-//         >
-//           <NotificationProvider>
-//             <NotificationNav />
-//           </NotificationProvider>
-//         </UserContext>
-//       )
-//     );
+  test("Fetch unread notification count if user is not null", async () => {
+    await act(() =>
+      render(
+        <QueryProvider>
+          <UserContext
+            value={{
+              user: {
+                id: "1",
+              },
+              setUser: jest.fn(),
+            }}
+          >
+            <NotificationProvider>
+              <LobbyNavWrapper />
+            </NotificationProvider>
+          </UserContext>
+        </QueryProvider>
+      )
+    );
 
-//     const unreadNotificationIndicator = screen.queryByTestId(
-//       "nrd-ntfctn-cnt-indicator"
-//     );
-//     expect(unreadNotificationIndicator).toBeInTheDocument();
-//   });
-// });
+    const notificationBtn = screen.getByTestId("notification-l");
+    await user.click(notificationBtn);
+    const unreadNotificationIndicator = screen.queryByTestId(
+      "nrd-ntfctn-cnt-indicator"
+    );
+    await waitFor(async () => {
+      expect(unreadNotificationIndicator).toBeInTheDocument();
+    });
+  });
+});
 
 describe("Test NotificationProvider notifications buffer", () => {
   beforeEach(async () => {
     await act(async () =>
       render(
-        <UserContext
-          value={{
-            user: {
-              id: "1",
-            },
-            setUser: jest.fn(),
-          }}
-        >
-          <NotificationProvider>
-            <LobbyNavWrapper />
-          </NotificationProvider>
-        </UserContext>
+        <QueryProvider>
+          <UserContext
+            value={{
+              user: {
+                id: "1",
+              },
+              setUser: jest.fn(),
+            }}
+          >
+            <NotificationProvider>
+              <LobbyNavWrapper />
+            </NotificationProvider>
+          </UserContext>
+        </QueryProvider>
       )
     );
   });

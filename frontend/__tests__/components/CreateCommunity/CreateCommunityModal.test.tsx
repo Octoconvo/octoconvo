@@ -5,6 +5,7 @@ import { ActiveModalsContext } from "@/contexts/modal";
 import ActiveModalProvider from "@/components/ActiveModalProvider";
 import CreateCommunityModalProvider from "@/components/CreateCommunity/CreateCommunityModalProvider";
 import LobbyNavWrapper from "@/components/Lobby/LobbyNavWrapper";
+import QueryProvider from "@/components/QueryProvider";
 
 const openModalMock = jest.fn();
 const closeModalMock = jest.fn();
@@ -23,15 +24,17 @@ describe("Render CreateCommunityModal", () => {
 
   beforeEach(() => {
     render(
-      <ActiveModalsContext.Provider
-        value={{
-          activeModals: [],
-          openModal: openModalMock,
-          closeModal: closeModalMock,
-        }}
-      >
-        <CreateCommunityModal></CreateCommunityModal>
-      </ActiveModalsContext.Provider>
+      <QueryProvider>
+        <ActiveModalsContext.Provider
+          value={{
+            activeModals: [],
+            openModal: openModalMock,
+            closeModal: closeModalMock,
+          }}
+        >
+          <CreateCommunityModal></CreateCommunityModal>
+        </ActiveModalsContext.Provider>
+      </QueryProvider>
     );
   });
 
@@ -52,11 +55,13 @@ describe("Render CreateCommunityModal", () => {
   beforeEach(async () => {
     await act(async () => {
       render(
-        <ActiveModalProvider>
-          <CreateCommunityModalProvider>
-            <LobbyNavWrapper></LobbyNavWrapper>
-          </CreateCommunityModalProvider>
-        </ActiveModalProvider>
+        <QueryProvider>
+          <ActiveModalProvider>
+            <CreateCommunityModalProvider>
+              <LobbyNavWrapper></LobbyNavWrapper>
+            </CreateCommunityModalProvider>
+          </ActiveModalProvider>
+        </QueryProvider>
       );
     });
   });
