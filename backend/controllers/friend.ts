@@ -380,8 +380,9 @@ const user_friends_get = [
     const lastFriendOnTheList =
       getLastItemInTheArray<UserFriendData>(userFriends);
     let nextCursor: string | false = false;
+    const isFull = userFriends.length === limit;
 
-    if (lastFriendOnTheList) {
+    if (lastFriendOnTheList && isFull) {
       nextCursor = constructFriendCursor({
         id: lastFriendOnTheList.friendId,
         username: lastFriendOnTheList.friend.username,
@@ -391,7 +392,7 @@ const user_friends_get = [
     const responseData: UserFriendsGETResponse = {
       message: "Successfully fetched user's friends",
       friends: userFriends,
-      nextCursor,
+      nextCursor: nextCursor,
     };
 
     res.json(responseData);
