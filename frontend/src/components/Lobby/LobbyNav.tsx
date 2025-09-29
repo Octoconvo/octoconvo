@@ -12,6 +12,7 @@ import {
 import { usePathname } from "next/navigation";
 import NotificationNav from "./NotificationNav";
 import { hasPath } from "@/utils/stringUtils";
+import FriendsNavButton from "../nav/FriendsNavButton";
 
 const LobbyNav = () => {
   const path = usePathname();
@@ -29,22 +30,6 @@ const LobbyNav = () => {
         }
       >
         <div className="flex flex-col justify-between gap-8">
-          <Link
-            data-testid="friends-l"
-            href={`/lobby/friends`}
-            className={
-              "main-nav-link" +
-              (hasPath({ path, toCompare: "friends" })
-                ? " main-nav-link-active"
-                : "")
-            }
-          >
-            <span
-              className={
-                "lobby-nav-icon" + " after:bg-[url(/images/friends-icon.svg)]"
-              }
-            ></span>
-          </Link>
           <Link
             data-testid="dm-l"
             href={`lobby/dm`}
@@ -95,6 +80,7 @@ const LobbyNav = () => {
               }
             ></span>
           </Link>
+          <FriendsNavButton />
           <button
             data-testid="crt-cmmnty-mdl-opn-btn"
             className={

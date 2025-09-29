@@ -4,6 +4,7 @@ import ProtectedRouteWrapper from "@/components/ProtectedRouteWrapper";
 import EditProfileModalProvider from "@/components/EditProfile/EditProfileModalProvider";
 import CreateCommunityModalProvider from "@/components/CreateCommunity/CreateCommunityModalProvider";
 import NotificationProvider from "@/components/NotificationProvider";
+import FriendProvider from "@/components/FriendProvider";
 
 export default async function Layout({
   children,
@@ -17,8 +18,10 @@ export default async function Layout({
           <EditProfileModalProvider>
             <CreateCommunityModalProvider>
               <NotificationProvider>
-                <LobbyNavWrapper />
-                {children}
+                <FriendProvider>
+                  <LobbyNavWrapper />
+                  {children}
+                </FriendProvider>
               </NotificationProvider>
             </CreateCommunityModalProvider>
           </EditProfileModalProvider>
