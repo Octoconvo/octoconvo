@@ -83,6 +83,7 @@ const FriendListModal = () => {
     ref: modalRef,
     onAnimateStart: () => {},
     onAnimateEnd: onAnimateEnd,
+    isOpen,
   });
 
   if (isPending)

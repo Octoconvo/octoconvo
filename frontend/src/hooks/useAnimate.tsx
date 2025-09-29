@@ -4,9 +4,15 @@ interface UseAnimateProps {
   ref: null | React.RefObject<HTMLElement | null>;
   onAnimateStart: () => void;
   onAnimateEnd: () => void;
+  isOpen?: boolean;
 }
 
-const useAnimate = ({ ref, onAnimateStart, onAnimateEnd }: UseAnimateProps) => {
+const useAnimate = ({
+  ref,
+  onAnimateStart,
+  onAnimateEnd,
+  isOpen,
+}: UseAnimateProps) => {
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   useEffect(() => {
@@ -28,7 +34,9 @@ const useAnimate = ({ ref, onAnimateStart, onAnimateEnd }: UseAnimateProps) => {
       HTMLElement?.removeEventListener("animationstart", animateStart);
       HTMLElement?.removeEventListener("animationend", animateEnd);
     };
-  }, [isAnimating]);
+  }, [isOpen]);
+
+  return { isAnimating, setIsAnimating };
 };
 
 export default useAnimate;
