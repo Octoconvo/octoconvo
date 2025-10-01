@@ -1,3 +1,5 @@
+import { removeItemFromArray } from "@/utils/arrayUtils";
+
 interface Entry {
   el: HTMLElement;
   isIntersecting: boolean;
@@ -19,9 +21,14 @@ interface Unobserve {
   (el: HTMLElement): void;
 }
 
+interface Disconnect {
+  (): void;
+}
+
 interface IntersectionObserverMockI {
   observe: Observe;
   unobserve: Unobserve;
+  disconnect: Disconnect;
 }
 
 const updateIsIntersecting = (
@@ -74,12 +81,13 @@ class IntersectionObserverMock implements IntersectionObserverMockI {
     this.removeEntry(el);
   }
 
+  disconnect() {}
+
   private removeEntry(el: HTMLElement) {
-    const index = this.entries.findIndex((entry) => (entry.el = el));
-    this.entries = [
-      ...this.entries.slice(0, index),
-      ...this.entries.slice(index + 1),
-    ];
+    const item = this.entries.find((entry) => entry.el === el);
+    if (item) {
+      removeItemFromArray<Entry>(this.entries, item);
+    }
   }
 }
 
