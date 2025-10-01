@@ -1,5 +1,3 @@
-window.IntersectionObserver = jest.fn(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-})) as jest.Mock;
+import IntersectionObserverMock from "@/mocks/IntersectionObserverMock";
+
+window.IntersectionObserver = IntersectionObserverMock as jest.Mock;
