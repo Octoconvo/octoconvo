@@ -2,12 +2,14 @@
 
 import { FriendListModalContext } from "@/contexts/modal";
 import useAnimate from "@/hooks/useAnimate";
-import { FC, useContext } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { FC, useContext, useRef } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { getUserFriendsFromAPI } from "@/utils/api/friend";
 import Loader from "../loader";
 import FriendList from "./FriendList";
 import testIds from "@/utils/tests/testIds";
+import { Fragment } from "react";
+import useInfiniteLoader from "@/hooks/useInfiniteLoader";
 
 type FriendListModalContainerProps = {
   children: React.ReactNode;
@@ -33,8 +35,8 @@ const FriendListModalContainer: FC<FriendListModalContainerProps> = ({
       <div className="rounded-[16px] overflow-hidden max-h-full">
         <section
           className={
-            "relative w-[480px] bg-black-200 overflow-auto min-h-[100dvh]" +
-            " max-h-[100dvh] scrollbar"
+            "relative w-[480px] bg-black-200 overflow-auto box-border" +
+            " max-h-[calc(100dvh-48px)] min-h-[calc(100dvh-48px)] scrollbar"
           }
         >
           <h1
@@ -45,7 +47,9 @@ const FriendListModalContainer: FC<FriendListModalContainerProps> = ({
           >
             Friends
           </h1>
-          <div className="flex justify-center items-center"> {children}</div>
+          <div className="flex flex-col justify-center items-center">
+            {children}
+          </div>
         </section>
       </div>
     </div>
@@ -54,9 +58,36 @@ const FriendListModalContainer: FC<FriendListModalContainerProps> = ({
 
 const FriendListModal = () => {
   const { modalRef, isOpen } = useContext(FriendListModalContext);
-  const { isPending, error, data, isFetching } = useQuery({
+  let friendsCount = 0;
+  const fetchNextPageRef = useRef<HTMLDivElement | null>(null);
+  const {
+    isPending,
+    error,
+    data,
+    isFetching,
+    isFetchingNextPage,
+    fetchNextPage,
+    hasNextPage,
+  } = useInfiniteQuery({
     queryKey: [`friends`],
-    queryFn: getUserFriendsFromAPI,
+    queryFn: async ({ pageParam }) => getUserFriendsFromAPI({ pageParam }),
+    initialPageParam: "",
+    getNextPageParam: (lastPage, _) => {
+      if (lastPage.nextCursor?.toString().toUpperCase() === "FALSE") {
+        return;
+      }
+
+      return lastPage.nextCursor?.toString();
+    },
+  });
+  useInfiniteLoader({
+    ref: fetchNextPageRef,
+    fetchNextPage: () => {
+      if (hasNextPage && !isFetching) {
+        fetchNextPage();
+      }
+    },
+    threshold: 1,
   });
 
   const showModal = () => {
@@ -105,11 +136,34 @@ const FriendListModal = () => {
   return (
     <>
       <FriendListModalContainer>
-        {data.friends && data.friends?.length < 1 && (
-          <p>You have no friends yet</p>
+        <ul
+          className={
+            "flex flex-col gap-[16px] p-[16px] h-full w-full" + " box-border"
+          }
+        >
+          {data.pages.map((data, i) => {
+            friendsCount = friendsCount + (data.friends?.length || 0);
+
+            return (
+              <Fragment key={i}>
+                {!friendsCount && <p>You have no friends yet</p>}
+                {data.friends && <FriendList friends={data.friends} />}
+              </Fragment>
+            );
+          })}
+        </ul>
+        {hasNextPage && (
+          <div
+            ref={fetchNextPageRef}
+            data-testid={testIds.friendListModalInfiniteLoader}
+            className="min-h-[32px] w-full"
+          ></div>
         )}
-        {data.friends && <FriendList friends={data.friends} />}
-        <div>{isFetching ? "Updating..." : ""}</div>
+        {(isFetching || isFetchingNextPage) && (
+          <div className="mb-[24px]">
+            <Loader size={48} />
+          </div>
+        )}
       </FriendListModalContainer>
     </>
   );
