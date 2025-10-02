@@ -1,10 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import FriendListModal from "@/components/friends/FriendListModal";
 import testIds from "@/utils/tests/testIds";
@@ -20,23 +14,46 @@ import { ConfigMock, GetData, ResponseMock } from "@/types/tests/mocks";
 import { Counter } from "@/utils/tests/helpers";
 
 const friendsMock = generateUserFriendMocks(10);
+const nextCursorMock = friendsMock[friendsMock.length - 1].friend.username;
 const counter = new Counter();
 
 interface UserFriendResponse {
   message: string;
   friends: UserFriendMock[];
+  nextCursor: string;
 }
+
+const getFriendsData = (index: number) => {
+  let friendData: UserFriendMock[];
+
+  switch (index) {
+    case 0:
+      friendData = [];
+      break;
+    case 1:
+    case 2:
+      friendData = friendsMock;
+      break;
+    default:
+      friendData = [];
+  }
+
+  return friendData;
+};
 
 const getData: GetData<UserFriendResponse> = (
   url?: string,
   config?: ConfigMock
 ) => {
+  const data: UserFriendResponse = {
+    message: "Successfully fetched user's friends",
+    friends: getFriendsData(counter.count),
+    nextCursor: counter.count > 1 ? "false" : nextCursorMock,
+  };
+
   return {
     status: 200,
-    data: {
-      message: "Successfully fetched user's friends",
-      friends: counter.count === 0 ? friendsMock : [],
-    },
+    data,
     error: null,
   };
 };
@@ -73,29 +90,26 @@ const ComponentMock: FC<ComponentMock> = ({ isOpen, isInitial }) => {
 };
 
 describe("Test FriendListModal component", () => {
-  test("The modal should render 10 friends on the ulist", async () => {
-    render(<ComponentMock isInitial={true} isOpen={false} />);
-
-    await waitFor(async () => {
-      const list = screen.getAllByRole("listitem") as HTMLElement[];
-      expect(list.length).toBe(10);
-      counter.increment();
-    });
-  });
-
   test(
     "The modal should display 'You have no friends yet' if the user has 0" +
       " friends",
     async () => {
       render(<ComponentMock isInitial={true} isOpen={false} />);
-
       await waitFor(async () => {
         const noFriendsText = screen.getByText("You have no friends yet");
-        expect(noFriendsText).toBeInTheDocument;
+        expect(noFriendsText).toBeInTheDocument();
         counter.increment();
       });
     }
   );
+
+  test("The modal should render 10 friends on the ulist", async () => {
+    render(<ComponentMock isInitial={true} isOpen={false} />);
+    await waitFor(async () => {
+      const list = screen.getAllByRole("listitem");
+      expect(list.length).toBe(10);
+    });
+  });
 
   test(
     "The modal should have display hidden if isInital is true and isOpen is" +
@@ -112,9 +126,7 @@ describe("Test FriendListModal component", () => {
       " is true",
     () => {
       render(<ComponentMock isInitial={true} isOpen={true} />);
-      const friendListModal = screen.getByTestId(
-        testIds.friendListModal
-      ) as HTMLElement;
+      const friendListModal = screen.getByTestId(testIds.friendListModal);
       expect(friendListModal.classList).not.toContain("hidden");
     }
   );
@@ -124,9 +136,7 @@ describe("Test FriendListModal component", () => {
       " is false",
     () => {
       render(<ComponentMock isInitial={true} isOpen={false} />);
-      const friendListModal = screen.getByTestId(
-        testIds.friendListModal
-      ) as HTMLElement;
+      const friendListModal = screen.getByTestId(testIds.friendListModal);
       expect(friendListModal.classList).toContain("hidden");
     }
   );
@@ -136,9 +146,7 @@ describe("Test FriendListModal component", () => {
       " animationEnd event is called",
     () => {
       render(<ComponentMock isInitial={true} isOpen={true} />);
-      const friendListModal = screen.getByTestId(
-        testIds.friendListModal
-      ) as HTMLElement;
+      const friendListModal = screen.getByTestId(testIds.friendListModal);
       expect(friendListModal.classList).not.toContain("z-10");
       fireEvent.animationEnd(friendListModal);
       expect(friendListModal.classList).toContain("z-10");
@@ -150,12 +158,37 @@ describe("Test FriendListModal component", () => {
       " animationEnd event is calledd",
     () => {
       render(<ComponentMock isInitial={true} isOpen={false} />);
-      const friendListModal = screen.getByTestId(
-        testIds.friendListModal
-      ) as HTMLElement;
+      const friendListModal = screen.getByTestId(testIds.friendListModal);
       expect(friendListModal.classList).not.toContain("z-0");
       fireEvent.animationEnd(friendListModal);
       expect(friendListModal.classList).toContain("z-0");
     }
   );
+
+  const testInfiniteLoader = async (before: number, after: number) => {
+    render(<ComponentMock isInitial={true} isOpen={true} />);
+    const lists = screen.getAllByRole("listitem");
+    expect(lists.length).toBe(before);
+    const infiniteLoader = screen.queryByTestId(
+      testIds.friendListModalInfiniteLoader
+    );
+
+    counter.increment();
+
+    if (infiniteLoader) {
+      await waitFor(async () => {
+        fireEvent.mouseEnter(infiniteLoader);
+        const friendListItems = screen.getAllByRole("listitem");
+        expect(friendListItems.length).toBe(after);
+      });
+    }
+  };
+
+  test("Load more friends if nextCursor is defined", async () => {
+    await testInfiniteLoader(10, 20);
+  });
+
+  test("Don't loead more friends if nextCursor is undefined", async () => {
+    await testInfiniteLoader(20, 20);
+  });
 });
