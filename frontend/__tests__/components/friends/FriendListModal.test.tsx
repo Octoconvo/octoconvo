@@ -4,7 +4,7 @@ import FriendListModal from "@/components/friends/FriendListModal";
 import testIds from "@/utils/tests/testIds";
 import QueryProvider from "@/components/QueryProvider";
 import { FriendListModalContext } from "@/contexts/modal";
-import { FC, useRef } from "react";
+import { FC, useRef, useState } from "react";
 import {
   createFetchMock,
   generateUserFriendMocks,
@@ -12,6 +12,7 @@ import {
 } from "@/utils/tests/mocks";
 import { ConfigMock, GetData, ResponseMock } from "@/types/tests/mocks";
 import { Counter } from "@/utils/tests/helpers";
+import userEvent from "@testing-library/user-event";
 
 const friendsMock = generateUserFriendMocks(10);
 const nextCursorMock = friendsMock[friendsMock.length - 1].friend.username;
@@ -71,13 +72,14 @@ interface ComponentMock {
 
 const ComponentMock: FC<ComponentMock> = ({ isOpen, isInitial }) => {
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const [isOpenMock, setIsOpenMock] = useState<boolean>(isOpen);
 
   return (
     <FriendListModalContext
       value={{
         isInitial,
-        isOpen,
-        setIsOpen: jest.fn(),
+        isOpen: isOpenMock,
+        setIsOpen: setIsOpenMock,
         toggleView: jest.fn(),
         modalRef,
       }}
@@ -90,6 +92,8 @@ const ComponentMock: FC<ComponentMock> = ({ isOpen, isInitial }) => {
 };
 
 describe("Test FriendListModal component", () => {
+  const user = userEvent.setup();
+
   test(
     "The modal should display 'You have no friends yet' if the user has 0" +
       " friends",
@@ -111,13 +115,22 @@ describe("Test FriendListModal component", () => {
     });
   });
 
+  const testIsModalHidden = () => {
+    const friendListModal = screen.getByTestId(testIds.friendListModal);
+    expect(friendListModal.classList).toContain("hidden");
+  };
+
+  const testIsModalShown = () => {
+    const friendListModal = screen.getByTestId(testIds.friendListModal);
+    expect(friendListModal.classList).not.toContain("hidden");
+  };
+
   test(
     "The modal should have display hidden if isInital is true and isOpen is" +
       " false",
     () => {
       render(<ComponentMock isInitial={true} isOpen={false} />);
-      const friendListModal = screen.getByTestId(testIds.friendListModal);
-      expect(friendListModal.classList).toContain("hidden");
+      testIsModalHidden();
     }
   );
 
@@ -126,8 +139,7 @@ describe("Test FriendListModal component", () => {
       " is true",
     () => {
       render(<ComponentMock isInitial={true} isOpen={true} />);
-      const friendListModal = screen.getByTestId(testIds.friendListModal);
-      expect(friendListModal.classList).not.toContain("hidden");
+      testIsModalShown();
     }
   );
 
@@ -136,8 +148,7 @@ describe("Test FriendListModal component", () => {
       " is false",
     () => {
       render(<ComponentMock isInitial={true} isOpen={false} />);
-      const friendListModal = screen.getByTestId(testIds.friendListModal);
-      expect(friendListModal.classList).toContain("hidden");
+      testIsModalHidden();
     }
   );
 
@@ -191,4 +202,29 @@ describe("Test FriendListModal component", () => {
   test("Don't loead more friends if nextCursor is undefined", async () => {
     await testInfiniteLoader(20, 20);
   });
+
+  test("The friendListModal should be closed after pressing the Escape key", async () => {
+    render(<ComponentMock isInitial={true} isOpen={true} />);
+    testIsModalShown();
+    await user.keyboard("{Escape}");
+    await waitFor(async () => {
+      testIsModalHidden();
+    });
+  });
+
+  test(
+    "The friendListModal should be closed after clicking outside of the" +
+      " modal",
+    async () => {
+      render(<ComponentMock isInitial={true} isOpen={true} />);
+      const controller = screen.getByTestId(
+        testIds.FriendListModalCloseController
+      );
+      testIsModalShown();
+      await user.click(controller);
+      await waitFor(async () => {
+        testIsModalHidden();
+      });
+    }
+  );
 });
