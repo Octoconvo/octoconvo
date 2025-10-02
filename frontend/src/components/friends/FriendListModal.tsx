@@ -11,6 +11,7 @@ import testIds from "@/utils/tests/testIds";
 import { Fragment } from "react";
 import useInfiniteLoader from "@/hooks/useInfiniteLoader";
 import useCloseOnEscape from "@/hooks/useCloseOnEscape";
+import { closeOnOutsideClick } from "@/utils/HTMLUtils";
 
 interface FriendListModalContainerProps {
   children: React.ReactNode;
@@ -19,41 +20,61 @@ interface FriendListModalContainerProps {
 const FriendListModalContainer: FC<FriendListModalContainerProps> = ({
   children,
 }) => {
-  const { modalRef, isOpen, isInitial } = useContext(FriendListModalContext);
+  const { modalRef, isOpen, isInitial, setIsOpen } = useContext(
+    FriendListModalContext
+  );
   const isClosed = !isOpen;
 
   return (
-    <div
-      ref={modalRef}
-      data-testid={testIds.friendListModal}
-      className={
-        "absolute top-0 left-[100%] h-full bg-gr-black-2-r p-[16px]" +
-        " max-h-[100dvh] rounded-tr-[16px] rounded-br-[16px] box-border" +
-        (isOpen ? " animate-slide-right" : " animate-slide-left") +
-        (isInitial && isClosed ? " hidden" : "")
-      }
-    >
-      <div className="rounded-[16px] overflow-hidden max-h-full">
-        <section
-          className={
-            "relative w-[480px] bg-black-200 overflow-auto box-border" +
-            " max-h-[calc(100dvh-48px)] min-h-[calc(100dvh-48px)] scrollbar"
-          }
-        >
-          <h1
+    <>
+      <div
+        data-testid={testIds.FriendListModalCloseController}
+        className={
+          "absolute z-10 top-0 left-0" +
+          (isOpen ? " w-[100dvw] h-[100dvh]" : "w-0 h-0")
+        }
+        onClick={(e) => {
+          closeOnOutsideClick({
+            e,
+            ref: modalRef,
+            closeModal: () => {
+              setIsOpen(false);
+            },
+          });
+        }}
+      ></div>
+      <div
+        ref={modalRef}
+        data-testid={testIds.friendListModal}
+        className={
+          "absolute top-0 left-[100%] h-full bg-gr-black-2-r p-[16px]" +
+          " max-h-[100dvh] rounded-tr-[16px] rounded-br-[16px] box-border" +
+          (isOpen ? " animate-slide-right" : " animate-slide-left") +
+          (isInitial && isClosed ? " hidden" : "")
+        }
+      >
+        <div className="rounded-[16px] overflow-hidden max-h-full">
+          <section
             className={
-              "sticky top-0 bg-black-200 p-[24px] text-h5 font-bold" +
-              " rounded-[inherit]"
+              "relative w-[480px] bg-black-200 overflow-auto box-border" +
+              " max-h-[calc(100dvh-48px)] min-h-[calc(100dvh-48px)] scrollbar"
             }
           >
-            Friends
-          </h1>
-          <div className="flex flex-col justify-center items-center">
-            {children}
-          </div>
-        </section>
+            <h1
+              className={
+                "sticky top-0 bg-black-200 p-[24px] text-h5 font-bold" +
+                " rounded-[inherit]"
+              }
+            >
+              Friends
+            </h1>
+            <div className="flex flex-col justify-center items-center">
+              {children}
+            </div>
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
