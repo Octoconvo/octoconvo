@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FC, useContext, useEffect, useState } from "react";
 import { UserProfile } from "@/types/user";
 import avatarIcon from "../../public/images/avatar_icon.svg";
-import { formatDateString } from "@/utils/date";
+import { formatDateString } from "@/utils/dateUtils";
 import socket from "@/socket/socket";
 import { UserContext, UserProfileContext } from "@/contexts/user";
 import {
@@ -13,7 +13,7 @@ import {
   EditProfileModalContext,
 } from "@/contexts/modal";
 import { connectToRoom } from "@/socket/eventHandler";
-import { logout } from "@/utils/authentication";
+import { logout } from "@/utils/authUtils";
 
 type ProfileModalProps = {
   id?: string;

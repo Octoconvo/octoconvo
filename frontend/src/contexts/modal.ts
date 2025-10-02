@@ -57,10 +57,27 @@ const NotificationModalContext = createContext<NotificationModalContext>({
   setIsNotificationModalAnimating: () => {},
 });
 
+type FriendListModalContext = {
+  modalRef: null | React.RefObject<null | HTMLDivElement>;
+  isOpen: boolean;
+  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  toggleView: () => void;
+  isInitial: boolean;
+};
+
+const FriendListModalContext = createContext<FriendListModalContext>({
+  modalRef: null,
+  isOpen: false,
+  setIsOpen: () => {},
+  toggleView: () => {},
+  isInitial: true,
+});
+
 export {
   ActiveModalsContext,
   EditProfileModalContext,
   UserProfileModalContext,
   CreateCommunityModalContext,
   NotificationModalContext,
+  FriendListModalContext,
 };

@@ -1227,4 +1227,25 @@ describe("Test user_friends_get controller", () => {
         .expect(200, done);
     },
   );
+
+  test(
+    "The returned nextCursor should be false if friends' length is less than" +
+      " limit",
+    done => {
+      const currentFriend = userFriends[userFriends.length - 2];
+      const cursorQuery = constructFriendCursor({
+        id: currentFriend.friendId,
+        username: currentFriend.friend.username,
+      });
+
+      agent
+        .get(`/friends?limit=10&cursor=${cursorQuery}`)
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const nextCursor = res.body.nextCursor;
+          expect(nextCursor).toBe(false);
+        })
+        .expect(200, done);
+    },
+  );
 });

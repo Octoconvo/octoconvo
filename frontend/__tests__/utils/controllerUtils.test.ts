@@ -1,4 +1,4 @@
-import { triggerInputClick } from "@/utils/controller";
+import { triggerInputClick } from "@/utils/controllerUtils";
 
 describe("Test triggerInputClick", () => {
   test("Test click", () => {

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { FC, useEffect, useRef, useState } from "react";
-import { formatDateString } from "@/utils/date";
+import { formatDateString } from "@/utils/dateUtils";
 import { ProfileAPI } from "@/types/api";
 import { getFriendshipStatusFromAPI } from "@/utils/api/friend";
 import FriendshipStatusButton from "./FriendshipStatusButton";

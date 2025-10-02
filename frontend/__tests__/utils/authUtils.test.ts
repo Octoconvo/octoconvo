@@ -1,4 +1,4 @@
-import { checkAuthStatus, logout } from "@/utils/authentication";
+import { checkAuthStatus, logout } from "@/utils/authUtils";
 
 const successObj = {
   message: "You are authenticated",

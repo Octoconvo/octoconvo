@@ -14,7 +14,7 @@ import {
   getNotificationCountFromAPI,
   postNotificationsReadStatusesToAPI,
 } from "@/api/notification";
-import { pushBufferedNotifications } from "@/utils/notification";
+import { pushBufferedNotifications } from "@/utils/notificationUtils";
 
 const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useContext(UserContext);

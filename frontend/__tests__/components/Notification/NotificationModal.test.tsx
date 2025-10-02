@@ -1,6 +1,6 @@
 import NotificationModal from "@/components/Notification/NotificationModal";
 import "@testing-library/jest-dom";
-import { screen, render, act, waitFor } from "@testing-library/react";
+import { screen, render, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NotificationAPI } from "@/types/api";
 import { NotificationModalContext } from "@/contexts/modal";

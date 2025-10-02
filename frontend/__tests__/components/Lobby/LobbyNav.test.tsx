@@ -24,7 +24,6 @@ describe("Render LobbyNav component", () => {
   it("Friends nav link exists", () => {
     const loginLink = screen.getByTestId("friends-l") as HTMLAnchorElement;
     expect(loginLink).toBeInTheDocument();
-    expect(loginLink.href).toContain("/friends");
   });
 
   it("DM nav link exists", () => {

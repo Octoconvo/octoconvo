@@ -1,6 +1,6 @@
 "use client";
 
-import { unescapeString } from "@/utils/string";
+import { unescapeString } from "@/utils/stringUtils";
 
 const Payload = ({
   triggeredBy,

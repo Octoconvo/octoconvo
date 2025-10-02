@@ -1,10 +1,10 @@
 import MessageBox from "@/components/MessageBox/MessageBox";
-import { validateFiles } from "@/utils/file";
+import { validateFiles } from "@/utils/fileUtils";
 import "@testing-library/jest-dom";
 import { render, act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-jest.mock("@/utils/file", () => ({
+jest.mock("@/utils/fileUtils", () => ({
   previewImage: jest.fn(() => "blob: testpreviewurl"),
   validateFiles: jest.fn(() => {}),
 }));
@@ -52,7 +52,7 @@ describe("Render MessageBox", () => {
   const user = userEvent.setup();
 
   beforeAll(async () => {
-    const originalModule = jest.requireActual("@/utils/file");
+    const originalModule = jest.requireActual("@/utils/fileUtils");
 
     (validateFiles as jest.Mock)
       .mockImplementation(originalModule.validateFiles)

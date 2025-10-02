@@ -5,7 +5,7 @@ import { CommunityAPI } from "@/types/api";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { unescapeString } from "@/utils/string";
+import { unescapeString } from "@/utils/stringUtils";
 
 const CommunitiesItem = ({ community }: { community: CommunityAPI }) => {
   const [isHovered, setIsHovered] = useState(false);

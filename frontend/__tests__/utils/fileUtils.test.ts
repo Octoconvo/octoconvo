@@ -3,9 +3,9 @@ import {
   previewFile,
   selectFile,
   validateFiles,
-} from "@/utils/file";
+} from "@/utils/fileUtils";
 
-jest.unmock("@/utils/file");
+jest.unmock("@/utils/fileUtils");
 
 describe("Test readFileAsDataURL", () => {
   test("Return dataURL on success", async () => {

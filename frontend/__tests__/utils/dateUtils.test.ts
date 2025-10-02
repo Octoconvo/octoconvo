@@ -1,4 +1,4 @@
-import { formatDateString } from "@/utils/date";
+import { formatDateString } from "@/utils/dateUtils";
 
 describe("Test transformDateString function", () => {
   test("return correct date string in january 01 2000 format", () => {

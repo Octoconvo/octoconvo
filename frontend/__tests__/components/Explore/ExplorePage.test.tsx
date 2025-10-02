@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { render, act, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { CommunityExploreAPI, ProfileAPI } from "@/types/api";
-import SearchBar from "@/components/SearchBar/SearchBar";
 
 const community1: CommunityExploreAPI = {
   id: "testid1",

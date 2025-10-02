@@ -6,6 +6,8 @@ import ProfileModal from "@/components/ProfileModal";
 import { UserProfileContext } from "@/contexts/user";
 import { UserProfileModalContext } from "@/contexts/modal";
 import NotificationModal from "@/components/Notification/NotificationModal";
+import FriendListModal from "../friends/FriendListModal";
+import QueryProvider from "../QueryProvider";
 
 const LobbyNavWrapper = () => {
   const { userProfile } = useContext(UserProfileContext);
@@ -13,11 +15,14 @@ const LobbyNavWrapper = () => {
 
   return (
     <div className="relative z-10">
-      <UserProfileModalContext.Provider value={{ userProfileModal }}>
-        <LobbyNav />
-        <ProfileModal profileData={userProfile} />
-        <NotificationModal />
-      </UserProfileModalContext.Provider>
+      <QueryProvider>
+        <UserProfileModalContext.Provider value={{ userProfileModal }}>
+          <LobbyNav />
+          <ProfileModal profileData={userProfile} />
+          <NotificationModal />
+          <FriendListModal />
+        </UserProfileModalContext.Provider>
+      </QueryProvider>
     </div>
   );
 };

@@ -2,7 +2,7 @@
 
 import CreateCommunityForm from "@/components/CreateCommunity/CreateCommunityForm";
 import { useContext, useState } from "react";
-import { getFormData, createOnSubmit } from "@/utils/form";
+import { getFormData, createOnSubmit } from "@/utils/formUtils";
 import { CommunityAPI } from "@/types/api";
 import {
   CreateCommunityForm as CreateCommunityFormType,

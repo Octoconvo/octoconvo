@@ -3,9 +3,6 @@ import "@testing-library/jest-dom";
 import userEvent from "@testing-library/user-event";
 import RequestActionBtn from "@/components/Notification/RequestActionBtn";
 
-const notification = jest.fn();
-const participant = jest.fn();
-const newNotifications = jest.fn();
 const onSubmitMock = jest.fn((action: string) => {});
 
 describe("Render RequestActionBtn with false isRead and REJECT action", () => {

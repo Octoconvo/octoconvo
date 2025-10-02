@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createSignupOnSubmit } from "@/utils/form";
+import { createSignupOnSubmit } from "@/utils/formUtils";
 import SignupForm from "./SignupForm";
 import { useState } from "react";
 import { ValidationError } from "@/types/form";

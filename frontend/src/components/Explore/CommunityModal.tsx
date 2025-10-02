@@ -1,7 +1,7 @@
 import { CommunityExploreAPI } from "@/types/api";
-import { unescapeString } from "@/utils/string";
+import { unescapeString } from "@/utils/stringUtils";
 import { FC, useEffect, useRef, useState } from "react";
-import { formatDateString } from "@/utils/date";
+import { formatDateString } from "@/utils/dateUtils";
 import CommunityParticipationButton from "./CommunityParticipationButton";
 import { getCommunityParticipationStatusFromAPI } from "@/utils/api/community";
 

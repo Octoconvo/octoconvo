@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="512"
+   height="512"
+   viewBox="0 0 512 512"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="avatar_icon.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="px"
+     inkscape:zoom="0.53654489"
+     inkscape:cx="113.69039"
+     inkscape:cy="49.390089"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <inkscape:path-effect
+       effect="fillet_chamfer"
+       id="path-effect1"
+       is_visible="true"
+       lpeversion="1"
+       nodesatellites_param="F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1 @ F,0,0,1,0,0,0,1"
+       radius="0"
+       unit="px"
+       method="auto"
+       mode="F"
+       chamfer_steps="1"
+       flexible="false"
+       use_knot_distance="true"
+       apply_no_radius="true"
+       apply_with_radius="true"
+       only_selected="false"
+       hide_knots="false" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="path1"
+       style="fill:#d5cfdd;fill-opacity:1;fill-rule:evenodd;stroke:#3bc1e7;stroke-width:0"
+       d="m 256,109 c -55.22847,0 -100,44.77153 -100,100 0,55.22847 44.77153,100 100,100 55.22847,0 100,-44.77153 100,-100 0,-55.22847 -44.77153,-100 -100,-100 z m 0,25 c 41.42136,0 75,33.57864 75,75 0,41.42136 -33.57864,75 -75,75 -9.20942,0 -18.03114,-1.65989 -26.18233,-4.69681 C 201.30712,268.6809 181,241.21194 181,209 c 0,-41.42136 33.57864,-75 75,-75 z m 0,191.57227 C 167.0279,325.79678 90.848635,404.18434 74.824219,512 H 106 C 119.25468,422.82179 182.26534,357.98471 255.85742,357.79883 329.55705,357.81536 392.72582,422.69168 406,512 h 31.51953 C 421.47161,404.0275 345.10175,325.59263 256,325.57227 Z"
+       sodipodi:nodetypes="sssssssssssccccccc" />
+  </g>
+</svg>

@@ -4,6 +4,7 @@ import { inter } from "@/fonts";
 import SocketWrapper from "@/components/SocketWrapper";
 import UserProvider from "@/components/UserProvider";
 import UserProfileProvider from "@/components/UserProfileProvider";
+import QueryProvider from "@/components/QueryProvider";
 
 export const metadata: Metadata = {
   title: "Octoconvo",
