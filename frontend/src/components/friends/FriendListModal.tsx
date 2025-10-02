@@ -10,10 +10,11 @@ import FriendList from "./FriendList";
 import testIds from "@/utils/tests/testIds";
 import { Fragment } from "react";
 import useInfiniteLoader from "@/hooks/useInfiniteLoader";
+import useCloseOnEscape from "@/hooks/useCloseOnEscape";
 
-type FriendListModalContainerProps = {
+interface FriendListModalContainerProps {
   children: React.ReactNode;
-};
+}
 
 const FriendListModalContainer: FC<FriendListModalContainerProps> = ({
   children,
@@ -57,7 +58,7 @@ const FriendListModalContainer: FC<FriendListModalContainerProps> = ({
 };
 
 const FriendListModal = () => {
-  const { modalRef, isOpen } = useContext(FriendListModalContext);
+  const { modalRef, isOpen, setIsOpen } = useContext(FriendListModalContext);
   let friendsCount = 0;
   const fetchNextPageRef = useRef<HTMLDivElement | null>(null);
   const {
@@ -89,6 +90,11 @@ const FriendListModal = () => {
     },
     threshold: 1,
   });
+  useCloseOnEscape({
+    closeModal: () => {
+      setIsOpen(false);
+    },
+  });
 
   const showModal = () => {
     const HTMLElement = modalRef?.current;
@@ -114,7 +120,6 @@ const FriendListModal = () => {
     ref: modalRef,
     onAnimateStart: () => {},
     onAnimateEnd: onAnimateEnd,
-    isOpen,
   });
 
   if (isPending)
