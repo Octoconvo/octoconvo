@@ -499,8 +499,11 @@ describe("Test friend request post controller", () => {
         notUserFriendRequestNotification,
         userCommunityRequestNotification,
       );
-    } catch (err) {
-      logErrorMessage(err);
+    } catch (
+      //eslint-disable-next-line
+      err
+    ) {
+      logErrorMessage("friend_request_post controller: failed to setup");
     }
   });
 
@@ -508,8 +511,13 @@ describe("Test friend request post controller", () => {
     for (const notification of notificationsToDelete) {
       try {
         await deleteNotificatioById(notification.id);
-      } catch (err) {
-        logErrorMessage(err);
+      } catch (
+        //eslint-disable-next-line
+        err
+      ) {
+        logErrorMessage(
+          "friend_request_post controller: failed to delete notification",
+        );
       }
     }
     for (const friend of friendsToDelete) {
@@ -518,8 +526,13 @@ describe("Test friend request post controller", () => {
           friendOfId: friend.friendOfId,
           friendId: friend.friendId,
         });
-      } catch (err) {
-        logErrorMessage(err);
+      } catch (
+        //eslint-disable-next-line
+        err
+      ) {
+        logErrorMessage(
+          "friend_request_post controller: failed to delete friend",
+        );
       }
     }
   });
