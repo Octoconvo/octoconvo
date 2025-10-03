@@ -195,6 +195,40 @@ const getUserByUsername = (username: string) => {
   });
 };
 
+interface DeleteFriendRequestsArgs {
+  id: string;
+  friendId: string;
+  startDate: string;
+  endDate: string;
+}
+
+const deleteFriendRequests = ({
+  id,
+  friendId,
+  startDate,
+  endDate,
+}: DeleteFriendRequestsArgs) => {
+  return prisma.notification.deleteMany({
+    where: {
+      OR: [
+        {
+          triggeredForId: id,
+          triggeredById: friendId,
+        },
+        {
+          triggeredForId: friendId,
+          triggeredById: id,
+        },
+      ],
+      type: "FRIENDREQUEST",
+      createdAt: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+  });
+};
+
 export {
   getUserFriends,
   getUserLastFriend,
@@ -204,4 +238,5 @@ export {
   deleteNotificatioById,
   deleteFriendByIds,
   getUserByUsername,
+  deleteFriendRequests,
 };
