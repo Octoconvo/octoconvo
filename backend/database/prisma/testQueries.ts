@@ -128,4 +128,42 @@ const createFriend = ({
   });
 };
 
-export { getUserFriends, getUserLastFriend, createNotification, createFriend };
+interface CreateFriendsAndNotificationArgs {
+  username: string;
+  friendUsername: string;
+}
+const createFriendsAndNotification = async ({
+  username,
+  friendUsername,
+}: CreateFriendsAndNotificationArgs) => {
+  const notification = await createNotification({
+    triggeredForUsername: username,
+    triggeredByUsername: friendUsername,
+    payload: "sent a friend request",
+    type: "FRIENDREQUEST",
+  });
+
+  const friends = await Promise.all([
+    createFriend({
+      friendOfUsername: username,
+      friendUsername: friendUsername,
+    }),
+    createFriend({
+      friendOfUsername: friendUsername,
+      friendUsername: username,
+    }),
+  ]);
+
+  return {
+    notification,
+    friends,
+  };
+};
+
+export {
+  getUserFriends,
+  getUserLastFriend,
+  createNotification,
+  createFriend,
+  createFriendsAndNotification,
+};

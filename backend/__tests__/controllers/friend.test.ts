@@ -10,7 +10,7 @@ import {
   getUserFriends,
   getUserLastFriend,
   createNotification,
-  createFriend,
+  createFriendsAndNotification,
 } from "../../database/prisma/testQueries";
 import { logErrorMessage } from "../../utils/loggerUtils";
 
@@ -509,55 +509,30 @@ describe("Test friend request post controller", () => {
   const notificationsToDelete: NotificationRes[] = [];
   const friendsToDelete: Friend[] = [];
 
+  const pushFriendsToArray = (friends: Friend[], array: Friend[]) => {
+    for (const friend of friends) {
+      array.push(friend);
+    }
+  };
+
   beforeAll(async () => {
     try {
-      interface CreateFriendsAndNotificationArgs {
-        username: string;
-        friendUsername: string;
-      }
-      const createFriendsAndNotification = async ({
-        username,
-        friendUsername,
-      }: CreateFriendsAndNotificationArgs) => {
-        const notification = await createNotification({
-          triggeredForUsername: userUsername,
-          triggeredByUsername: friendUsername,
-          payload: "sent a friend request",
-          type: "FRIENDREQUEST",
-        });
-
-        const friends = await Promise.all([
-          createFriend({
-            friendOfUsername: username,
-            friendUsername: friendUsername,
-          }),
-          createFriend({
-            friendOfUsername: friendUsername,
-            friendUsername: username,
-          }),
-        ]);
-
-        for (const friend of friends) {
-          friendsToDelete.push(friend);
-        }
-        notificationsToDelete.push(notification);
-
-        return {
-          notification,
-        };
-      };
-
-      const { notification: notification1 } =
+      const { notification: notification1, friends: friends1 } =
         await createFriendsAndNotification({
           username: userUsername,
           friendUsername: toBeFriendUsername1,
         });
-      const { notification: notification2 } =
+      pushFriendsToArray(friends1, friendsToDelete);
+      notificationsToDelete.push(notification1);
+
+      const { notification: notification2, friends: friends2 } =
         await createFriendsAndNotification({
           username: userUsername,
           friendUsername: toBeFriendUsername2,
         });
+      notificationsToDelete.push(notification2);
 
+      pushFriendsToArray(friends2, friendsToDelete);
       userFriendRequestNotification1 = notification1;
       userFriendRequestNotification2 = notification2;
 
@@ -567,12 +542,14 @@ describe("Test friend request post controller", () => {
         payload: "sent a friend request",
         type: "FRIENDREQUEST",
       });
+
       userCommunityRequestNotification = await createNotification({
         triggeredForUsername: userUsername,
         triggeredByUsername: toBeFriendUsername1,
         payload: "requested to join",
         type: "COMMUNITYREQUEST",
       });
+
       notificationsToDelete.push(
         notUserFriendRequestNotification,
         userCommunityRequestNotification,
