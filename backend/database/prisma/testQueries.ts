@@ -103,4 +103,29 @@ const createNotification = ({
   });
 };
 
-export { getUserFriends, getUserLastFriend, createNotification };
+interface CreateFriendArgs {
+  friendOfUsername: string;
+  friendUsername: string;
+}
+
+const createFriend = ({
+  friendOfUsername,
+  friendUsername,
+}: CreateFriendArgs) => {
+  return prisma.friend.create({
+    data: {
+      friendOf: {
+        connect: {
+          username: friendOfUsername,
+        },
+      },
+      friend: {
+        connect: {
+          username: friendUsername,
+        },
+      },
+    },
+  });
+};
+
+export { getUserFriends, getUserLastFriend, createNotification, createFriend };

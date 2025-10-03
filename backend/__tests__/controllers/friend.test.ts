@@ -10,6 +10,7 @@ import {
   getUserFriends,
   getUserLastFriend,
   createNotification,
+  createFriend,
 } from "../../database/prisma/testQueries";
 
 describe("Test user's friendship status get controller with seeduser1", () => {
@@ -500,33 +501,6 @@ describe("Test friend request post controller", () => {
   let communityRequestNotification1: null | NotificationRes = null;
   let friends1: Friend[] | null = null;
   let friends2: Friend[] | null = null;
-
-  type CreateFriend = {
-    friendOfUsername: string;
-    friendUsername: string;
-  };
-
-  const createFriend = async ({
-    friendOfUsername,
-    friendUsername,
-  }: CreateFriend) => {
-    const friend = await prisma.friend.create({
-      data: {
-        friendOf: {
-          connect: {
-            username: friendOfUsername,
-          },
-        },
-        friend: {
-          connect: {
-            username: friendUsername,
-          },
-        },
-      },
-    });
-
-    return friend;
-  };
 
   beforeAll(async () => {
     try {
