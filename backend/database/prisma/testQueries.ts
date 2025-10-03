@@ -187,6 +187,14 @@ const deleteNotificatioById = async (id: string) => {
   });
 };
 
+const getUserByUsername = (username: string) => {
+  return prisma.user.findUnique({
+    where: {
+      username: username,
+    },
+  });
+};
+
 export {
   getUserFriends,
   getUserLastFriend,
@@ -195,4 +203,5 @@ export {
   createFriendsAndNotification,
   deleteNotificatioById,
   deleteFriendByIds,
+  getUserByUsername,
 };
