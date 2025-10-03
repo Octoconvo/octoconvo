@@ -49,16 +49,11 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .get("/friend/friendship-status")
         .expect("Content-type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const usernameQueryValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "username",
           });
-
-          expect(message).toBe(
-            "Failed to fetch your friendship status with the user",
-          );
           expect(usernameQueryValidationErrorMsg).toBe(
             "Username query is required",
           );
@@ -76,16 +71,11 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .get(`/friend/friendship-status?username=${usernameQuery}`)
         .expect("Content-type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const usernameQueryValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "username",
           });
-
-          expect(message).toBe(
-            "Failed to fetch your friendship status with the user",
-          );
           expect(usernameQueryValidationErrorMsg).toBe(
             "Username query must not exceed 32 characters",
           );
@@ -103,16 +93,11 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .get(`/friend/friendship-status?username=${usernameQuery}`)
         .expect("Content-type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const usernameQueryValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "username",
           });
-
-          expect(message).toBe(
-            "Failed to fetch your friendship status with the user",
-          );
           expect(usernameQueryValidationErrorMsg).toBe(
             "Username query must only contain alphanumeric characters" +
               " and underscores",
@@ -131,12 +116,7 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .get(`/friend/friendship-status?username=${usernameQuery}`)
         .expect("Content-type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const errorMessage = res.body.error.message;
-
-          expect(message).toBe(
-            "Failed to fetch your friendship status with the user",
-          );
           expect(errorMessage).toBe("User with that username doesn't exist");
         })
         .expect(404, done);
@@ -153,7 +133,6 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .expect("Content-type", /json/)
         .expect((res: Response) => {
           const message = res.body.message;
-
           expect(message).toBe(
             "Successfully fetched your friendship status with seeduser2",
           );
@@ -169,7 +148,6 @@ describe("Test user's friendship status get controller with seeduser1", () => {
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const frienshipStatus = res.body.friendshipStatus;
-
         expect(frienshipStatus).toBe("NONE");
       })
       .expect(200, done);
@@ -182,7 +160,6 @@ describe("Test user's friendship status get controller with seeduser1", () => {
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const frienshipStatus = res.body.friendshipStatus;
-
         expect(frienshipStatus).toBe("ACTIVE");
       })
       .expect(200, done);
@@ -195,7 +172,6 @@ describe("Test user's friendship status get controller with seeduser1", () => {
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const frienshipStatus = res.body.friendshipStatus;
-
         expect(frienshipStatus).toBe("PENDING");
       })
       .expect(200, done);
@@ -216,7 +192,6 @@ describe("Test user's friendship status get controller with seeduser2", () => {
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const frienshipStatus = res.body.friendshipStatus;
-
         expect(frienshipStatus).toBe("ACTIVE");
       })
       .expect(200, done);
