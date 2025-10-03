@@ -1,3 +1,4 @@
+import { NotificationType } from "@prisma/client";
 import prisma from "./client";
 
 interface GetUserFriendsArgs {
@@ -52,4 +53,54 @@ const getUserLastFriend = ({ username, orderBy }: GetUserLastFriendArgs) => {
   });
 };
 
-export { getUserFriends, getUserLastFriend };
+interface CreateNotificationArgs {
+  triggeredByUsername: string;
+  triggeredForUsername: string;
+  type: NotificationType;
+  payload: string;
+}
+
+const createNotification = ({
+  triggeredByUsername,
+  triggeredForUsername,
+  type,
+  payload,
+}: CreateNotificationArgs) => {
+  return prisma.notification.create({
+    data: {
+      triggeredBy: {
+        connect: {
+          username: triggeredByUsername,
+        },
+      },
+      triggeredFor: {
+        connect: {
+          username: triggeredForUsername,
+        },
+      },
+      type: type,
+      payload: payload,
+      status: "PENDING",
+      isRead: false,
+    },
+    include: {
+      triggeredBy: {
+        select: {
+          username: true,
+        },
+      },
+      triggeredFor: {
+        select: {
+          username: true,
+        },
+      },
+      community: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+};
+
+export { getUserFriends, getUserLastFriend, createNotification };

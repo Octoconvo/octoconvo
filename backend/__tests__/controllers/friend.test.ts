@@ -9,6 +9,7 @@ import { constructFriendCursor } from "../../utils/cursor";
 import {
   getUserFriends,
   getUserLastFriend,
+  createNotification,
 } from "../../database/prisma/testQueries";
 
 describe("Test user's friendship status get controller with seeduser1", () => {
@@ -499,58 +500,6 @@ describe("Test friend request post controller", () => {
   let communityRequestNotification1: null | NotificationRes = null;
   let friends1: Friend[] | null = null;
   let friends2: Friend[] | null = null;
-
-  type CreateNotification = {
-    triggeredByUsername: string;
-    triggeredForUsername: string;
-    type: "FRIENDREQUEST" | "REQUESTUPDATE" | "COMMUNITYREQUEST";
-    payload: string;
-  };
-
-  const createNotification = async ({
-    triggeredByUsername,
-    triggeredForUsername,
-    type,
-    payload,
-  }: CreateNotification) => {
-    const notification = await prisma.notification.create({
-      data: {
-        triggeredBy: {
-          connect: {
-            username: triggeredByUsername,
-          },
-        },
-        triggeredFor: {
-          connect: {
-            username: triggeredForUsername,
-          },
-        },
-        type: type,
-        payload: payload,
-        status: "PENDING",
-        isRead: false,
-      },
-      include: {
-        triggeredBy: {
-          select: {
-            username: true,
-          },
-        },
-        triggeredFor: {
-          select: {
-            username: true,
-          },
-        },
-        community: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
-
-    return notification;
-  };
 
   type CreateFriend = {
     friendOfUsername: string;
