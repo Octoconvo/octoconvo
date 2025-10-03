@@ -76,14 +76,20 @@ const populateUsers = async (seedUserGenerators: SeedUserGenerator[]) => {
   }
 };
 
+const populateLoneUsers = async (size: number) => {
+  for (let i = 0; i < size; i++) {
+    await generateSeedLoneUser({
+      index: i,
+    });
+  }
+};
+
 const populateUsersDB = async (size: number) => {
   const seedUserGenerators = generateSeedUserGenerators(size);
 
   try {
     await populateUsers(seedUserGenerators);
-    await generateSeedLoneUser({
-      index: 1,
-    });
+    await populateLoneUsers(10);
   } catch (err) {
     logErrorMessage(err);
   }
