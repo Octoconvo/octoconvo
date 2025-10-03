@@ -160,10 +160,39 @@ const createFriendsAndNotification = async ({
   };
 };
 
+type DeleteFriendByIds = {
+  friendOfId: string;
+  friendId: string;
+};
+
+const deleteFriendByIds = async ({
+  friendOfId,
+  friendId,
+}: DeleteFriendByIds) => {
+  return prisma.friend.delete({
+    where: {
+      friendOfId_friendId: {
+        friendOfId: friendOfId,
+        friendId: friendId,
+      },
+    },
+  });
+};
+
+const deleteNotificatioById = async (id: string) => {
+  return prisma.notification.delete({
+    where: {
+      id: id,
+    },
+  });
+};
+
 export {
   getUserFriends,
   getUserLastFriend,
   createNotification,
   createFriend,
   createFriendsAndNotification,
+  deleteNotificatioById,
+  deleteFriendByIds,
 };

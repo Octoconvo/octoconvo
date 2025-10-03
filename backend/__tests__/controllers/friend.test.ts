@@ -11,6 +11,8 @@ import {
   getUserLastFriend,
   createNotification,
   createFriendsAndNotification,
+  deleteNotificatioById,
+  deleteFriendByIds,
 } from "../../database/prisma/testQueries";
 import { logErrorMessage } from "../../utils/loggerUtils";
 
@@ -558,33 +560,6 @@ describe("Test friend request post controller", () => {
       logErrorMessage(err);
     }
   });
-
-  type DeleteFriendByIds = {
-    friendOfId: string;
-    friendId: string;
-  };
-
-  const deleteFriendByIds = async ({
-    friendOfId,
-    friendId,
-  }: DeleteFriendByIds) => {
-    return prisma.friend.delete({
-      where: {
-        friendOfId_friendId: {
-          friendOfId: friendOfId,
-          friendId: friendId,
-        },
-      },
-    });
-  };
-
-  const deleteNotificatioById = async (id: string) => {
-    return prisma.notification.delete({
-      where: {
-        id: id,
-      },
-    });
-  };
 
   afterAll(async () => {
     for (const notification of notificationsToDelete) {
