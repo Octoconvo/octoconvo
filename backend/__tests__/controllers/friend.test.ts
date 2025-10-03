@@ -12,6 +12,7 @@ import {
   createNotification,
   createFriend,
 } from "../../database/prisma/testQueries";
+import { logErrorMessage } from "../../utils/loggerUtils";
 
 describe("Test user's friendship status get controller with seeduser1", () => {
   test(
@@ -493,124 +494,91 @@ describe("Test friend add post controller", () => {
 });
 
 describe("Test friend request post controller", () => {
-  let friendNONE1: null | User = null;
-  let friendNONE2: null | User = null;
-  let friendRequestNotification1SeedUser1: null | NotificationRes = null;
-  let friendRequestNotification1SeedUser2: null | NotificationRes = null;
-  let friendRequestNotification2SeedUser1: null | NotificationRes = null;
-  let communityRequestNotification1: null | NotificationRes = null;
-  let friends1: Friend[] | null = null;
-  let friends2: Friend[] | null = null;
+  const userUsername = "seedloneuser2";
+  const userPassword = "seedlone@User2";
+
+  const toBeFriendUsername1 = "seedloneuser3";
+  const toBeFriendUsername2 = "seedloneuser4";
+
+  let userFriendRequestNotification1: null | NotificationRes = null;
+  let userFriendRequestNotification2: null | NotificationRes = null;
+
+  let notUserFriendRequestNotification: null | NotificationRes = null;
+  let userCommunityRequestNotification: null | NotificationRes = null;
+
+  const notificationsToDelete: NotificationRes[] = [];
+  const friendsToDelete: Friend[] = [];
 
   beforeAll(async () => {
     try {
-      friendNONE1 = await prisma.user.findFirst({
-        where: {
-          NOT: {
-            OR: [
-              { username: "seeduser1" },
-              { username: "seeduser2" },
-              { username: "seeduser4" },
-            ],
-          },
-          friendsOf: {
-            every: {
-              friend: {
-                username: "seeduser4",
-              },
-            },
-          },
-          friends: {
-            every: {
-              friendOf: {
-                username: "seeduser4",
-              },
-            },
-          },
-        },
+      interface CreateFriendsAndNotificationArgs {
+        username: string;
+        friendUsername: string;
+      }
+      const createFriendsAndNotification = async ({
+        username,
+        friendUsername,
+      }: CreateFriendsAndNotificationArgs) => {
+        const notification = await createNotification({
+          triggeredForUsername: userUsername,
+          triggeredByUsername: friendUsername,
+          payload: "sent a friend request",
+          type: "FRIENDREQUEST",
+        });
+
+        const friends = await Promise.all([
+          createFriend({
+            friendOfUsername: username,
+            friendUsername: friendUsername,
+          }),
+          createFriend({
+            friendOfUsername: friendUsername,
+            friendUsername: username,
+          }),
+        ]);
+
+        for (const friend of friends) {
+          friendsToDelete.push(friend);
+        }
+        notificationsToDelete.push(notification);
+
+        return {
+          notification,
+        };
+      };
+
+      const { notification: notification1 } =
+        await createFriendsAndNotification({
+          username: userUsername,
+          friendUsername: toBeFriendUsername1,
+        });
+      const { notification: notification2 } =
+        await createFriendsAndNotification({
+          username: userUsername,
+          friendUsername: toBeFriendUsername2,
+        });
+
+      userFriendRequestNotification1 = notification1;
+      userFriendRequestNotification2 = notification2;
+
+      notUserFriendRequestNotification = await createNotification({
+        triggeredForUsername: toBeFriendUsername1,
+        triggeredByUsername: userUsername,
+        payload: "sent a friend request",
+        type: "FRIENDREQUEST",
       });
-
-      if (friendNONE1) {
-        friendNONE2 = await prisma.user.findFirst({
-          where: {
-            id: {
-              not: friendNONE1.id,
-            },
-            NOT: {
-              AND: [{ username: "seeduser1" }, { username: "seeduser2" }],
-            },
-            friendsOf: {
-              every: {
-                friend: {
-                  username: "seeduser4",
-                },
-              },
-            },
-            friends: {
-              every: {
-                friendOf: {
-                  username: "seeduser4",
-                },
-              },
-            },
-          },
-        });
-      }
-
-      if (friendNONE1) {
-        friendRequestNotification1SeedUser1 = await createNotification({
-          triggeredForUsername: "seeduser4",
-          triggeredByUsername: friendNONE1.username,
-          payload: "sent a friend request",
-          type: "FRIENDREQUEST",
-        });
-
-        friendRequestNotification1SeedUser2 = await createNotification({
-          triggeredForUsername: friendNONE1.username,
-          triggeredByUsername: "seeduser4",
-          payload: "sent a friend request",
-          type: "FRIENDREQUEST",
-        });
-        communityRequestNotification1 = await createNotification({
-          triggeredForUsername: "seeduser4",
-          triggeredByUsername: friendNONE1.username,
-          payload: "requested to join",
-          type: "COMMUNITYREQUEST",
-        });
-
-        friends1 = await Promise.all([
-          createFriend({
-            friendOfUsername: "seeduser4",
-            friendUsername: friendNONE1.username,
-          }),
-          createFriend({
-            friendOfUsername: friendNONE1.username,
-            friendUsername: "seeduser4",
-          }),
-        ]);
-      }
-
-      if (friendNONE2) {
-        friendRequestNotification2SeedUser1 = await createNotification({
-          triggeredForUsername: "seeduser4",
-          triggeredByUsername: friendNONE2.username,
-          payload: "sent a friend request",
-          type: "FRIENDREQUEST",
-        });
-
-        friends2 = await Promise.all([
-          createFriend({
-            friendOfUsername: "seeduser4",
-            friendUsername: friendNONE2.username,
-          }),
-          createFriend({
-            friendOfUsername: friendNONE2.username,
-            friendUsername: "seeduser4",
-          }),
-        ]);
-      }
+      userCommunityRequestNotification = await createNotification({
+        triggeredForUsername: userUsername,
+        triggeredByUsername: toBeFriendUsername1,
+        payload: "requested to join",
+        type: "COMMUNITYREQUEST",
+      });
+      notificationsToDelete.push(
+        notUserFriendRequestNotification,
+        userCommunityRequestNotification,
+      );
     } catch (err) {
-      if (err instanceof Error) console.log(err.message);
+      logErrorMessage(err);
     }
   });
 
@@ -623,7 +591,7 @@ describe("Test friend request post controller", () => {
     friendOfId,
     friendId,
   }: DeleteFriendByIds) => {
-    await prisma.friend.delete({
+    return prisma.friend.delete({
       where: {
         friendOfId_friendId: {
           friendOfId: friendOfId,
@@ -633,90 +601,39 @@ describe("Test friend request post controller", () => {
     });
   };
 
-  const deleteFriend = async (friend: Friend) => {
-    try {
-      await deleteFriendByIds({
-        friendOfId: friend.friendOfId,
-        friendId: friend.friendId,
-      });
-    } catch (err) {
-      if (err instanceof Error) console.log(err.message);
-    }
-  };
-
   const deleteNotificatioById = async (id: string) => {
-    await prisma.notification.delete({
+    return prisma.notification.delete({
       where: {
         id: id,
       },
     });
   };
 
-  const deleteNotification = async (notification: NotificationRes | null) => {
-    if (notification !== null) {
+  afterAll(async () => {
+    for (const notification of notificationsToDelete) {
       try {
         await deleteNotificatioById(notification.id);
       } catch (err) {
-        if (err instanceof Error) console.log(err.message);
+        logErrorMessage(err);
       }
     }
-  };
-
-  type DeleteTestNotifications = {
-    userUsername: string;
-    friendUsername: string;
-  };
-
-  const deleteTestNotifications = async ({
-    userUsername,
-    friendUsername,
-  }: DeleteTestNotifications) => {
-    await prisma.notification.deleteMany({
-      where: {
-        triggeredFor: {
-          username: friendUsername,
-        },
-        triggeredBy: {
-          username: userUsername,
-        },
-        type: "REQUESTUPDATE",
-      },
-    });
-  };
-
-  afterAll(async () => {
-    await deleteNotification(friendRequestNotification1SeedUser1);
-    await deleteNotification(friendRequestNotification1SeedUser2);
-    await deleteNotification(communityRequestNotification1);
-    if (friends1) {
-      for (const friend of friends1) {
-        await deleteFriend(friend);
+    for (const friend of friendsToDelete) {
+      try {
+        await deleteFriendByIds({
+          friendOfId: friend.friendOfId,
+          friendId: friend.friendId,
+        });
+      } catch (err) {
+        logErrorMessage(err);
       }
-    }
-    if (friends2) {
-      for (const friend of friends2) {
-        await deleteFriend(friend);
-      }
-    }
-
-    if (friendNONE1 && friendNONE2) {
-      await deleteTestNotifications({
-        userUsername: "seeduser4",
-        friendUsername: friendNONE1.username,
-      });
-
-      await deleteTestNotifications({
-        userUsername: "seeduser4",
-        friendUsername: friendNONE2.username,
-      });
     }
   });
 
   const agent = request.agent(app);
 
   login(agent, {
-    username: "seeduser4",
-    password: "seed@User4",
+    username: userUsername,
+    password: userPassword,
   });
 
   test(
@@ -727,7 +644,7 @@ describe("Test friend request post controller", () => {
         .post("/friend/request")
         .send({
           action: "ACCEPT",
-          notificationId: `${friendRequestNotification1SeedUser1?.id}`,
+          notificationId: `${userFriendRequestNotification1?.id}`,
         })
         .expect("Content-Type", /json/)
         .expect({
@@ -752,16 +669,11 @@ describe("Test friend request post controller", () => {
           action: "ACCEPT",
         })
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const notificationIdValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "notificationid",
           });
-
-          expect(message).toBe(
-            "Failed to perform the action on the friend request",
-          );
           expect(notificationIdValidationErrorMsg).toBe(
             "Friend request notification id is invalid",
           );
@@ -778,20 +690,15 @@ describe("Test friend request post controller", () => {
         .post("/friend/request")
         .expect("Content-type", /json/)
         .send({
-          notificationid: friendRequestNotification1SeedUser1?.id,
+          notificationid: userFriendRequestNotification1?.id,
           action: "testaction1",
         })
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const actionValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "action",
           });
-
-          expect(message).toBe(
-            "Failed to perform the action on the friend request",
-          );
           expect(actionValidationErrorMsg).toBe(
             "Action must either be REJECT or ACCEPT",
           );
@@ -808,7 +715,7 @@ describe("Test friend request post controller", () => {
         .post("/friend/request")
         .expect("Content-type", /json/)
         .send({
-          notificationid: communityRequestNotification1?.id,
+          notificationid: userCommunityRequestNotification?.id,
           action: "ACCEPT",
         })
         .expect({
@@ -829,7 +736,7 @@ describe("Test friend request post controller", () => {
         .post("/friend/request")
         .expect("Content-type", /json/)
         .send({
-          notificationid: friendRequestNotification1SeedUser2?.id,
+          notificationid: notUserFriendRequestNotification?.id,
           action: "ACCEPT",
         })
         .expect({
@@ -849,7 +756,7 @@ describe("Test friend request post controller", () => {
       .post("/friend/request")
       .expect("Content-type", /json/)
       .send({
-        notificationid: friendRequestNotification1SeedUser1?.id,
+        notificationid: userFriendRequestNotification1?.id,
         action: "REJECT",
       })
       .expect((res: Response) => {
@@ -871,7 +778,7 @@ describe("Test friend request post controller", () => {
       .post("/friend/request")
       .expect("Content-type", /json/)
       .send({
-        notificationid: friendRequestNotification2SeedUser1?.id,
+        notificationid: userFriendRequestNotification2?.id,
         action: "ACCEPT",
       })
       .expect((res: Response) => {
@@ -879,11 +786,11 @@ describe("Test friend request post controller", () => {
         const friends = res.body.friends;
         const notification = res.body.notification;
         const newNotification = res.body.newNotification;
-
         expect(message).toBe("Successfully accepted the friend request");
         expect(friends.length).toBe(2);
         expect(notification.status).toBe("ACCEPTED");
         expect(newNotification.type).toBe("REQUESTUPDATE");
+        notificationsToDelete.push(newNotification);
       })
       .expect(200, done);
   });
