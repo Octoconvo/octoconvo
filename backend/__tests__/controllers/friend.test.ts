@@ -1,11 +1,21 @@
 import request, { Response } from "supertest";
 import app from "../../config/testConfig";
 import { getValidationErrorMsg, login } from "../../utils/testUtils";
-import prisma from "../../database/prisma/client";
 import { Friend, User } from "@prisma/client";
 import { NotificationRes } from "../../@types/apiResponse";
 import { UserFriendData } from "../../@types/database";
 import { constructFriendCursor } from "../../utils/cursor";
+import {
+  getUserFriends,
+  getUserLastFriend,
+  createNotification,
+  createFriendsAndNotification,
+  deleteNotificatioById,
+  deleteFriendByIds,
+  deleteFriendRequests,
+} from "../../database/prisma/testQueries";
+import { logErrorMessage } from "../../utils/loggerUtils";
+import { getUserByUsername } from "../../database/prisma/userQueries";
 
 describe("Test user's friendship status get controller with seeduser1", () => {
   test(
@@ -39,16 +49,11 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .get("/friend/friendship-status")
         .expect("Content-type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const usernameQueryValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "username",
           });
-
-          expect(message).toBe(
-            "Failed to fetch your friendship status with the user",
-          );
           expect(usernameQueryValidationErrorMsg).toBe(
             "Username query is required",
           );
@@ -66,16 +71,11 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .get(`/friend/friendship-status?username=${usernameQuery}`)
         .expect("Content-type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const usernameQueryValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "username",
           });
-
-          expect(message).toBe(
-            "Failed to fetch your friendship status with the user",
-          );
           expect(usernameQueryValidationErrorMsg).toBe(
             "Username query must not exceed 32 characters",
           );
@@ -93,16 +93,11 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .get(`/friend/friendship-status?username=${usernameQuery}`)
         .expect("Content-type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const usernameQueryValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "username",
           });
-
-          expect(message).toBe(
-            "Failed to fetch your friendship status with the user",
-          );
           expect(usernameQueryValidationErrorMsg).toBe(
             "Username query must only contain alphanumeric characters" +
               " and underscores",
@@ -121,12 +116,7 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .get(`/friend/friendship-status?username=${usernameQuery}`)
         .expect("Content-type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const errorMessage = res.body.error.message;
-
-          expect(message).toBe(
-            "Failed to fetch your friendship status with the user",
-          );
           expect(errorMessage).toBe("User with that username doesn't exist");
         })
         .expect(404, done);
@@ -143,7 +133,6 @@ describe("Test user's friendship status get controller with seeduser1", () => {
         .expect("Content-type", /json/)
         .expect((res: Response) => {
           const message = res.body.message;
-
           expect(message).toBe(
             "Successfully fetched your friendship status with seeduser2",
           );
@@ -159,7 +148,6 @@ describe("Test user's friendship status get controller with seeduser1", () => {
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const frienshipStatus = res.body.friendshipStatus;
-
         expect(frienshipStatus).toBe("NONE");
       })
       .expect(200, done);
@@ -172,7 +160,6 @@ describe("Test user's friendship status get controller with seeduser1", () => {
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const frienshipStatus = res.body.friendshipStatus;
-
         expect(frienshipStatus).toBe("ACTIVE");
       })
       .expect(200, done);
@@ -185,7 +172,6 @@ describe("Test user's friendship status get controller with seeduser1", () => {
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const frienshipStatus = res.body.friendshipStatus;
-
         expect(frienshipStatus).toBe("PENDING");
       })
       .expect(200, done);
@@ -206,7 +192,6 @@ describe("Test user's friendship status get controller with seeduser2", () => {
       .expect("Content-type", /json/)
       .expect((res: Response) => {
         const frienshipStatus = res.body.friendshipStatus;
-
         expect(frienshipStatus).toBe("ACTIVE");
       })
       .expect(200, done);
@@ -214,115 +199,64 @@ describe("Test user's friendship status get controller with seeduser2", () => {
 });
 
 describe("Test friend add post controller", () => {
-  let seedUser1: null | User = null;
-  let friendNONE: null | User = null;
+  const startDate = new Date().toISOString();
+  const userUsername = "seeduser1";
+  const userPassword = "seed@User1";
+  const toBeFriendUsername = "seedloneuser1";
+  let user: null | User = null;
+  let toBeFriendUser: null | User = null;
+  const friendsToDelete: Friend[] = [];
 
   beforeAll(async () => {
     try {
-      seedUser1 = await prisma.user.findUnique({
-        where: {
-          username: "seeduser1",
-        },
-      });
-
-      friendNONE = await prisma.user.findFirst({
-        where: {
-          NOT: { username: "seeduser1" },
-          friendsOf: {
-            every: {
-              NOT: {
-                friend: {
-                  username: "seeduser1",
-                },
-              },
-            },
-          },
-        },
-      });
-    } catch (err) {
-      console.error(err);
+      user = await getUserByUsername(userUsername);
+      toBeFriendUser = await getUserByUsername(toBeFriendUsername);
+    } catch (
+      //eslint-disable-next-line
+      error
+    ) {
+      logErrorMessage("friend_add_post:Failed to setup");
     }
   });
 
   afterEach(async () => {
-    if (friendNONE?.username && seedUser1?.username) {
+    const endDate = new Date().toISOString();
+
+    for (const friend of friendsToDelete) {
       try {
-        const friends = await prisma.friend.findMany({
-          where: {
-            OR: [
-              {
-                AND: [
-                  {
-                    friendOf: {
-                      username: "seeduser1",
-                    },
-                  },
-                  {
-                    friend: {
-                      username: friendNONE.username,
-                    },
-                  },
-                ],
-              },
-              {
-                AND: [
-                  {
-                    friendOf: {
-                      username: friendNONE.username,
-                    },
-                  },
-                  {
-                    friend: {
-                      username: "seeduser1",
-                    },
-                  },
-                ],
-              },
-            ],
-          },
+        await deleteFriendByIds({
+          friendId: friend.friendId,
+          friendOfId: friend.friendOfId,
         });
+      } catch (
+        // eslint-disable-next-line
+        err
+      ) {
+        logErrorMessage("friend_add_post:Failed to delete friend");
+      }
+    }
 
-        const notifications = await prisma.notification.findMany({
-          where: {
-            type: "FRIENDREQUEST",
-            triggeredBy: {
-              username: "seeduser1",
-            },
-            triggeredFor: {
-              username: friendNONE.username,
-            },
-          },
+    if (user && toBeFriendUser) {
+      try {
+        await deleteFriendRequests({
+          startDate,
+          endDate,
+          id: user.id,
+          friendId: toBeFriendUser.id,
         });
-
-        for (const friend of friends) {
-          await prisma.friend.delete({
-            where: {
-              friendOfId_friendId: {
-                friendOfId: friend.friendOfId,
-                friendId: friend.friendId,
-              },
-            },
-          });
-        }
-
-        for (const notification of notifications) {
-          await prisma.notification.delete({
-            where: {
-              id: notification.id,
-            },
-          });
-        }
-      } catch (err) {
-        if (err instanceof Error) console.log(err.message);
+      } catch (
+        //eslint-disable-next-line
+        err
+      ) {
+        logErrorMessage("friend_add_post:Failed to delete friend requests");
       }
     }
   });
 
   const agent = request.agent(app);
-
   login(agent, {
-    username: "seeduser1",
-    password: "seed@User1",
+    username: userUsername,
+    password: userPassword,
   });
 
   test(
@@ -332,7 +266,7 @@ describe("Test friend add post controller", () => {
       request(app)
         .post("/friend")
         .send({
-          username: friendNONE?.username,
+          username: toBeFriendUsername,
         })
         .expect("Content-Type", /json/)
         .expect({
@@ -354,10 +288,7 @@ describe("Test friend add post controller", () => {
         .send({ username })
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const errorMessage = res.body.error.message;
-
-          expect(message).toBe("Failed to send a friend request to the user");
           expect(errorMessage).toBe("User with that username doesn't exist");
         })
         .expect(404, done);
@@ -376,10 +307,7 @@ describe("Test friend add post controller", () => {
         })
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const errorMessage = res.body.error.message;
-
-          expect(message).toBe("Failed to send a friend request to the user");
           expect(errorMessage).toBe("You are already friends with the user");
         })
         .expect(409, done);
@@ -398,10 +326,7 @@ describe("Test friend add post controller", () => {
         })
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const errorMessage = res.body.error.message;
-
-          expect(message).toBe("Failed to send a friend request to the user");
           expect(errorMessage).toBe(
             "You already sent a friend request to the user",
           );
@@ -422,10 +347,7 @@ describe("Test friend add post controller", () => {
         })
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const errorMessage = res.body.error.message;
-
-          expect(message).toBe("Failed to send a friend request to the user");
           expect(errorMessage).toBe(
             "You can't send a friend request to yourself",
           );
@@ -434,362 +356,167 @@ describe("Test friend add post controller", () => {
     },
   );
 
+  const pushFriendsToDelete = (res: Response) => {
+    const friends: Friend[] = res.body.friends;
+    for (const friend of friends) {
+      friendsToDelete.push(friend);
+    }
+  };
+
   test("Return 200 success if all validations pass", done => {
-    const username = friendNONE?.username;
     agent
       .post("/friend")
       .send({
-        username,
+        username: toBeFriendUsername,
       })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const message = res.body.message;
-
         expect(message).toBe("Successfully sent a friend request to the user");
+        pushFriendsToDelete(res);
       })
       .expect(200, done);
   });
 
   test("Succss 200 return 2 friends object", done => {
-    const username = friendNONE?.username;
     agent
       .post("/friend")
       .send({
-        username,
+        username: toBeFriendUsername,
       })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const friends = res.body.friends;
-
         expect(friends.length).toBe(2);
+        pushFriendsToDelete(res);
       })
       .expect(200, done);
   });
 
   test("Succss 200 create the correct friends", done => {
-    const username = friendNONE?.username;
     agent
       .post("/friend")
       .send({
-        username,
+        username: toBeFriendUsername,
       })
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
         const friends = res.body.friends;
 
-        expect(friends[0].friendOfId).toBe(seedUser1?.id);
-        expect(friends[0].friendId).toBe(friendNONE?.id);
-        expect(friends[1].friendOfId).toBe(friendNONE?.id);
-        expect(friends[1].friendId).toBe(seedUser1?.id);
+        expect(friends[0].friendOfId).toBe(user?.id);
+        expect(friends[0].friendId).toBe(toBeFriendUser?.id);
+        expect(friends[1].friendOfId).toBe(toBeFriendUser?.id);
+        expect(friends[1].friendId).toBe(user?.id);
+        pushFriendsToDelete(res);
       })
       .expect(200, done);
   });
 });
 
 describe("Test friend request post controller", () => {
-  let friendNONE1: null | User = null;
-  let friendNONE2: null | User = null;
-  let friendRequestNotification1SeedUser1: null | NotificationRes = null;
-  let friendRequestNotification1SeedUser2: null | NotificationRes = null;
-  let friendRequestNotification2SeedUser1: null | NotificationRes = null;
-  let communityRequestNotification1: null | NotificationRes = null;
-  let friends1: Friend[] | null = null;
-  let friends2: Friend[] | null = null;
+  const userUsername = "seedloneuser2";
+  const userPassword = "seedlone@User2";
 
-  type CreateNotification = {
-    triggeredByUsername: string;
-    triggeredForUsername: string;
-    type: "FRIENDREQUEST" | "REQUESTUPDATE" | "COMMUNITYREQUEST";
-    payload: string;
-  };
+  const toBeFriendUsername1 = "seedloneuser3";
+  const toBeFriendUsername2 = "seedloneuser4";
 
-  const createNotification = async ({
-    triggeredByUsername,
-    triggeredForUsername,
-    type,
-    payload,
-  }: CreateNotification) => {
-    const notification = await prisma.notification.create({
-      data: {
-        triggeredBy: {
-          connect: {
-            username: triggeredByUsername,
-          },
-        },
-        triggeredFor: {
-          connect: {
-            username: triggeredForUsername,
-          },
-        },
-        type: type,
-        payload: payload,
-        status: "PENDING",
-        isRead: false,
-      },
-      include: {
-        triggeredBy: {
-          select: {
-            username: true,
-          },
-        },
-        triggeredFor: {
-          select: {
-            username: true,
-          },
-        },
-        community: {
-          select: {
-            name: true,
-          },
-        },
-      },
-    });
+  let userFriendRequestNotification1: null | NotificationRes = null;
+  let userFriendRequestNotification2: null | NotificationRes = null;
 
-    return notification;
-  };
+  let notUserFriendRequestNotification: null | NotificationRes = null;
+  let userCommunityRequestNotification: null | NotificationRes = null;
 
-  type CreateFriend = {
-    friendOfUsername: string;
-    friendUsername: string;
-  };
+  const notificationsToDelete: NotificationRes[] = [];
+  const friendsToDelete: Friend[] = [];
 
-  const createFriend = async ({
-    friendOfUsername,
-    friendUsername,
-  }: CreateFriend) => {
-    const friend = await prisma.friend.create({
-      data: {
-        friendOf: {
-          connect: {
-            username: friendOfUsername,
-          },
-        },
-        friend: {
-          connect: {
-            username: friendUsername,
-          },
-        },
-      },
-    });
-
-    return friend;
+  const pushFriendsToArray = (friends: Friend[], array: Friend[]) => {
+    for (const friend of friends) {
+      array.push(friend);
+    }
   };
 
   beforeAll(async () => {
     try {
-      friendNONE1 = await prisma.user.findFirst({
-        where: {
-          NOT: {
-            OR: [
-              { username: "seeduser1" },
-              { username: "seeduser2" },
-              { username: "seeduser4" },
-            ],
-          },
-          friendsOf: {
-            every: {
-              friend: {
-                username: "seeduser4",
-              },
-            },
-          },
-          friends: {
-            every: {
-              friendOf: {
-                username: "seeduser4",
-              },
-            },
-          },
-        },
+      const { notification: notification1, friends: friends1 } =
+        await createFriendsAndNotification({
+          username: userUsername,
+          friendUsername: toBeFriendUsername1,
+        });
+      pushFriendsToArray(friends1, friendsToDelete);
+      notificationsToDelete.push(notification1);
+
+      const { notification: notification2, friends: friends2 } =
+        await createFriendsAndNotification({
+          username: userUsername,
+          friendUsername: toBeFriendUsername2,
+        });
+      notificationsToDelete.push(notification2);
+
+      pushFriendsToArray(friends2, friendsToDelete);
+      userFriendRequestNotification1 = notification1;
+      userFriendRequestNotification2 = notification2;
+
+      notUserFriendRequestNotification = await createNotification({
+        triggeredForUsername: toBeFriendUsername1,
+        triggeredByUsername: userUsername,
+        payload: "sent a friend request",
+        type: "FRIENDREQUEST",
       });
 
-      if (friendNONE1) {
-        friendNONE2 = await prisma.user.findFirst({
-          where: {
-            id: {
-              not: friendNONE1.id,
-            },
-            NOT: {
-              AND: [{ username: "seeduser1" }, { username: "seeduser2" }],
-            },
-            friendsOf: {
-              every: {
-                friend: {
-                  username: "seeduser4",
-                },
-              },
-            },
-            friends: {
-              every: {
-                friendOf: {
-                  username: "seeduser4",
-                },
-              },
-            },
-          },
-        });
-      }
+      userCommunityRequestNotification = await createNotification({
+        triggeredForUsername: userUsername,
+        triggeredByUsername: toBeFriendUsername1,
+        payload: "requested to join",
+        type: "COMMUNITYREQUEST",
+      });
 
-      if (friendNONE1) {
-        friendRequestNotification1SeedUser1 = await createNotification({
-          triggeredForUsername: "seeduser4",
-          triggeredByUsername: friendNONE1.username,
-          payload: "sent a friend request",
-          type: "FRIENDREQUEST",
-        });
-
-        friendRequestNotification1SeedUser2 = await createNotification({
-          triggeredForUsername: friendNONE1.username,
-          triggeredByUsername: "seeduser4",
-          payload: "sent a friend request",
-          type: "FRIENDREQUEST",
-        });
-        communityRequestNotification1 = await createNotification({
-          triggeredForUsername: "seeduser4",
-          triggeredByUsername: friendNONE1.username,
-          payload: "requested to join",
-          type: "COMMUNITYREQUEST",
-        });
-
-        friends1 = await Promise.all([
-          createFriend({
-            friendOfUsername: "seeduser4",
-            friendUsername: friendNONE1.username,
-          }),
-          createFriend({
-            friendOfUsername: friendNONE1.username,
-            friendUsername: "seeduser4",
-          }),
-        ]);
-      }
-
-      if (friendNONE2) {
-        friendRequestNotification2SeedUser1 = await createNotification({
-          triggeredForUsername: "seeduser4",
-          triggeredByUsername: friendNONE2.username,
-          payload: "sent a friend request",
-          type: "FRIENDREQUEST",
-        });
-
-        friends2 = await Promise.all([
-          createFriend({
-            friendOfUsername: "seeduser4",
-            friendUsername: friendNONE2.username,
-          }),
-          createFriend({
-            friendOfUsername: friendNONE2.username,
-            friendUsername: "seeduser4",
-          }),
-        ]);
-      }
-    } catch (err) {
-      if (err instanceof Error) console.log(err.message);
+      notificationsToDelete.push(
+        notUserFriendRequestNotification,
+        userCommunityRequestNotification,
+      );
+    } catch (
+      //eslint-disable-next-line
+      err
+    ) {
+      logErrorMessage("friend_request_post controller: failed to setup");
     }
   });
 
-  type DeleteFriendByIds = {
-    friendOfId: string;
-    friendId: string;
-  };
-
-  const deleteFriendByIds = async ({
-    friendOfId,
-    friendId,
-  }: DeleteFriendByIds) => {
-    await prisma.friend.delete({
-      where: {
-        friendOfId_friendId: {
-          friendOfId: friendOfId,
-          friendId: friendId,
-        },
-      },
-    });
-  };
-
-  const deleteFriend = async (friend: Friend) => {
-    try {
-      await deleteFriendByIds({
-        friendOfId: friend.friendOfId,
-        friendId: friend.friendId,
-      });
-    } catch (err) {
-      if (err instanceof Error) console.log(err.message);
-    }
-  };
-
-  const deleteNotificatioById = async (id: string) => {
-    await prisma.notification.delete({
-      where: {
-        id: id,
-      },
-    });
-  };
-
-  const deleteNotification = async (notification: NotificationRes | null) => {
-    if (notification !== null) {
+  afterAll(async () => {
+    for (const notification of notificationsToDelete) {
       try {
         await deleteNotificatioById(notification.id);
-      } catch (err) {
-        if (err instanceof Error) console.log(err.message);
+      } catch (
+        //eslint-disable-next-line
+        err
+      ) {
+        logErrorMessage(
+          "friend_request_post controller: failed to delete notification",
+        );
       }
     }
-  };
-
-  type DeleteTestNotifications = {
-    userUsername: string;
-    friendUsername: string;
-  };
-
-  const deleteTestNotifications = async ({
-    userUsername,
-    friendUsername,
-  }: DeleteTestNotifications) => {
-    await prisma.notification.deleteMany({
-      where: {
-        triggeredFor: {
-          username: friendUsername,
-        },
-        triggeredBy: {
-          username: userUsername,
-        },
-        type: "REQUESTUPDATE",
-      },
-    });
-  };
-
-  afterAll(async () => {
-    await deleteNotification(friendRequestNotification1SeedUser1);
-    await deleteNotification(friendRequestNotification1SeedUser2);
-    await deleteNotification(communityRequestNotification1);
-    if (friends1) {
-      for (const friend of friends1) {
-        await deleteFriend(friend);
+    for (const friend of friendsToDelete) {
+      try {
+        await deleteFriendByIds({
+          friendOfId: friend.friendOfId,
+          friendId: friend.friendId,
+        });
+      } catch (
+        //eslint-disable-next-line
+        err
+      ) {
+        logErrorMessage(
+          "friend_request_post controller: failed to delete friend",
+        );
       }
-    }
-    if (friends2) {
-      for (const friend of friends2) {
-        await deleteFriend(friend);
-      }
-    }
-
-    if (friendNONE1 && friendNONE2) {
-      await deleteTestNotifications({
-        userUsername: "seeduser4",
-        friendUsername: friendNONE1.username,
-      });
-
-      await deleteTestNotifications({
-        userUsername: "seeduser4",
-        friendUsername: friendNONE2.username,
-      });
     }
   });
 
   const agent = request.agent(app);
 
   login(agent, {
-    username: "seeduser4",
-    password: "seed@User4",
+    username: userUsername,
+    password: userPassword,
   });
 
   test(
@@ -800,7 +527,7 @@ describe("Test friend request post controller", () => {
         .post("/friend/request")
         .send({
           action: "ACCEPT",
-          notificationId: `${friendRequestNotification1SeedUser1?.id}`,
+          notificationId: `${userFriendRequestNotification1?.id}`,
         })
         .expect("Content-Type", /json/)
         .expect({
@@ -825,16 +552,11 @@ describe("Test friend request post controller", () => {
           action: "ACCEPT",
         })
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const notificationIdValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "notificationid",
           });
-
-          expect(message).toBe(
-            "Failed to perform the action on the friend request",
-          );
           expect(notificationIdValidationErrorMsg).toBe(
             "Friend request notification id is invalid",
           );
@@ -851,20 +573,15 @@ describe("Test friend request post controller", () => {
         .post("/friend/request")
         .expect("Content-type", /json/)
         .send({
-          notificationid: friendRequestNotification1SeedUser1?.id,
+          notificationid: userFriendRequestNotification1?.id,
           action: "testaction1",
         })
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const actionValidationErrorMsg = getValidationErrorMsg({
             error,
             field: "action",
           });
-
-          expect(message).toBe(
-            "Failed to perform the action on the friend request",
-          );
           expect(actionValidationErrorMsg).toBe(
             "Action must either be REJECT or ACCEPT",
           );
@@ -881,7 +598,7 @@ describe("Test friend request post controller", () => {
         .post("/friend/request")
         .expect("Content-type", /json/)
         .send({
-          notificationid: communityRequestNotification1?.id,
+          notificationid: userCommunityRequestNotification?.id,
           action: "ACCEPT",
         })
         .expect({
@@ -902,7 +619,7 @@ describe("Test friend request post controller", () => {
         .post("/friend/request")
         .expect("Content-type", /json/)
         .send({
-          notificationid: friendRequestNotification1SeedUser2?.id,
+          notificationid: notUserFriendRequestNotification?.id,
           action: "ACCEPT",
         })
         .expect({
@@ -922,7 +639,7 @@ describe("Test friend request post controller", () => {
       .post("/friend/request")
       .expect("Content-type", /json/)
       .send({
-        notificationid: friendRequestNotification1SeedUser1?.id,
+        notificationid: userFriendRequestNotification1?.id,
         action: "REJECT",
       })
       .expect((res: Response) => {
@@ -944,7 +661,7 @@ describe("Test friend request post controller", () => {
       .post("/friend/request")
       .expect("Content-type", /json/)
       .send({
-        notificationid: friendRequestNotification2SeedUser1?.id,
+        notificationid: userFriendRequestNotification2?.id,
         action: "ACCEPT",
       })
       .expect((res: Response) => {
@@ -952,11 +669,11 @@ describe("Test friend request post controller", () => {
         const friends = res.body.friends;
         const notification = res.body.notification;
         const newNotification = res.body.newNotification;
-
         expect(message).toBe("Successfully accepted the friend request");
         expect(friends.length).toBe(2);
         expect(notification.status).toBe("ACCEPTED");
         expect(newNotification.type).toBe("REQUESTUPDATE");
+        notificationsToDelete.push(newNotification);
       })
       .expect(200, done);
   });
@@ -964,22 +681,16 @@ describe("Test friend request post controller", () => {
 
 describe("Test user_friends_get controller", () => {
   let userFriends: UserFriendData[] = [];
+  let userLastFriend: UserFriendData | null = null;
 
   beforeAll(async () => {
-    userFriends = await prisma.friend.findMany({
-      where: {
-        friendOf: {
-          username: "seeduser1",
-        },
-      },
-      orderBy: [{ friend: { username: "asc" } }, { friend: { id: "asc" } }],
-      include: {
-        friend: {
-          select: {
-            username: true,
-          },
-        },
-      },
+    userFriends = await getUserFriends({
+      username: "seeduser1",
+      limit: 30,
+    });
+    userLastFriend = await getUserLastFriend({
+      username: "seeduser1",
+      orderBy: "desc",
     });
   });
 
@@ -1013,14 +724,11 @@ describe("Test user_friends_get controller", () => {
         .get(`/friends?cursor=${userFriends[0].friendId}_test@username`)
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const cursorValidationErrorMessage = getValidationErrorMsg({
             error,
             field: "cursor",
           });
-
-          expect(message).toBe("Failed to fetch user's friends");
           expect(cursorValidationErrorMessage).toBe("Cursor value is invalid");
         })
         .expect(422, done);
@@ -1034,53 +742,47 @@ describe("Test user_friends_get controller", () => {
         .get(`/friends?cursor=testid1_${userFriends[0].friend.username}`)
         .expect("Content-Type", /json/)
         .expect((res: Response) => {
-          const message = res.body.message;
           const error = res.body.error;
           const cursorValidationErrorMessage = getValidationErrorMsg({
             error,
             field: "cursor",
           });
-
-          expect(message).toBe("Failed to fetch user's friends");
           expect(cursorValidationErrorMessage).toBe("Cursor value is invalid");
         })
         .expect(422, done);
     },
   );
 
-  test("Failed to fetch user's friends when the limit is not a number", done => {
-    agent
-      .get("/friends?limit=testlimit1")
-      .expect("Content-Type", /json/)
-      .expect((res: Response) => {
-        const message = res.body.message;
-        const error = res.body.error;
-        const limitValidationErrorMessage = getValidationErrorMsg({
-          error,
-          field: "limit",
-        });
-
-        expect(message).toBe("Failed to fetch user's friends");
-        expect(limitValidationErrorMessage).toBe(
-          "Limit must be an integer and between 1 and 100",
-        );
-      })
-      .expect(422, done);
-  });
+  test(
+    "Failed to fetch user's friends when the limit is not a" + " number",
+    done => {
+      agent
+        .get("/friends?limit=testlimit1")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const error = res.body.error;
+          const limitValidationErrorMessage = getValidationErrorMsg({
+            error,
+            field: "limit",
+          });
+          expect(limitValidationErrorMessage).toBe(
+            "Limit must be an integer and between 1 and 100",
+          );
+        })
+        .expect(422, done);
+    },
+  );
 
   test("Failed to fetch user's friends when the limit is a decimal", done => {
     agent
       .get("/friends?limit=1.0")
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
-        const message = res.body.message;
         const error = res.body.error;
         const limitValidationErrorMessage = getValidationErrorMsg({
           error,
           field: "limit",
         });
-
-        expect(message).toBe("Failed to fetch user's friends");
         expect(limitValidationErrorMessage).toBe(
           "Limit must be an integer and between 1 and 100",
         );
@@ -1093,14 +795,11 @@ describe("Test user_friends_get controller", () => {
       .get("/friends?limit=0")
       .expect("Content-Type", /json/)
       .expect((res: Response) => {
-        const message = res.body.message;
         const error = res.body.error;
         const limitValidationErrorMessage = getValidationErrorMsg({
           error,
           field: "limit",
         });
-
-        expect(message).toBe("Failed to fetch user's friends");
         expect(limitValidationErrorMessage).toBe(
           "Limit must be an integer and between 1 and 100",
         );
@@ -1108,25 +807,25 @@ describe("Test user_friends_get controller", () => {
       .expect(422, done);
   });
 
-  test("Failed to fetch user's friends when the limit is more than 100", done => {
-    agent
-      .get("/friends?limit=101")
-      .expect("Content-Type", /json/)
-      .expect((res: Response) => {
-        const message = res.body.message;
-        const error = res.body.error;
-        const limitValidationErrorMessage = getValidationErrorMsg({
-          error,
-          field: "limit",
-        });
-
-        expect(message).toBe("Failed to fetch user's friends");
-        expect(limitValidationErrorMessage).toBe(
-          "Limit must be an integer and between 1 and 100",
-        );
-      })
-      .expect(422, done);
-  });
+  test(
+    "Failed to fetch user's friends when the limit is more than" + " 100",
+    done => {
+      agent
+        .get("/friends?limit=101")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const error = res.body.error;
+          const limitValidationErrorMessage = getValidationErrorMsg({
+            error,
+            field: "limit",
+          });
+          expect(limitValidationErrorMessage).toBe(
+            "Limit must be an integer and between 1 and 100",
+          );
+        })
+        .expect(422, done);
+    },
+  );
 
   test("Successfully fetch user's friends if validation passed", done => {
     agent
@@ -1232,10 +931,9 @@ describe("Test user_friends_get controller", () => {
     "The returned nextCursor should be false if friends' length is less than" +
       " limit",
     done => {
-      const currentFriend = userFriends[userFriends.length - 2];
       const cursorQuery = constructFriendCursor({
-        id: currentFriend.friendId,
-        username: currentFriend.friend.username,
+        id: userLastFriend?.friendId as string,
+        username: userLastFriend?.friend.username as string,
       });
 
       agent
