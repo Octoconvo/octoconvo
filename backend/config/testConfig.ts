@@ -13,6 +13,7 @@ import * as communityController from "../controllers/community";
 import * as messageController from "../controllers/message";
 import * as notificationController from "../controllers/notification";
 import * as friendController from "../controllers/friend";
+import * as dmController from "../controllers/dm";
 
 const app = express();
 
@@ -93,6 +94,8 @@ app.get(
 app.post("/friend", friendController.friend_add_post);
 app.post("/friend/request", friendController.friend_request_post);
 app.get("/friends", friendController.user_friends_get);
+
+app.get("/direct-messages", dmController.user_DMs_get);
 
 app.use(notFoundErrorMiddleware);
 app.use(errorMiddleware);

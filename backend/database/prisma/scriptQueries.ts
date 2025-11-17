@@ -4,6 +4,7 @@ import {
   Community,
   Inbox,
   ParticipantStatus,
+  DirectMessage,
 } from "@prisma/client";
 import prisma from "./client";
 import {
@@ -509,6 +510,42 @@ const createCommunityMessage = async ({
   });
 };
 
+interface CreateDirectMessageArgs {
+  userOneId: string;
+  userTwoId: string;
+}
+
+const createDirectMessage = async ({
+  userOneId,
+  userTwoId,
+}: CreateDirectMessageArgs): Promise<DirectMessage> => {
+  return prisma.directMessage.create({
+    data: {
+      participants: {
+        createMany: {
+          data: [
+            {
+              userId: userOneId,
+              role: "MEMBER",
+              status: "ACTIVE",
+              memberSince: new Date(),
+            },
+            {
+              userId: userTwoId,
+              role: "MEMBER",
+              status: "ACTIVE",
+              memberSince: new Date(),
+            },
+          ],
+        },
+      },
+    },
+    include: {
+      participants: true,
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -535,4 +572,5 @@ export {
   deleteUser,
   deleteUserMessages,
   createCommunityMessage,
+  createDirectMessage,
 };

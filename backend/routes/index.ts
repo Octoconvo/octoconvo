@@ -3,6 +3,7 @@ import express from "express";
 import * as communityController from "../controllers/community";
 import * as notificationController from "../controllers/notification";
 import * as friendController from "../controllers/friend";
+import * as dmController from "../controllers/dm";
 
 const router = express.Router();
 
@@ -21,5 +22,7 @@ router.post(
 );
 
 router.get("/friends", friendController.user_friends_get);
+
+router.get("/direct-messages", dmController.user_DMs_get);
 
 export default router;
