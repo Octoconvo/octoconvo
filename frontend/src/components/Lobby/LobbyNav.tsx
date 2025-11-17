@@ -32,7 +32,7 @@ const LobbyNav = () => {
         <div className="flex flex-col justify-between gap-8">
           <Link
             data-testid="dm-l"
-            href={`lobby/dm`}
+            href={`/lobby/direct-messages`}
             className={
               "main-nav-link" +
               (hasPath({ path, toCompare: "dm" })
