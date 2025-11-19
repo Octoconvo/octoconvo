@@ -67,6 +67,7 @@ export default {
         "gr-brand-1-3-d-1-b": "var(--gradient-brand-1-3-d-1-b)",
         "gr-black-1-b": "var(--gradient-black-1-b)",
         "gr-black-1-l": "var(--gradient-black-1-l)",
+        "gr-black-1-r": "var(--gradient-black-1-r)",
         "gr-black-2-r": "var(--gradient-black-2-r)",
         "gr-silver-b": "var(--gradient-silver-b)",
         "gr-brand-1-2-3-d-1-t": "var(--gradient-brand-1-2-3-d-1-t)",
