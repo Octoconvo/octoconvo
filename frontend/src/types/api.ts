@@ -131,6 +131,20 @@ type UserFriendAPI = FriendAPI & {
   };
 };
 
+interface DirectMessageAPI {
+  id: string;
+  recipient: {
+    id: string;
+    username: string;
+    displayName: string;
+    avatar: string | null;
+  };
+  inbox: {
+    id: string;
+  };
+  lastMessage: InboxMessageAPI;
+}
+
 export type {
   CommunityAPI,
   CommunityExploreAPI,
@@ -143,4 +157,5 @@ export type {
   ErrorAPI,
   FriendAPI,
   UserFriendAPI,
+  DirectMessageAPI,
 };
