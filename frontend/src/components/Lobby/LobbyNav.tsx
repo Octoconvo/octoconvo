@@ -35,7 +35,7 @@ const LobbyNav = () => {
             href={`/lobby/direct-messages`}
             className={
               "main-nav-link" +
-              (hasPath({ path, toCompare: "dm" })
+              (hasPath({ path, toCompare: "direct-messages" })
                 ? " main-nav-link-active"
                 : "")
             }
