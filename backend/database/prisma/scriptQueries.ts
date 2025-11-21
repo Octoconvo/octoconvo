@@ -5,6 +5,7 @@ import {
   Inbox,
   ParticipantStatus,
   DirectMessage,
+  PrismaPromise,
 } from "@prisma/client";
 import prisma from "./client";
 import {
@@ -546,6 +547,55 @@ const createDirectMessage = async ({
   });
 };
 
+const deleteDirectMessageParticipants = (
+  id: string,
+): PrismaPromise<{ count: number }> => {
+  return prisma.participant.deleteMany({
+    where: {
+      directMessageId: id,
+    },
+  });
+};
+
+const deleteDirectMessageMessages = (
+  id: string,
+): PrismaPromise<{
+  count: number;
+}> => {
+  return prisma.message.deleteMany({
+    where: {
+      inbox: {
+        directMessageId: id,
+      },
+    },
+  });
+};
+
+const deleteDirectMessageInbox = (id: string): PrismaPromise<Inbox> => {
+  return prisma.inbox.delete({
+    where: {
+      directMessageId: id,
+    },
+  });
+};
+
+const deleteDirectMessage = (id: string): PrismaPromise<DirectMessage> => {
+  return prisma.directMessage.delete({
+    where: {
+      id: id,
+    },
+  });
+};
+
+const deleteDirectMessageAndItsData = async (id: string) => {
+  return prisma.$transaction([
+    deleteDirectMessageMessages(id),
+    deleteDirectMessageParticipants(id),
+    deleteDirectMessageInbox(id),
+    deleteDirectMessage(id),
+  ]);
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -573,4 +623,5 @@ export {
   deleteUserMessages,
   createCommunityMessage,
   createDirectMessage,
+  deleteDirectMessageAndItsData,
 };
