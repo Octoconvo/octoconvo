@@ -24,6 +24,7 @@
     "communitiesPopulate": "ts-node scripts/populateCommunitiesDB.ts",
     "communitiesUnpopulate": "ts-node scripts/unpopulateCommunitiesDB.ts",
     "directMessagesPopulate": "ts-node scripts/populateDirectMessagesDB.ts",
+    "directMessagesUnpopulate": "ts-node scripts/unpopulateDirectMessagesDB.ts",
     "data-migration:add-community-participantsCount-column": "ts-node ./prisma/migrations/20250714160939_add_community_participants_count_column/data-migration.ts"
   },
   "dependencies": {
