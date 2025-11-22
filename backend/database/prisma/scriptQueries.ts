@@ -522,6 +522,11 @@ const createDirectMessage = async ({
 }: CreateDirectMessageArgs): Promise<DirectMessage> => {
   return prisma.directMessage.create({
     data: {
+      inbox: {
+        create: {
+          inboxType: "DM",
+        },
+      },
       participants: {
         createMany: {
           data: [
