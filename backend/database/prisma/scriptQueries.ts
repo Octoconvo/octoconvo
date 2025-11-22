@@ -596,6 +596,22 @@ const deleteDirectMessageAndItsData = async (id: string) => {
   ]);
 };
 
+const getSeedDirectMessages = async (): Promise<DirectMessage[]> => {
+  return prisma.directMessage.findMany({
+    where: {
+      participants: {
+        every: {
+          user: {
+            username: {
+              startsWith: "seed",
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -624,4 +640,5 @@ export {
   createCommunityMessage,
   createDirectMessage,
   deleteDirectMessageAndItsData,
+  getSeedDirectMessages,
 };
