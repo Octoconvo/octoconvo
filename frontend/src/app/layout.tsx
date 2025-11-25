@@ -19,11 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="min-h-[100dvh]">
       <body className={`${inter.variable} font-sans flex h-full`}>
-        <UserProvider>
-          <SocketWrapper>
-            <UserProfileProvider>{children}</UserProfileProvider>
-          </SocketWrapper>
-        </UserProvider>
+        <QueryProvider>
+          <UserProvider>
+            <SocketWrapper>
+              <UserProfileProvider>{children}</UserProfileProvider>
+            </SocketWrapper>
+          </UserProvider>
+        </QueryProvider>
       </body>
     </html>
   );
