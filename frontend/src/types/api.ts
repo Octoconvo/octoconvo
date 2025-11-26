@@ -142,7 +142,9 @@ interface DirectMessageAPI {
   inbox: {
     id: string;
   };
-  lastMessage: InboxMessageAPI;
+  lastMessage: {
+    content: string;
+  };
 }
 
 export type {
