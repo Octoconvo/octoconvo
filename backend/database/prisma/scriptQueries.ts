@@ -150,9 +150,25 @@ const getSeedCommunities = async () => {
 const getClientCommunities = async () => {
   return prisma.community.findMany({
     where: {
-      name: {
-        startsWith: "clientcommunity",
-      },
+      OR: [
+        {
+          name: {
+            startsWith: "clientcommunity",
+          },
+        },
+        {
+          participants: {
+            some: {
+              role: "OWNER",
+              user: {
+                username: {
+                  startsWith: "client",
+                },
+              },
+            },
+          },
+        },
+      ],
     },
   });
 };
