@@ -634,6 +634,22 @@ const getSeedDirectMessages = async (): Promise<DirectMessage[]> => {
   });
 };
 
+const getClientDirectMessages = async (): Promise<DirectMessage[]> => {
+  return prisma.directMessage.findMany({
+    where: {
+      participants: {
+        every: {
+          user: {
+            username: {
+              startsWith: "clientuser",
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
 const getDirectMessageInboxById = async (id: string): Promise<Inbox | null> => {
   return prisma.inbox.findFirst({
     where: {
@@ -691,6 +707,7 @@ export {
   createDirectMessage,
   deleteDirectMessageAndItsData,
   getSeedDirectMessages,
+  getClientDirectMessages,
   getDirectMessageInboxById,
   createDirectMessageMessage,
 };
