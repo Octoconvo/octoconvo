@@ -6,6 +6,7 @@ import {
   ParticipantStatus,
   DirectMessage,
   PrismaPromise,
+  Message,
 } from "@prisma/client";
 import prisma from "./client";
 import {
@@ -625,6 +626,26 @@ const getDirectMessageInboxById = async (id: string): Promise<Inbox | null> => {
   });
 };
 
+interface CreateDirectMessageMessage {
+  number: number;
+  inboxId: string;
+  authorId: string;
+}
+
+const createDirectMessageMessage = ({
+  number,
+  inboxId,
+  authorId,
+}: CreateDirectMessageMessage): Promise<Message> => {
+  return prisma.message.create({
+    data: {
+      inboxId: inboxId,
+      authorId: authorId,
+      content: `seedmessage${number}`,
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -655,4 +676,5 @@ export {
   deleteDirectMessageAndItsData,
   getSeedDirectMessages,
   getDirectMessageInboxById,
+  createDirectMessageMessage,
 };
