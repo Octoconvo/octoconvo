@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { createAuthenticationMiddleware } from "../utils/authentication";
 import { getUserDMs } from "../database/prisma/dmQueries";
 import { UserDMData } from "../@types/database";
-import { UserDMsGETResponse } from "../@types/apiResponse";
+import { LastMessage, UserDMsGETResponse } from "../@types/apiResponse";
 
 const userDMsGetAuth = createAuthenticationMiddleware({
   message: "Failed to fetch user's DMs",
@@ -21,9 +21,19 @@ const user_DMs_get = [
 
     const processedUserDMs: UserDMsGETResponse[] = userDMs.map(
       (DM: UserDMData): UserDMsGETResponse => {
-        const { participants, ...rest } = DM;
+        const { participants, inbox, ...rest } = DM;
+        const lastMessage: LastMessage = inbox
+          ? inbox.messages.length
+            ? inbox.messages[0]
+            : null
+          : null;
 
-        return { ...rest, recipient: participants[0] };
+        return {
+          ...rest,
+          recipient: { ...participants[0].user },
+          inbox: inbox ? { id: inbox.id } : null,
+          lastMessage: lastMessage,
+        };
       },
     );
 
