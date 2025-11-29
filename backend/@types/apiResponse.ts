@@ -1,6 +1,11 @@
 import { Notification, User } from "@prisma/client";
 import { UserFriendData } from "./database";
-import type { DirectMessage, Inbox, Participant } from "@prisma/client";
+import type {
+  DirectMessage,
+  Inbox,
+  Participant,
+  Message,
+} from "@prisma/client";
 
 type CommunityPOST = {
   name: string;
@@ -36,15 +41,19 @@ type Recipient = Pick<Participant, "id"> & {
   user: Pick<User, "id" | "username" | "displayName" | "avatar">;
 };
 
+type LastMessage = Pick<Message, "content"> | null;
+
 type UserDMsGETResponse = DirectMessage & {
   inbox: Pick<Inbox, "id"> | null;
   recipient: Recipient;
+  lastMessage: LastMessage;
 };
 
 export type {
   CommunityPOST,
   NotificationRes,
   ProfileRes,
+  LastMessage,
   UserFriendsGETResponse,
   UserDMsGETResponse,
 };
