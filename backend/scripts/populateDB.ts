@@ -10,6 +10,7 @@ import {
   logPopulateMessage,
   logPopulateSuccessMessage,
 } from "../utils/loggerUtils";
+import { populateDirectMessagesDB } from "./populateDirectMessagesScript";
 
 type Mode = "COMPACT" | "BALANCED" | "EXTENSIVE";
 
@@ -31,6 +32,7 @@ const populateDB = async (size: number) => {
   await populateMessagesDB();
   await populateNotificationsDB();
   await populateFriendsDB();
+  await populateDirectMessagesDB();
   timer.stopTimer();
   const timeInSecond = timer.timeInSecond;
   logPopulateSuccessMessage("Finished populating database");
