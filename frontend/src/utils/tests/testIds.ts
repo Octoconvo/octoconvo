@@ -4,6 +4,9 @@ const testIds = {
   friendListModal: "friend-list-modal",
   friendListModalInfiniteLoader: "friend-list-modal-infinite-loader",
   FriendListModalCloseController: "friend-list-modal-close-controller",
+  DMItemDisplayName: "DM-item-displayname",
+  DMItemLastMessage: "DM-item-last-message",
+  DMItemAvatar: "DM-item-avatar",
 };
 
 export default testIds;
