@@ -6,10 +6,10 @@ import {
 } from "@/types/tests/mocks";
 import {
   createFetchMock,
-  createMockURL,
   generateUserFriendMocks,
   UserFriendMock,
 } from "@/utils/tests/mocks";
+import createMockURL from "@/mocks/createMockURL";
 
 describe("Test createMockURL function", () => {
   test("createMockURL should return the correct link format", () => {

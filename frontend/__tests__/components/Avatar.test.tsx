@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import Avatar from "@/components/Avatar";
-import { createMockURL } from "@/utils/tests/mocks";
+import createMockURL from "@/mocks/createMockURL";
 
 const DOMAIN = window.location.origin;
 const URLMock = createMockURL("testavatar.com");
