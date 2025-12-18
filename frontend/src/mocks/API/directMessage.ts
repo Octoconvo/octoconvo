@@ -42,4 +42,20 @@ class DirectMessageMock implements DirectMessageAPI {
   }
 }
 
-export default DirectMessageMock;
+const generateDirectMessageMock = (size: number): DirectMessageAPI[] => {
+  const directMessages: DirectMessageAPI[] = [];
+
+  for (let i: number = 0; i < size; i++) {
+    const username: string = `username${i}`;
+    const displayName: string = `displayName${i}`;
+    const message: string = `message${i}`;
+
+    directMessages.push(
+      new DirectMessageMock({ username, displayName, message })
+    );
+  }
+
+  return directMessages;
+};
+
+export { DirectMessageMock, generateDirectMessageMock };

@@ -1,4 +1,4 @@
-import DirectMessageMock from "@/mocks/API/directMessage";
+import { DirectMessageMock } from "@/mocks/API/directMessage";
 
 describe("Test DirectMessageMock", () => {
   test("Ensure the DirectMessageMock has the correct shape", () => {
