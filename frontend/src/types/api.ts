@@ -131,20 +131,26 @@ type UserFriendAPI = FriendAPI & {
   };
 };
 
+interface DirectMessageAPIRecipient {
+  id: string;
+  username: string;
+  displayName: string;
+  avatar: string | null;
+}
+
+interface DirectMessageAPIInbox {
+  id: string;
+}
+
+interface DirectMessageAPILastMessage {
+  content: string;
+}
+
 interface DirectMessageAPI {
   id: string;
-  recipient: {
-    id: string;
-    username: string;
-    displayName: string;
-    avatar: string | null;
-  };
-  inbox: {
-    id: string;
-  };
-  lastMessage: {
-    content: string;
-  };
+  recipient: DirectMessageAPIRecipient;
+  inbox: DirectMessageAPIInbox;
+  lastMessage: DirectMessageAPILastMessage;
 }
 
 export type {
@@ -159,5 +165,8 @@ export type {
   ErrorAPI,
   FriendAPI,
   UserFriendAPI,
+  DirectMessageAPIRecipient,
+  DirectMessageAPIInbox,
+  DirectMessageAPILastMessage,
   DirectMessageAPI,
 };
