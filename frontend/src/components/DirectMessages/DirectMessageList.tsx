@@ -11,7 +11,7 @@ const DirectMessageList: FC<DirectMessageListProps> = ({ directMessages }) => {
     <ul className="h-full p-[16px]">
       {directMessages.length ? (
         directMessages.map((DM: DirectMessageAPI) => {
-          return <DirectMessageListItem DM={DM} />;
+          return <DirectMessageListItem key={DM.id} DM={DM} />;
         })
       ) : (
         <p className="text-center w-full text-white-200">No messages yet.</p>
