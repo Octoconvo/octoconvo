@@ -4,6 +4,7 @@ import TestAgent from "supertest/lib/agent";
 import { login } from "../../utils/testUtils";
 import { Response } from "supertest";
 import { DirectMessage } from "@prisma/client";
+import { UserDMsGETResponse } from "../../@types/apiResponse";
 
 describe("Test user DMs get controller", () => {
   test(
@@ -51,6 +52,23 @@ describe("Test user DMs get controller", () => {
       .expect((res: Response) => {
         const directMessages: DirectMessage[] = res.body.directMessages;
         expect(directMessages.length).toBe(99);
+      })
+      .expect(200, done);
+  });
+
+  test(`The returned data has correct properties`, done => {
+    agent
+      .get("/direct-messages")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const directMessages: UserDMsGETResponse[] = res.body.directMessages;
+
+        for (const DM of directMessages) {
+          expect(DM.inbox?.id).toBeDefined();
+          expect(DM.recipient.id).toBeDefined();
+          expect(DM.recipient).toBeDefined();
+          expect(DM.lastMessage).toBeDefined();
+        }
       })
       .expect(200, done);
   });

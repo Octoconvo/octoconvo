@@ -7,10 +7,7 @@ import {
   ResponseMock,
   ConfigMock,
 } from "@/types/tests/mocks";
-
-const createMockURL = (path: string) => {
-  return `blob: https://${path}`;
-};
+import createMockURL from "@/mocks/createMockURL";
 
 class UserFriendMock implements UserFriendMockI {
   status: FriendStatus;
@@ -69,9 +66,4 @@ const createFetchMock = <Data>(response: ResponseMock<Data>): jest.Mock => {
   );
 };
 
-export {
-  createMockURL,
-  UserFriendMock,
-  generateUserFriendMocks,
-  createFetchMock,
-};
+export { UserFriendMock, generateUserFriendMocks, createFetchMock };

@@ -507,6 +507,11 @@
     var(--black-200),
     var(--black-400)
   );
+  --gradient-black-1-r: linear-gradient(
+    to right,
+    var(--black-200),
+    var(--black-400)
+  );
   --gradient-black-2-r: linear-gradient(
     to right,
     var(--black-400),

@@ -5,6 +5,8 @@ import {
   Inbox,
   ParticipantStatus,
   DirectMessage,
+  PrismaPromise,
+  Message,
 } from "@prisma/client";
 import prisma from "./client";
 import {
@@ -148,9 +150,25 @@ const getSeedCommunities = async () => {
 const getClientCommunities = async () => {
   return prisma.community.findMany({
     where: {
-      name: {
-        startsWith: "clientcommunity",
-      },
+      OR: [
+        {
+          name: {
+            startsWith: "clientcommunity",
+          },
+        },
+        {
+          participants: {
+            some: {
+              role: "OWNER",
+              user: {
+                username: {
+                  startsWith: "client",
+                },
+              },
+            },
+          },
+        },
+      ],
     },
   });
 };
@@ -521,6 +539,11 @@ const createDirectMessage = async ({
 }: CreateDirectMessageArgs): Promise<DirectMessage> => {
   return prisma.directMessage.create({
     data: {
+      inbox: {
+        create: {
+          inboxType: "DM",
+        },
+      },
       participants: {
         createMany: {
           data: [
@@ -542,6 +565,115 @@ const createDirectMessage = async ({
     },
     include: {
       participants: true,
+    },
+  });
+};
+
+const deleteDirectMessageParticipants = (
+  id: string,
+): PrismaPromise<{ count: number }> => {
+  return prisma.participant.deleteMany({
+    where: {
+      directMessageId: id,
+    },
+  });
+};
+
+const deleteDirectMessageMessages = (
+  id: string,
+): PrismaPromise<{
+  count: number;
+}> => {
+  return prisma.message.deleteMany({
+    where: {
+      inbox: {
+        directMessageId: id,
+      },
+    },
+  });
+};
+
+const deleteDirectMessageInbox = (id: string): PrismaPromise<Inbox> => {
+  return prisma.inbox.delete({
+    where: {
+      directMessageId: id,
+    },
+  });
+};
+
+const deleteDirectMessage = (id: string): PrismaPromise<DirectMessage> => {
+  return prisma.directMessage.delete({
+    where: {
+      id: id,
+    },
+  });
+};
+
+const deleteDirectMessageAndItsData = async (id: string) => {
+  return prisma.$transaction([
+    deleteDirectMessageMessages(id),
+    deleteDirectMessageParticipants(id),
+    deleteDirectMessageInbox(id),
+    deleteDirectMessage(id),
+  ]);
+};
+
+const getSeedDirectMessages = async (): Promise<DirectMessage[]> => {
+  return prisma.directMessage.findMany({
+    where: {
+      participants: {
+        every: {
+          user: {
+            username: {
+              startsWith: "seed",
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+const getClientDirectMessages = async (): Promise<DirectMessage[]> => {
+  return prisma.directMessage.findMany({
+    where: {
+      participants: {
+        every: {
+          user: {
+            username: {
+              startsWith: "clientuser",
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+const getDirectMessageInboxById = async (id: string): Promise<Inbox | null> => {
+  return prisma.inbox.findFirst({
+    where: {
+      directMessageId: id,
+    },
+  });
+};
+
+interface CreateDirectMessageMessage {
+  number: number;
+  inboxId: string;
+  authorId: string;
+}
+
+const createDirectMessageMessage = ({
+  number,
+  inboxId,
+  authorId,
+}: CreateDirectMessageMessage): Promise<Message> => {
+  return prisma.message.create({
+    data: {
+      inboxId: inboxId,
+      authorId: authorId,
+      content: `seedmessage${number}`,
     },
   });
 };
@@ -573,4 +705,9 @@ export {
   deleteUserMessages,
   createCommunityMessage,
   createDirectMessage,
+  deleteDirectMessageAndItsData,
+  getSeedDirectMessages,
+  getClientDirectMessages,
+  getDirectMessageInboxById,
+  createDirectMessageMessage,
 };

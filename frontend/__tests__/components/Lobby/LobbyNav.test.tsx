@@ -29,7 +29,7 @@ describe("Render LobbyNav component", () => {
   it("DM nav link exists", () => {
     const loginLink = screen.getByTestId("dm-l") as HTMLAnchorElement;
     expect(loginLink).toBeInTheDocument();
-    expect(loginLink.href).toContain("/dm");
+    expect(loginLink.href).toContain("/direct-messages");
   });
 
   it("Communities nav link exists", () => {
