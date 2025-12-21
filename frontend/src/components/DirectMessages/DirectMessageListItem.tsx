@@ -9,7 +9,11 @@ interface DirectMessageListItemProps {
 
 const DirectMessageListItem: FC<DirectMessageListItemProps> = ({ DM }) => {
   return (
-    <li key={DM.id} className="rounded-[8px] w-full hover:bg-black-500">
+    <li
+      data-testid={testIds.DMItem}
+      key={DM.id}
+      className="rounded-[8px] w-full hover:bg-black-500"
+    >
       <article className="flex gap-[16px] p-[32px]">
         <Avatar
           testId={testIds.DMItemAvatar}
