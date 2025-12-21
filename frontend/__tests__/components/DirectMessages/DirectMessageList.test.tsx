@@ -6,7 +6,7 @@ import { DirectMessageAPI } from "@/types/api";
 
 const directMessages: DirectMessageAPI[] = generateDirectMessageMock(10);
 
-describe("Render RenderMessageList", () => {
+describe("Render MessageList component", () => {
   test(
     "Render 10 direct messages component when the directMessages.length is" +
       " 10",
