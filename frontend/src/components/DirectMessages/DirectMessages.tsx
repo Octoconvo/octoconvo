@@ -14,7 +14,7 @@ const DirectMessagesContainer: FC<DirectMessagesContainerProps> = ({
   children,
 }) => {
   return (
-    <div className="w-full h-full">
+    <div className="h-full">
       <div
         className="flex flex-col w-[480px] h-full bg-black-200 border-r-[1px]
     border-r-[rgba(81,77,86,0.2)]"
