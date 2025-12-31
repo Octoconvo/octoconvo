@@ -229,6 +229,41 @@ const deleteFriendRequests = ({
   });
 };
 
+interface GetDMByParticipantsArgs {
+  usernameOne: string;
+  usernameTwo: string;
+}
+
+const getDMByParticipants = ({
+  usernameOne,
+  usernameTwo,
+}: GetDMByParticipantsArgs) => {
+  return prisma.directMessage.findFirst({
+    where: {
+      AND: [
+        {
+          participants: {
+            some: {
+              user: {
+                username: usernameOne,
+              },
+            },
+          },
+        },
+        {
+          participants: {
+            some: {
+              user: {
+                username: usernameTwo,
+              },
+            },
+          },
+        },
+      ],
+    },
+  });
+};
+
 export {
   getUserFriends,
   getUserLastFriend,
@@ -239,4 +274,5 @@ export {
   deleteFriendByIds,
   getUserByUsername,
   deleteFriendRequests,
+  getDMByParticipants,
 };
