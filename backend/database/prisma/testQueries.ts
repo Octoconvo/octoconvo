@@ -1,4 +1,9 @@
-import { NotificationType } from "@prisma/client";
+import {
+  DirectMessage,
+  Inbox,
+  NotificationType,
+  PrismaPromise,
+} from "@prisma/client";
 import prisma from "./client";
 
 interface GetUserFriendsArgs {
@@ -237,7 +242,9 @@ interface GetDMByParticipantsArgs {
 const getDMByParticipants = ({
   usernameOne,
   usernameTwo,
-}: GetDMByParticipantsArgs) => {
+}: GetDMByParticipantsArgs): PrismaPromise<
+  (DirectMessage & { inbox: Inbox | null }) | null
+> => {
   return prisma.directMessage.findFirst({
     where: {
       AND: [
@@ -260,6 +267,9 @@ const getDMByParticipants = ({
           },
         },
       ],
+    },
+    include: {
+      inbox: true,
     },
   });
 };
