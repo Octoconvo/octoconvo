@@ -62,7 +62,10 @@ interface GetDirectMessageByIdArgs {
   userId: string;
 }
 
-const getDirectMessageById = ({ id, userId }: GetDirectMessageByIdArgs) => {
+const getDirectMessageById = ({
+  id,
+  userId,
+}: GetDirectMessageByIdArgs): PrismaPromise<UserDMData | null> => {
   return prisma.directMessage.findUnique({
     where: {
       id: id,

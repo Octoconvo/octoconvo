@@ -96,12 +96,28 @@ const DM_get = [
       });
 
       return;
-    }
+    } else {
+      const processedDM: UserDMsGETResponse = ((): UserDMsGETResponse => {
+        const { participants, inbox, ...rest } = DM;
+        const lastMessage: LastMessage = inbox
+          ? inbox.messages.length
+            ? inbox.messages[0]
+            : null
+          : null;
 
-    res.json({
-      message: `Successfully fetched DM with that id`,
-      directMessage: DM,
-    });
+        return {
+          ...rest,
+          recipient: { ...participants[0].user },
+          inbox: inbox ? { id: inbox.id } : null,
+          lastMessage: lastMessage,
+        };
+      })();
+
+      res.json({
+        message: `Successfully fetched DM with that id`,
+        directMessage: processedDM,
+      });
+    }
   }),
 ];
 
