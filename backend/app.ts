@@ -18,6 +18,7 @@ import inboxRouter from "./routes/inbox";
 import exploreRouter from "./routes/explore";
 import notificationRouter from "./routes/notification";
 import friendRouter from "./routes/friend";
+import dmRouter from "./routes/dm";
 
 const NODE_ENV = process.env.NODE_ENV;
 const isDev = NODE_ENV?.toLowerCase() == "development";
@@ -74,6 +75,7 @@ app.use("/message", messageRouter);
 app.use("/inbox", inboxRouter);
 app.use("/notification", notificationRouter);
 app.use("/friend", friendRouter);
+app.use("/direct-message", dmRouter);
 
 app.use(notFoundErrorMiddleware);
 app.use(errorMiddleware);
