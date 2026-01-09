@@ -57,4 +57,56 @@ const getUserDMs = ({
   });
 };
 
-export { getUserDMs };
+interface GetDirectMessageByIdArgs {
+  id: string;
+  userId: string;
+}
+
+const getDirectMessageById = ({
+  id,
+  userId,
+}: GetDirectMessageByIdArgs): PrismaPromise<UserDMData | null> => {
+  return prisma.directMessage.findUnique({
+    where: {
+      id: id,
+    },
+    include: {
+      participants: {
+        where: {
+          user: {
+            NOT: {
+              id: userId,
+            },
+          },
+        },
+        select: {
+          id: true,
+          user: {
+            select: {
+              id: true,
+              username: true,
+              displayName: true,
+              avatar: true,
+            },
+          },
+        },
+      },
+      inbox: {
+        select: {
+          id: true,
+          messages: {
+            select: {
+              content: true,
+            },
+            take: 1,
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+export { getUserDMs, getDirectMessageById };
