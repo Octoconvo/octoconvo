@@ -8,6 +8,9 @@ const testIds = {
   DMItemDisplayName: "DM-item-displayname",
   DMItemLastMessage: "DM-item-last-message",
   DMItemAvatar: "DM-item-avatar",
+  DMInformationItem: "DM-information-item",
+  DMInformationAvatar: "DM-information-avatar",
+  DMInformationDisplayName: "DM-information-displayName",
 };
 
 export default testIds;
