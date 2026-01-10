@@ -29,4 +29,40 @@ const getUserDirectMessages = async (): Promise<UserDirectMessageResponse> => {
   };
 };
 
-export { getUserDirectMessages, type UserDirectMessageResponse };
+interface DirectMessageAPIResponse {
+  message: string;
+  error?: {
+    message: string;
+  };
+  directMessage: DirectMessageAPI;
+}
+
+interface DirectMessageAPIData extends DirectMessageAPIResponse {
+  status: number;
+}
+
+const getDirectMessageById = async (
+  directMessageId: string
+): Promise<DirectMessageAPIData> => {
+  const response: Response = await fetch(
+    `${DOMAIN_URL}/direct-message/${directMessageId}`,
+    {
+      method: "GET",
+      mode: "cors",
+      credentials: "include",
+    }
+  );
+
+  const responseData: DirectMessageAPIResponse = await response.json();
+
+  return {
+    status: response.status,
+    ...responseData,
+  };
+};
+
+export {
+  getUserDirectMessages,
+  type UserDirectMessageResponse,
+  getDirectMessageById,
+};
