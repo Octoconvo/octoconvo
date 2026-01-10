@@ -5,5 +5,10 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  return <DirectMessages />;
+  return (
+    <>
+      <DirectMessages />
+      {children}
+    </>
+  );
 }
