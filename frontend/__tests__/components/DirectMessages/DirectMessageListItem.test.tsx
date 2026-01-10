@@ -32,4 +32,11 @@ describe("Render DirectMessageListItem component", () => {
     const avatar: HTMLImageElement = screen.getByTestId(testIds.DMItemAvatar);
     expect(avatar.src).toContain("avatar");
   });
+
+  test("Render the correct DM's linkr", () => {
+    const link: HTMLAnchorElement = screen.getByTestId(testIds.DMItemLink);
+    expect(link.href).toContain(
+      `/lobby/direct-messages/${directMessageMock.id}`
+    );
+  });
 });
