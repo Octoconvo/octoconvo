@@ -5,9 +5,49 @@ import {
   logErrorMessage,
   logPopulateSuccessMessage,
 } from "../utils/loggerUtils";
-import { createDirectMessage } from "../database/prisma/scriptQueries";
+import {
+  createDirectMessage,
+  createDMSeedMessage,
+} from "../database/prisma/scriptQueries";
 import { SeedUserGenerator } from "../@types/scriptTypes";
 import { generateSeedUserGenerators } from "../utils/scriptUtils";
+
+interface GenerateDMMessagesArgs {
+  DMID: string;
+  messageCount: number;
+  userOneUsername: string;
+  userTwoUsername: string;
+}
+
+const generateDMMessages = async ({
+  DMID,
+  messageCount,
+  userOneUsername,
+  userTwoUsername,
+}: GenerateDMMessagesArgs) => {
+  try {
+    const messageInflection = messageCount > 1 ? "messages" : "message";
+    logPopulateMessage(
+      `Creating ${messageCount} ${messageInflection} between` +
+        ` ${userOneUsername} and ${userTwoUsername}...`,
+    );
+    for (let i = 1; i <= messageCount; i++) {
+      await new Promise(resolve => setTimeout(resolve, 250));
+      await createDMSeedMessage({
+        index: i,
+        DMID: DMID,
+        authorUsername: userOneUsername,
+      });
+    }
+
+    logPopulateSuccessMessage(
+      `Successfully created ${messageCount} ${messageInflection} between` +
+        ` ${userOneUsername} and ${userTwoUsername}...`,
+    );
+  } catch (err) {
+    logErrorMessage(err);
+  }
+};
 
 interface GenerateUserDirectMessageArgs {
   userOneUsername: string;
@@ -28,9 +68,16 @@ const generateUserDirectMessage = async ({
           ` ${userTwoUsername}...`,
       );
 
-      await createDirectMessage({
+      const DM = await createDirectMessage({
         userOneId: userOne.id,
         userTwoId: userTwo.id,
+      });
+
+      generateDMMessages({
+        DMID: DM.id,
+        messageCount: 100,
+        userOneUsername,
+        userTwoUsername,
       });
 
       logPopulateSuccessMessage(
