@@ -20,4 +20,6 @@ type UserDMData = DirectMessage & {
   })[];
 };
 
-export type { UserFriendData, UserDMData };
+type DMWithInbox = DirectMessage & { inbox: Inbox | null };
+
+export type { UserFriendData, UserDMData, DMWithInbox };
