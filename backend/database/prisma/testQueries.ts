@@ -1,10 +1,6 @@
-import {
-  DirectMessage,
-  Inbox,
-  NotificationType,
-  PrismaPromise,
-} from "@prisma/client";
+import { Message, NotificationType, PrismaPromise } from "@prisma/client";
 import prisma from "./client";
+import { DMWithInbox } from "../../@types/database";
 
 interface GetUserFriendsArgs {
   username: string;
@@ -242,9 +238,7 @@ interface GetDMByParticipantsArgs {
 const getDMByParticipants = ({
   usernameOne,
   usernameTwo,
-}: GetDMByParticipantsArgs): PrismaPromise<
-  (DirectMessage & { inbox: Inbox | null }) | null
-> => {
+}: GetDMByParticipantsArgs): PrismaPromise<DMWithInbox | null> => {
   return prisma.directMessage.findFirst({
     where: {
       AND: [
@@ -274,6 +268,15 @@ const getDMByParticipants = ({
   });
 };
 
+const getMessagesByInboxId = (inboxId: string): PrismaPromise<Message[]> => {
+  return prisma.message.findMany({
+    where: {
+      inboxId: inboxId,
+    },
+    orderBy: [{ createdAt: "desc" }, { id: "asc" }],
+  });
+};
+
 export {
   getUserFriends,
   getUserLastFriend,
@@ -285,4 +288,5 @@ export {
   getUserByUsername,
   deleteFriendRequests,
   getDMByParticipants,
+  getMessagesByInboxId,
 };
