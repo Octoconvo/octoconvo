@@ -1,4 +1,4 @@
-import { PrismaPromise } from "@prisma/client";
+import { Inbox, PrismaPromise } from "@prisma/client";
 import { UserDMData } from "../../@types/database";
 import prisma from "./client";
 
@@ -109,4 +109,12 @@ const getDirectMessageById = ({
   });
 };
 
-export { getUserDMs, getDirectMessageById };
+const getDirectMessageInboxById = (id: string): PrismaPromise<Inbox | null> => {
+  return prisma.inbox.findUnique({
+    where: {
+      directMessageId: id,
+    },
+  });
+};
+
+export { getUserDMs, getDirectMessageById, getDirectMessageInboxById };
