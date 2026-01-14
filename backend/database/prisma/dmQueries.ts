@@ -1,4 +1,4 @@
-import { Inbox, PrismaPromise } from "@prisma/client";
+import { DirectMessage, Inbox, PrismaPromise } from "@prisma/client";
 import { UserDMData } from "../../@types/database";
 import prisma from "./client";
 
@@ -117,4 +117,30 @@ const getDirectMessageInboxById = (id: string): PrismaPromise<Inbox | null> => {
   });
 };
 
-export { getUserDMs, getDirectMessageById, getDirectMessageInboxById };
+const hasDMAccess = async ({
+  directMessageId,
+  userId,
+}: {
+  directMessageId: string;
+  userId: string;
+}): Promise<boolean> => {
+  const DM: DirectMessage | null = await prisma.directMessage.findUnique({
+    where: {
+      id: directMessageId,
+      participants: {
+        some: {
+          userId: userId,
+        },
+      },
+    },
+  });
+
+  return DM ? true : false;
+};
+
+export {
+  getUserDMs,
+  getDirectMessageById,
+  getDirectMessageInboxById,
+  hasDMAccess,
+};
