@@ -1,3 +1,5 @@
+import { Message } from "@prisma/client";
+
 type GenerateUsernameCursor = {
   firstUsername: string;
   lastUsername: string;
@@ -44,8 +46,67 @@ const constructFriendCursor = ({
   return `${id}_${username}`;
 };
 
+interface MessageCursorFields {
+  id: string;
+  createdAt: string;
+}
+
+const deconstructMessageCursor = (string: string): MessageCursorFields => {
+  const cursorValues: string[] = string.split("_");
+
+  return {
+    id: cursorValues[0],
+    createdAt: cursorValues[1],
+  };
+};
+
+interface ConstructMessageCursorArgs {
+  id: string;
+  createdAt: Date;
+}
+
+const constructMessageCursor = ({
+  id,
+  createdAt,
+}: ConstructMessageCursorArgs) => {
+  return `${id}_${new Date(createdAt).toISOString()}`;
+};
+
+const getMsgCursors = (
+  messages: Message[],
+  direction: "backward" | "forward",
+): {
+  prevCursor: string | null;
+  nextCursor: string | null;
+} => {
+  const firstMsgCursor =
+    messages.length && messages[0] ? constructMessageCursor(messages[0]) : null;
+
+  const lastIndex = messages.length - 1;
+  const lastMsgCursor =
+    messages.length && messages[lastIndex]
+      ? constructMessageCursor(messages[lastIndex])
+      : null;
+
+  // Get the oldest message as the previous cursor
+  const prevCursor: string | null =
+    direction === "backward" ? lastMsgCursor : firstMsgCursor;
+
+  // Get the latest message as the next cursor
+  const nextCursor: string | null =
+    direction === "backward" ? firstMsgCursor : lastMsgCursor;
+
+  return {
+    prevCursor,
+    nextCursor,
+  };
+};
+
 export {
   generateUsernameCursor,
   deconstructFriendCursor,
   constructFriendCursor,
+  constructMessageCursor,
+  deconstructMessageCursor,
+  getMsgCursors,
 };
