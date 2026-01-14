@@ -701,7 +701,7 @@ const createDMSeedMessage = ({
           username: authorUsername,
         },
       },
-      content: `message${index}`,
+      content: `seedmessage${index}`,
     },
   });
 };
