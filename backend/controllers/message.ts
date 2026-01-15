@@ -11,7 +11,12 @@ import { getPublicURL, uploadFile } from "../database/supabase/supabaseQueries";
 import { getCommunityByIdAndParticipant } from "../database/prisma/communityQueries";
 import { convertFileName } from "../utils/file";
 import { isUUID, isISOString } from "../utils/validation";
-import { Message } from "@prisma/client";
+import { Inbox, Message } from "@prisma/client";
+import {
+  getDirectMessageInboxById,
+  hasDMAccess,
+} from "../database/prisma/dmQueries";
+import { deconstructMessageCursor, getMsgCursors } from "../utils/cursor";
 
 // Process file forms
 const storage = multer.memoryStorage();
@@ -66,6 +71,16 @@ const messageValidation = {
 
       if (!uuidRegex.test(val)) {
         throw new Error("Invalid inbox id");
+      }
+
+      return true;
+    }),
+  directMessageIdParam: param("directmessageid")
+    .trim()
+    .custom((val: string): boolean => {
+      if (!isUUID(val)) {
+        console.log({ val });
+        throw new Error("DM id is invalid");
       }
 
       return true;
@@ -477,4 +492,82 @@ const messages_get = [
   }),
 ];
 
-export { message_post, messages_get };
+const dm_messages_get = [
+  messagesGETAuthentication,
+  messageValidation.directMessageIdParam,
+  messageValidation.limit,
+  messageValidation.cursor,
+  messageValidation.direction,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+    const DMId: string = req.params.directmessageid;
+    const user = req.user as Express.User;
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(errors, `Failed to fetch messages`);
+
+      console.log({ error: obj.error.validationError[0] });
+      res.status(422).json(obj);
+      return;
+    }
+
+    const inbox: Inbox | null = await getDirectMessageInboxById(DMId);
+
+    if (inbox === null) {
+      res.status(404).json({
+        message: `Failed to fetch messages`,
+        error: {
+          message: "DM doesn't exist",
+        },
+      });
+
+      return;
+    }
+
+    // Check authorisation
+    const isAuthorised: boolean = await hasDMAccess({
+      directMessageId: inbox.directMessageId as string,
+      userId: user.id as string,
+    });
+
+    if (!isAuthorised) {
+      res.status(403).json({
+        message: `Failed to fetch messages`,
+        error: {
+          message: "You are not authorised to access this DM",
+        },
+      });
+
+      return;
+    }
+
+    const limit = req.query.limit ? Number(req.query.limit) : 100;
+
+    type Direction = "forward" | "backward";
+    const direction = (req.query.direction as Direction) || "backward";
+    const cursor =
+      req.query.cursor && typeof req.query.cursor === "string"
+        ? deconstructMessageCursor(req.query.cursor)
+        : null;
+
+    const messages = await getMessages({
+      cursor,
+      inboxId: inbox.id,
+      limit,
+      direction,
+    });
+
+    const { prevCursor, nextCursor } = getMsgCursors(messages, direction);
+
+    res.json({
+      message: `Successfully fetched messages`,
+      prevCursor:
+        messages.length < limit && direction === "backward" ? null : prevCursor,
+      nextCursor:
+        messages.length < limit && direction === "forward" ? null : nextCursor,
+      messagesData: messages,
+    });
+  }),
+];
+
+export { message_post, messages_get, dm_messages_get };
