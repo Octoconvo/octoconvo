@@ -1,11 +1,17 @@
 import request, { Response } from "supertest";
 import app from "../../config/testConfig";
-import { login } from "../../utils/testUtils";
+import { getValidationErrorMsg, login } from "../../utils/testUtils";
 import prisma from "../../database/prisma/client";
 import { console } from "node:inspector";
 import { Community, Inbox, Message } from "@prisma/client";
 import { deleteAllMessageByContent } from "../../database/prisma/messageQueries";
 import { getLastIndexToBase10 } from "../../utils/numberUtils";
+import {
+  getDMByParticipants,
+  getMessagesByInboxId,
+} from "../../database/prisma/testQueries";
+import { DMWithInbox } from "../../@types/database";
+import { constructMessageCursor } from "../../utils/cursor";
 
 jest.mock("../../database/supabase/supabaseQueries", () => ({
   uploadFile: async ({
@@ -769,6 +775,332 @@ describe("Test messages get controller", () => {
         const messagesData = res.body.messagesData;
 
         expect(messagesData[0].id).toBe(messages1[11].id);
+      })
+      .expect(200)
+      .end(done);
+  });
+});
+
+describe("Test DM messages get controller", () => {
+  let DM: DMWithInbox | null;
+  // The DM's messages is sorted in Descending order (newest messages first).
+  let DMMessages: Message[];
+
+  beforeAll(async () => {
+    try {
+      DM = await getDMByParticipants({
+        usernameOne: "seeduser1",
+        usernameTwo: "seeduser2",
+      });
+      if (DM && DM.inbox) {
+        DMMessages = await getMessagesByInboxId(DM?.inbox?.id);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  test(
+    "Return 401 unauthorized if user tries to get DM messages without" +
+      " being authenticated",
+    done => {
+      request(app)
+        .get(`/direct-message/${DM?.id}/messages`)
+        .type("form")
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to fetch messages",
+          error: {
+            message: "You are not authenticated",
+          },
+        })
+        .expect(401, done);
+    },
+  );
+
+  const agent = request.agent(app);
+  login(agent, {
+    username: "seeduser1",
+    password: "seed@User1",
+  });
+
+  test("Return 422 error if DM id is invalid", done => {
+    agent
+      .get("/direct-message/testinbox1/messages?limit=1")
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message: string = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch messages");
+        expect(error.validationError).toBeDefined();
+        expect(getValidationErrorMsg({ field: "directmessageid", error })).toBe(
+          "DM id is invalid",
+        );
+      })
+      .expect(422)
+      .end(done);
+  });
+
+  test("Return 422 error if limit query is invalid", done => {
+    agent
+      .get(`/direct-message/${DM?.id}/messages?limit=0.1`)
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message: string = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch messages");
+        expect(error.validationError).toBeDefined();
+        expect(getValidationErrorMsg({ field: "limit", error })).toBe(
+          "Limit must be an integer between 1 and 100",
+        );
+      })
+      .expect(422)
+      .end(done);
+  });
+
+  test("Return 422 error when cursor query is invalid", done => {
+    agent
+      .get(`/direct-message/${DM?.id}/messages?cursor=testcursor1_testcursor1`)
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message: string = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch messages");
+        expect(getValidationErrorMsg({ field: "cursor", error })).toBe(
+          "Cursor value is invalid",
+        );
+      })
+      .expect(422)
+      .end(done);
+  });
+
+  test("Return 422 error if direction query is invalid", done => {
+    agent
+      .get(`/direct-message/${DM?.id}/messages?direction=testdirection`)
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message: string = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to fetch messages");
+        expect(error.validationError).toBeDefined();
+        expect(getValidationErrorMsg({ field: "direction", error })).toBe(
+          "Cursor direction must be either backward or forward",
+        );
+      })
+      .expect(422)
+      .end(done);
+  });
+
+  const agent403 = request.agent(app);
+  login(agent403, {
+    username: "seeduser3",
+    password: "seed@User3",
+  });
+
+  test("Return 403 error if user is not authorized to access the DM", done => {
+    agent403
+      .get(`/direct-message/${DM?.id}/messages`)
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch messages",
+        error: {
+          message: "You are not authorised to access this DM",
+        },
+      })
+      .expect(403)
+      .end(done);
+  });
+
+  test("Return 404 error if the DM doesn't exist", done => {
+    agent
+      .get(`/direct-message/${DM?.inbox?.id}/messages`)
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect({
+        message: "Failed to fetch messages",
+        error: {
+          message: "DM doesn't exist",
+        },
+      })
+      .expect(404)
+      .end(done);
+  });
+
+  test("Return two messages when limit query is 2", done => {
+    agent
+      .get(`/direct-message/${DM?.id}/messages?limit=2`)
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message: string = res.body.message;
+        const messagesData = res.body.messagesData;
+        expect(message).toBe(`Successfully fetched messages`);
+        expect(messagesData).toBeDefined();
+        expect(messagesData.length).toBe(2);
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return correct cursor when the direction query is backward", done => {
+    const lastIndex: number = DMMessages.length - 1;
+    const limit: number = 2;
+    agent
+      .get(
+        `/direct-message/${DM?.id}/messages?direction=backward&limit=${limit}`,
+      )
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const prevCursor: string = res.body.prevCursor;
+        const nextCursor: string = res.body.nextCursor;
+        console.log({ lastMessage: DMMessages[lastIndex] });
+        expect(prevCursor).toBe(
+          constructMessageCursor({
+            id: DMMessages[limit - 1].id,
+            createdAt: DMMessages[limit - 1].createdAt,
+          }),
+        );
+
+        expect(nextCursor).toBe(
+          constructMessageCursor({
+            id: DMMessages[0].id,
+            createdAt: DMMessages[0].createdAt,
+          }),
+        );
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return correct cursor when the direction query is forward", done => {
+    const limit: number = 2;
+    const lastIndex: number = DMMessages.length - 1;
+    agent
+      .get(
+        `/direct-message/${DM?.id}/messages?direction=forward&limit=${limit}`,
+      )
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const prevCursor: string = res.body.prevCursor;
+        const nextCursor: string = res.body.nextCursor;
+
+        expect(prevCursor).toBe(
+          constructMessageCursor({
+            createdAt: DMMessages[lastIndex].createdAt,
+            id: DMMessages[lastIndex].id,
+          }),
+        );
+
+        expect(nextCursor).toBe(
+          constructMessageCursor({
+            id: DMMessages[lastIndex - limit + 1].id,
+            createdAt: DMMessages[lastIndex - limit + 1].createdAt,
+          }),
+        );
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return null prev cursor when messages data less than limit", done => {
+    const lastIndex: number = DMMessages.length - 1;
+    const cursor: string = constructMessageCursor({
+      id: DMMessages[lastIndex].id,
+      createdAt: DMMessages[lastIndex].createdAt,
+    });
+
+    agent
+      .get(
+        `/direct-message/${DM?.id}/messages?cursor=${cursor}` +
+          "&direction=backward&limit=5",
+      )
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const prevCursor: string | null = res.body.prevCursor;
+        expect(prevCursor).toBeNull();
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Return null next cursor when messages data less than limit", done => {
+    const cursor: string = constructMessageCursor({
+      id: DMMessages[0].id,
+      createdAt: DMMessages[0].createdAt,
+    });
+
+    agent
+      .get(
+        `/direct-message/${DM?.id}/messages?cursor=${cursor}` +
+          "&direction=forward&limit=5",
+      )
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const nextCursor: string | null = res.body.nextCursor;
+        expect(nextCursor).toBeNull();
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test(
+    "Return correct messages using cursor and backward direction query" +
+      " params",
+    done => {
+      const cursor: string = constructMessageCursor({
+        id: DMMessages[10].id,
+        createdAt: DMMessages[10].createdAt,
+      });
+
+      agent
+        .get(
+          `/direct-message/${DM?.id}/messages?cursor=${cursor}` +
+            "&direction=backward&limit=1",
+        )
+        .type("form")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const error = res.body.error;
+          expect(error).toBeUndefined();
+          const messagesData = res.body.messagesData;
+          expect(messagesData[0].content).toBe(DMMessages[11].content);
+          expect(messagesData[0].content).toBe("seedmessage89");
+        })
+        .expect(200)
+        .end(done);
+    },
+  );
+
+  test("Return correct messages with cursor and forward direction", done => {
+    const cursor: string = constructMessageCursor({
+      id: DMMessages[10].id,
+      createdAt: DMMessages[10].createdAt,
+    });
+
+    agent
+      .get(
+        `/direct-message/${DM?.id}/messages?cursor=${cursor}` +
+          "&direction=forward&limit=1",
+      )
+      .type("form")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const messagesData = res.body.messagesData;
+        expect(messagesData[0].id).toBe(DMMessages[9].id);
+        expect(messagesData[0].content).toBe("seedmessage91");
       })
       .expect(200)
       .end(done);

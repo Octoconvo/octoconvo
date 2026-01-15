@@ -678,6 +678,34 @@ const createDirectMessageMessage = ({
   });
 };
 
+interface CreateDMSeedMessageArgs {
+  DMID: string;
+  index: number;
+  authorUsername: string;
+}
+
+const createDMSeedMessage = ({
+  DMID,
+  index,
+  authorUsername,
+}: CreateDMSeedMessageArgs): PrismaPromise<Message> => {
+  return prisma.message.create({
+    data: {
+      inbox: {
+        connect: {
+          directMessageId: DMID,
+        },
+      },
+      author: {
+        connect: {
+          username: authorUsername,
+        },
+      },
+      content: `seedmessage${index}`,
+    },
+  });
+};
+
 export {
   getUserByUsername,
   getSeedUsers,
@@ -710,4 +738,5 @@ export {
   getClientDirectMessages,
   getDirectMessageInboxById,
   createDirectMessageMessage,
+  createDMSeedMessage,
 };

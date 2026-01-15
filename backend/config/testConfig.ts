@@ -97,6 +97,10 @@ app.get("/friends", friendController.user_friends_get);
 
 app.get("/direct-messages", dmController.user_DMs_get);
 app.get("/direct-message/:directmessageid", dmController.DM_get);
+app.get(
+  "/direct-message/:directmessageid/messages",
+  messageController.dm_messages_get,
+);
 
 app.use(notFoundErrorMiddleware);
 app.use(errorMiddleware);
