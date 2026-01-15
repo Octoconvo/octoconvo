@@ -1,7 +1,11 @@
 import asyncHandler from "express-async-handler";
 import { Request, Response } from "express";
 import { createAuthenticationMiddleware } from "../utils/authentication";
-import { getDirectMessageById, getUserDMs } from "../database/prisma/dmQueries";
+import {
+  getDirectMessageById,
+  getUserDMs,
+  hasDMAccess,
+} from "../database/prisma/dmQueries";
 import { UserDMData } from "../@types/database";
 import { LastMessage, UserDMsGETResponse } from "../@types/apiResponse";
 import { check, validationResult } from "express-validator";
@@ -97,6 +101,22 @@ const DM_get = [
 
       return;
     } else {
+      // Check authorisation
+      const isAuthorised: boolean = await hasDMAccess({
+        directMessageId: DMId as string,
+        userId: userId as string,
+      });
+      if (!isAuthorised) {
+        res.status(403).json({
+          message: `Failed to fetch DM with that id`,
+          error: {
+            message: "You are not authorised to access this DM",
+          },
+        });
+
+        return;
+      }
+
       const processedDM: UserDMsGETResponse = ((): UserDMsGETResponse => {
         const { participants, inbox, ...rest } = DM;
         const lastMessage: LastMessage = inbox

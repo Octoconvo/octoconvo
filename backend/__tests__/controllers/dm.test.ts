@@ -162,6 +162,28 @@ describe("Test DM get controller", () => {
       .expect(404, done);
   });
 
+  const agent403: TestAgent = request.agent(app);
+  login(agent403, {
+    username: "seeduser2",
+    password: "seed@User2",
+  });
+
+  test(
+    "Return 403 error when the user is not authorised to access the" + " DM",
+    done => {
+      agent403
+        .get(`/direct-message/${DM?.id}`)
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to fetch DM with that id",
+          error: {
+            message: "You are not authorised to access this DM",
+          },
+        })
+        .expect(403, done);
+    },
+  );
+
   test("Successfully fetched DM after successful validation", done => {
     agent
       .get(`/direct-message/${DM?.id}`)
