@@ -7,15 +7,15 @@ import Avatar from "../Avatar";
 import Loader from "../loader";
 import testIds from "@/utils/tests/testIds";
 
-const DirectMessageContainer = ({
+const DirectMessageHeaderContainer = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  return <div className="bg-black-400 w-full h-full">{children}</div>;
+  return <div className="bg-black-400 w-full">{children}</div>;
 };
 
-const DirectMessage = () => {
+const DirectMessageHeader = () => {
   const { directmessageid } = useParams<{ directmessageid: string }>();
 
   const { isPending, error, data } = useQuery({
@@ -33,7 +33,7 @@ const DirectMessage = () => {
 
   if (isPending) {
     return (
-      <DirectMessageContainer>
+      <DirectMessageHeaderContainer>
         <div
           className={
             "flex justify-center w-full p-[32px] bg-black-200 gap-[32px]" +
@@ -44,20 +44,20 @@ const DirectMessage = () => {
             <Loader size={32} />
           </div>
         </div>
-      </DirectMessageContainer>
+      </DirectMessageHeaderContainer>
     );
   }
 
   if (error) {
     return (
-      <DirectMessageContainer>
+      <DirectMessageHeaderContainer>
         <p>Something went wrong!</p>
-      </DirectMessageContainer>
+      </DirectMessageHeaderContainer>
     );
   }
 
   return (
-    <DirectMessageContainer>
+    <DirectMessageHeaderContainer>
       {data && (
         <section
           data-testid={testIds.DMInformationItem}
@@ -78,8 +78,8 @@ const DirectMessage = () => {
           </p>
         </section>
       )}
-    </DirectMessageContainer>
+    </DirectMessageHeaderContainer>
   );
 };
 
-export default DirectMessage;
+export default DirectMessageHeader;
