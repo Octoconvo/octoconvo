@@ -557,7 +557,7 @@ const dm_messages_get = [
       direction,
     });
 
-    const { prevCursor, nextCursor } = getMsgCursors(messages, direction);
+    const { prevCursor, nextCursor } = getMsgCursors(messages);
 
     res.json({
       message: `Successfully fetched messages`,

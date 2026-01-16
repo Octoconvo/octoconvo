@@ -952,7 +952,6 @@ describe("Test DM messages get controller", () => {
   });
 
   test("Return correct cursor when the direction query is backward", done => {
-    const lastIndex: number = DMMessages.length - 1;
     const limit: number = 2;
     agent
       .get(
@@ -963,18 +962,17 @@ describe("Test DM messages get controller", () => {
       .expect((res: Response) => {
         const prevCursor: string = res.body.prevCursor;
         const nextCursor: string = res.body.nextCursor;
-        console.log({ lastMessage: DMMessages[lastIndex] });
         expect(prevCursor).toBe(
           constructMessageCursor({
-            id: DMMessages[limit - 1].id,
-            createdAt: DMMessages[limit - 1].createdAt,
+            id: DMMessages[0].id,
+            createdAt: DMMessages[0].createdAt,
           }),
         );
 
         expect(nextCursor).toBe(
           constructMessageCursor({
-            id: DMMessages[0].id,
-            createdAt: DMMessages[0].createdAt,
+            id: DMMessages[limit - 1].id,
+            createdAt: DMMessages[limit - 1].createdAt,
           }),
         );
       })

@@ -74,7 +74,6 @@ const constructMessageCursor = ({
 
 const getMsgCursors = (
   messages: Message[],
-  direction: "backward" | "forward",
 ): {
   prevCursor: string | null;
   nextCursor: string | null;
@@ -89,12 +88,10 @@ const getMsgCursors = (
       : null;
 
   // Get the oldest message as the previous cursor
-  const prevCursor: string | null =
-    direction === "backward" ? lastMsgCursor : firstMsgCursor;
+  const prevCursor: string | null = firstMsgCursor;
 
   // Get the latest message as the next cursor
-  const nextCursor: string | null =
-    direction === "backward" ? firstMsgCursor : lastMsgCursor;
+  const nextCursor: string | null = lastMsgCursor;
 
   return {
     prevCursor,
