@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import createMockURL from "../createMockURL";
 
 interface AttachmentMockConstructor {
-  messageId: string | null;
+  messageId?: string | null;
   subType: "JPEG" | "PNG" | "GIF";
   height?: number;
   width?: number;
@@ -30,7 +30,7 @@ class AttachmentMock implements AttachmentAPI {
     thumbnailUrl,
   }: AttachmentMockConstructor) {
     this.id = randomUUID();
-    this.messageId = messageId;
+    this.messageId = messageId ? messageId : null;
     this.type = "IMAGE";
     this.subType = subType;
     this.width = width;
