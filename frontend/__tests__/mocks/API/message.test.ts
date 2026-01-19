@@ -1,5 +1,5 @@
 import AttachmentMock from "@/mocks/API/attachment";
-import MessageMock from "@/mocks/API/message";
+import MessageMock, { generateMessageMock } from "@/mocks/API/message";
 import { randomUUID } from "crypto";
 
 describe("Test MessageMock class", () => {
@@ -118,6 +118,25 @@ describe("Test MessageMock class", () => {
     });
     for (const attachment of messageMock.attachments) {
       expect(attachment.messageId).toBe(messageMock.id);
+    }
+  });
+});
+
+describe("Test generateMessageMock function", () => {
+  test("Return 0 message mocks if the size is 0", () => {
+    const messageMocks: MessageMock[] = generateMessageMock(0);
+    expect(messageMocks.length).toBe(0);
+  });
+
+  test("Return 10 message mocks if the size is 10", () => {
+    const messageMocks: MessageMock[] = generateMessageMock(10);
+    expect(messageMocks.length).toBe(10);
+  });
+
+  test("message mocks are instances of MessageMock class", () => {
+    const messageMocks: MessageMock[] = generateMessageMock(10);
+    for (const messageMock of messageMocks) {
+      expect(messageMock instanceof MessageMock).toBeTruthy();
     }
   });
 });
