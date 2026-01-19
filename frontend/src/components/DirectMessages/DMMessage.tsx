@@ -49,9 +49,9 @@ const DMMessage: FC<DMMessageProps> = ({ message }) => {
         >
           {message.author.displayName}
         </p>
-        <p data-testid={testIds.DMMessageContent}>
+        <div data-testid={testIds.DMMessageContent}>
           {createHTMLNewLine(unescapeString(message.content))}
-        </p>
+        </div>
 
         {message.attachments?.length ? (
           <AttachmentBox
