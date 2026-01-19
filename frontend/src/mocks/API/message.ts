@@ -64,4 +64,25 @@ class MessageMock implements InboxMessageAPI {
   }
 }
 
+const generateMessageMock = (size: number): MessageMock[] => {
+  const messages: MessageMock[] = [];
+
+  for (let i: number = 0; i < size; i++) {
+    const authorUsername: string = `authorusername${i}`;
+    const authorDisplayName: string = `authordisplayName${i}`;
+    const content: string = `message${i}`;
+
+    messages.push(
+      new MessageMock({
+        authorUsername: authorUsername,
+        authorDisplayName: authorDisplayName,
+        content: content,
+      })
+    );
+  }
+
+  return messages;
+};
+
 export default MessageMock;
+export { generateMessageMock };
