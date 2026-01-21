@@ -1,4 +1,4 @@
-import { DirectMessageAPI } from "@/types/api";
+import { DirectMessageAPI, InboxMessageAPI } from "@/types/api";
 
 const DOMAIN_URL: string | undefined = process.env.NEXT_PUBLIC_DOMAIN_URL;
 
@@ -61,8 +61,48 @@ const getDirectMessageById = async (
   };
 };
 
+interface DMMessagesAPIResponse {
+  message: string;
+  error?: {
+    message: string;
+  };
+  messagesData: InboxMessageAPI[];
+  nextCursor: string | null;
+  prevCursor: string | null;
+}
+
+interface DMMessagesAPIData extends DMMessagesAPIResponse {
+  status: number;
+}
+
+const getDMMessages = async ({
+  DMId,
+  cursor,
+}: {
+  DMId: string;
+  cursor: null | string;
+}): Promise<DMMessagesAPIData> => {
+  const cursorQuery: string = cursor ? `&cursor=${cursor}` : "";
+  const response: Response = await fetch(
+    `${DOMAIN_URL}/direct-message/${DMId}/messages?limit=30&direction=backward` +
+      cursorQuery,
+    {
+      method: "GET",
+      credentials: "include",
+    }
+  );
+
+  const responseData: DMMessagesAPIResponse = await response.json();
+
+  return {
+    status: response.status,
+    ...responseData,
+  };
+};
+
 export {
   getUserDirectMessages,
   type UserDirectMessageResponse,
   getDirectMessageById,
+  getDMMessages,
 };
