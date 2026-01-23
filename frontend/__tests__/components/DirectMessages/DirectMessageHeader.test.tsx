@@ -1,4 +1,4 @@
-import DirectMessage from "@/components/DirectMessages/DirectMessage";
+import DirectMessageHeader from "@/components/DirectMessages/DirectMessageHeader";
 import { createFetchMock } from "@/utils/tests/mocks";
 import { render, screen, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
@@ -83,7 +83,7 @@ describe("Render DirectMessage component", () => {
   beforeEach(() => {
     render(
       <Wrapper>
-        <DirectMessage />
+        <DirectMessageHeader />
       </Wrapper>
     );
   });

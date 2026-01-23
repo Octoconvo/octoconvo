@@ -12,6 +12,11 @@ const testIds = {
   DMInformationItem: "DM-information-item",
   DMInformationAvatar: "DM-information-avatar",
   DMInformationDisplayName: "DM-information-displayName",
+  DMMessageContent: "DM-message-content",
+  DMMessageAuthorUsername: "DM-message-author-username",
+  DMMessageAuthorDisplayName: "DM-message-author-displayName",
+  DMMessageAuthorAvatar: "DM-message-author-avatar",
+  DMMessagesInfiniteLoader: "DM-messages-infinite-loader",
 };
 
 export default testIds;
