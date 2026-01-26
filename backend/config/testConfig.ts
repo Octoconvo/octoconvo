@@ -101,6 +101,10 @@ app.get(
   "/direct-message/:directmessageid/messages",
   messageController.dm_messages_get,
 );
+app.post(
+  "/direct-message/:directmessageid/message",
+  messageController.dm_message_post,
+);
 
 app.use(notFoundErrorMiddleware);
 app.use(errorMiddleware);

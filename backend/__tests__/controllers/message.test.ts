@@ -3,10 +3,11 @@ import app from "../../config/testConfig";
 import { getValidationErrorMsg, login } from "../../utils/testUtils";
 import prisma from "../../database/prisma/client";
 import { console } from "node:inspector";
-import { Community, Inbox, Message } from "@prisma/client";
+import { Attachment, Community, Inbox, Message } from "@prisma/client";
 import { deleteAllMessageByContent } from "../../database/prisma/messageQueries";
 import { getLastIndexToBase10 } from "../../utils/numberUtils";
 import {
+  deleteMessageAndItsDataById,
   getDMByParticipants,
   getMessagesByInboxId,
 } from "../../database/prisma/testQueries";
@@ -1099,6 +1100,289 @@ describe("Test DM messages get controller", () => {
         const messagesData = res.body.messagesData;
         expect(messagesData[0].id).toBe(DMMessages[9].id);
         expect(messagesData[0].content).toBe("seedmessage91");
+      })
+      .expect(200)
+      .end(done);
+  });
+});
+
+describe("Test DM message POST controller", () => {
+  type MessageWithAttachments = Message & { attachments: Attachment[] };
+  const createdDMMessages: MessageWithAttachments[] = [];
+  let DM: DMWithInbox | null;
+
+  beforeAll(async () => {
+    try {
+      DM = await getDMByParticipants({
+        usernameOne: "seeduser1",
+        usernameTwo: "seeduser2",
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  });
+
+  afterAll(async () => {
+    for (const message of createdDMMessages) {
+      try {
+        await deleteMessageAndItsDataById(message.id);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  });
+
+  test(
+    "Return 401 unauthorized if user tries to create a DM message without" +
+      " being authenticated",
+    done => {
+      request(app)
+        .post(`/direct-message/${DM?.id}/message`)
+        .type("form")
+        .send({
+          content: "testmessage1",
+        })
+        .expect("Content-Type", /json/)
+        .expect({
+          message: "Failed to create DM's message",
+          error: {
+            message: "You are not authenticated",
+          },
+        })
+        .expect(401, done);
+    },
+  );
+
+  const agent = request.agent(app);
+
+  login(agent, {
+    username: "seeduser1",
+    password: "seed@User1",
+  });
+
+  test("Return 422 error when user create a message without content", done => {
+    agent
+      .post(`/direct-message/${DM?.id}/message`)
+      .type("form")
+      .send({
+        content: "",
+      })
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message: string = res.body.message;
+        const error = res.body.error;
+
+        expect(message).toBe("Failed to create DM's message");
+        expect(error.validationError).toBeDefined();
+        expect(getValidationErrorMsg({ error, field: "content" })).toBe(
+          "Message is required",
+        );
+      })
+      .expect(422)
+      .end(done);
+  });
+
+  test(
+    "Return 422 error when user create a message to an invalid DM's" + " id",
+    done => {
+      agent
+        .post("/direct-message/testdirectmessageid/message")
+        .type("form")
+        .send({
+          content: "testmessage1",
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message: string = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to create DM's message");
+          expect(error.validationError).toBeDefined();
+          expect(
+            getValidationErrorMsg({ error, field: "directmessageid" }),
+          ).toBe("DM id is invalid");
+        })
+        .expect(422)
+        .end(done);
+    },
+  );
+
+  test(
+    "Return 422 error when user message's attachment mimetype is" + " invalid",
+    done => {
+      agent
+        .post(`/direct-message/${DM?.id}/message`)
+        .set("Content-type", "multipart/form-data")
+        .accept("application/json")
+        .field("content", "testmessage1")
+        .attach("attachments", __dirname + "/../assets/test-img-invalid-01.svg")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message: string = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to create DM's message");
+          expect(error.validationError).toBeDefined();
+          expect(getValidationErrorMsg({ error, field: "attachments" })).toBe(
+            "Message's attachments can only be in jpeg, png, or gif format",
+          );
+        })
+        .expect(422)
+        .end(done);
+    },
+  );
+
+  test(
+    "Return 413 error when user message's attacment size exceeds size" +
+      " limit",
+    done => {
+      agent
+        .post(`/direct-message/${DM?.id}/message`)
+        .set("Content-type", "multipart/form-data")
+        .accept("application/json")
+        .field("content", "testmessage1")
+        .attach("attachments", __dirname + "/../assets/testimageexceed10mb.png")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message: string = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to create DM's message");
+          expect(error.validationError).toBeDefined();
+          expect(getValidationErrorMsg({ error, field: "attachments" })).toBe(
+            "Individual file in attachments must not exceed 5 MB",
+          );
+        })
+        .expect(413)
+        .end(done);
+    },
+  );
+
+  test(
+    "Return 422 error when user message's total assigments size exceeds size" +
+      " limit",
+    done => {
+      agent
+        .post(`/direct-message/${DM?.id}/message`)
+        .set("Content-type", "multipart/form-data")
+        .accept("application/json")
+        .field("content", "testmessage1")
+        .attach("attachments", __dirname + "/../assets/testimageexceed2mb.png")
+        .attach("attachments", __dirname + "/../assets/testimageexceed2mb.png")
+        .attach("attachments", __dirname + "/../assets/testimageexceed2mb.png")
+        .attach("attachments", __dirname + "/../assets/testimageexceed2mb.png")
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message: string = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to create DM's message");
+          expect(error.validationError).toBeDefined();
+          expect(getValidationErrorMsg({ error, field: "attachments" })).toBe(
+            "Message attachments total size must not exceed 10 MB",
+          );
+        })
+        .expect(422)
+        .end(done);
+    },
+  );
+
+  test(
+    "Return 404 error when user send a message to a inbox that doesn't" +
+      " exist",
+    done => {
+      agent
+        .post(`/direct-message/${DM?.inbox?.id}/message`)
+        .type("form")
+        .send({
+          content: "tesmessage1",
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message: string = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to create DM's message");
+          expect(error.validationError).not.toBeDefined();
+          expect(error.message).toBe("Can't find DM's inbox");
+        })
+        .expect(404)
+        .end(done);
+    },
+  );
+
+  const agent403 = request.agent(app);
+  login(agent403, {
+    username: "seeduser3",
+    password: "seed@User3",
+  });
+
+  test(
+    "Return 403 error when user is not authorised to create a message to" +
+      " the DM",
+    done => {
+      agent403
+        .post(`/direct-message/${DM?.id}/message`)
+        .type("form")
+        .send({
+          content: "tesmessage1",
+        })
+        .expect("Content-Type", /json/)
+        .expect((res: Response) => {
+          const message: string = res.body.message;
+          const error = res.body.error;
+
+          expect(message).toBe("Failed to create DM's message");
+          expect(error.message).toBe(
+            "You are not authorised to create messages to this DM",
+          );
+        })
+        .expect(403)
+        .end(done);
+    },
+  );
+
+  test("Successfully created the message if all fields are valid", done => {
+    agent
+      .post(`/direct-message/${DM?.id}/message`)
+      .set("Content-type", "multipart/form-data")
+      .accept("application/json")
+      .field("content", "testmessage1")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message: string = res.body.message;
+        const messageData: MessageWithAttachments = res.body.messageData;
+        createdDMMessages.push(messageData);
+        expect(message).toBe("Successfully created DM's message");
+        expect(messageData).toBeDefined();
+        expect(messageData.inboxId).toBe(DM?.inbox?.id);
+      })
+      .expect(200)
+      .end(done);
+  });
+
+  test("Successfully created the message with attachments", done => {
+    agent
+      .post(`/direct-message/${DM?.id}/message`)
+      .set("Content-type", "multipart/form-data")
+      .accept("application/json")
+      .field("content", "testmessage1")
+      .attach("attachments", __dirname + "/../assets/test-img-valid-01.jpg")
+      .attach("attachments", __dirname + "/../assets/test-img-valid-01.jpg")
+      .expect("Content-Type", /json/)
+      .expect((res: Response) => {
+        const message: string = res.body.message;
+        const messageData: MessageWithAttachments = res.body.messageData;
+
+        expect(message).toBe("Successfully created DM's message");
+        expect(messageData).toBeDefined();
+        expect(messageData.attachments).toBeDefined();
+        for (const attachment of messageData.attachments) {
+          expect(attachment.url).toContain(`/attachment/${DM?.inbox?.id}/`);
+          expect(attachment.thumbnailUrl).toContain(
+            `/attachment/${DM?.inbox?.id}/`,
+          );
+        }
       })
       .expect(200)
       .end(done);
