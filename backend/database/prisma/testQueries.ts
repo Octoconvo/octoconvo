@@ -1,4 +1,9 @@
-import { Message, NotificationType, PrismaPromise } from "@prisma/client";
+import {
+  Message,
+  NotificationType,
+  Prisma,
+  PrismaPromise,
+} from "@prisma/client";
 import prisma from "./client";
 import { DMWithInbox } from "../../@types/database";
 
@@ -277,6 +282,33 @@ const getMessagesByInboxId = (inboxId: string): PrismaPromise<Message[]> => {
   });
 };
 
+const deleteAttachmentsByMessageId = (
+  messageId: string,
+): PrismaPromise<Prisma.BatchPayload> => {
+  return prisma.attachment.deleteMany({
+    where: {
+      messageId: messageId,
+    },
+  });
+};
+
+const deleteMessageById = (id: string): PrismaPromise<Message> => {
+  return prisma.message.delete({
+    where: {
+      id: id,
+    },
+  });
+};
+
+const deleteMessageAndItsDataById = (
+  id: string,
+): Promise<[Prisma.BatchPayload, Message]> => {
+  return prisma.$transaction([
+    deleteAttachmentsByMessageId(id),
+    deleteMessageById(id),
+  ]);
+};
+
 export {
   getUserFriends,
   getUserLastFriend,
@@ -289,4 +321,5 @@ export {
   deleteFriendRequests,
   getDMByParticipants,
   getMessagesByInboxId,
+  deleteMessageAndItsDataById,
 };
