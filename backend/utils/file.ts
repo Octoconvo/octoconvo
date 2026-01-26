@@ -123,10 +123,40 @@ const createAttachmentData = async ({
   };
 };
 
+interface HandleImageAttachmentArgs {
+  file: Express.Multer.File;
+  folder: string;
+  bucketName: string;
+}
+
+const handleImageAttachmentUpload = async ({
+  file,
+  folder,
+  bucketName,
+}: HandleImageAttachmentArgs): Promise<AttachmentData> => {
+  const { image, thumbnail } = await processImageAttachment(file);
+  const url: string = (
+    await uploadFileAndGetUrl({
+      file: image,
+      folder: folder,
+      bucketName: bucketName,
+    })
+  ).publicUrl;
+  const thumbnailUrl: string = (
+    await uploadFileAndGetUrl({
+      file: thumbnail,
+      folder: folder,
+      bucketName: bucketName,
+    })
+  ).publicUrl;
+  return createAttachmentData({ file: image, url, thumbnailUrl });
+};
+
 export {
   convertFileName,
   uploadFileAndGetUrl,
   resizeAndCompressImage,
   processImageAttachment,
   createAttachmentData,
+  handleImageAttachmentUpload,
 };
