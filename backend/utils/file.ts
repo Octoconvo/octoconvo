@@ -65,4 +65,31 @@ const resizeAndCompressImage = async ({
   }
 };
 
-export { convertFileName, uploadFileAndGetUrl, resizeAndCompressImage };
+const processImageAttachment = async (
+  file: Express.Multer.File,
+): Promise<{
+  image: Express.Multer.File;
+  thumbnail: Express.Multer.File;
+}> => {
+  const image: Express.Multer.File = convertFileName(file);
+  const thumbnail: Express.Multer.File = convertFileName(file);
+  image.buffer = await resizeAndCompressImage({
+    buffer: image.buffer,
+    maxLength: 720,
+    quality: 70,
+  });
+  thumbnail.buffer = await resizeAndCompressImage({
+    buffer: image.buffer,
+    maxLength: 720,
+    quality: 70,
+  });
+
+  return { image, thumbnail };
+};
+
+export {
+  convertFileName,
+  uploadFileAndGetUrl,
+  resizeAndCompressImage,
+  processImageAttachment,
+};
