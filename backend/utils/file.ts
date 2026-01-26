@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import path from "path";
+import sharp from "sharp";
 import { uploadFile, getPublicURL } from "../database/supabase/supabaseQueries";
 
 const convertFileName = (file: Express.Multer.File): Express.Multer.File => {
@@ -35,4 +36,33 @@ const uploadFileAndGetUrl = async ({
   return fileUrl;
 };
 
-export { convertFileName, uploadFileAndGetUrl };
+interface ResizeAndCompressImageArgs {
+  buffer: Buffer<ArrayBufferLike>;
+  maxLength: number;
+  quality: number;
+}
+
+const resizeAndCompressImage = async ({
+  buffer,
+  maxLength,
+  quality,
+}: ResizeAndCompressImageArgs): Promise<Buffer<ArrayBufferLike>> => {
+  const metadata = await sharp(buffer).metadata();
+
+  if (metadata.height && metadata.width && metadata.height > metadata.width) {
+    return await sharp(buffer)
+      .jpeg({ quality })
+      .resize({
+        height: maxLength,
+        fit: "cover",
+      })
+      .toBuffer();
+  } else {
+    return await sharp(buffer)
+      .jpeg({ quality })
+      .resize({ height: maxLength, fit: "cover" })
+      .toBuffer();
+  }
+};
+
+export { convertFileName, uploadFileAndGetUrl, resizeAndCompressImage };
