@@ -1,7 +1,8 @@
 import crypto from "crypto";
 import path from "path";
-import sharp from "sharp";
+import sharp, { Metadata } from "sharp";
 import { uploadFile, getPublicURL } from "../database/supabase/supabaseQueries";
+import { Attachment, AttachmentSubtype, AttachmentType } from "@prisma/client";
 
 const convertFileName = (file: Express.Multer.File): Express.Multer.File => {
   const uuid = crypto.randomUUID();
@@ -87,9 +88,45 @@ const processImageAttachment = async (
   return { image, thumbnail };
 };
 
+interface CreateAttachmentDataArgs {
+  file: Express.Multer.File;
+  url: string;
+  thumbnailUrl: string;
+}
+
+type AttachmentData = Pick<
+  Attachment,
+  "type" | "subtype" | "width" | "height" | "size" | "url" | "thumbnailUrl"
+>;
+
+const createAttachmentData = async ({
+  file,
+  url,
+  thumbnailUrl,
+}: CreateAttachmentDataArgs): Promise<AttachmentData> => {
+  const metadata: Metadata = await sharp(file.buffer).metadata();
+  const type: AttachmentType = file.mimetype
+    .split("/")[0]
+    .toUpperCase() as AttachmentType;
+  const subtype: AttachmentSubtype = file.mimetype
+    .split("/")[1]
+    .toUpperCase() as AttachmentSubtype;
+
+  return {
+    type: type,
+    subtype: subtype,
+    width: metadata.width || null,
+    height: metadata.height || null,
+    size: metadata.size || null,
+    url: url,
+    thumbnailUrl: thumbnailUrl,
+  };
+};
+
 export {
   convertFileName,
   uploadFileAndGetUrl,
   resizeAndCompressImage,
   processImageAttachment,
+  createAttachmentData,
 };
