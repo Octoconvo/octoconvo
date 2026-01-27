@@ -4,12 +4,20 @@ import { createAuthenticationMiddleware } from "../utils/authentication";
 import { createValidationErrObj } from "../utils/error";
 import { body, check, param, query, validationResult } from "express-validator";
 import { getInboxById } from "../database/prisma/inboxQueries";
-import { createMessage, getMessages } from "../database/prisma/messageQueries";
+import {
+  createDMMessage,
+  createMessage,
+  getMessages,
+} from "../database/prisma/messageQueries";
 import sharp from "sharp";
 import multer from "multer";
 import { getPublicURL, uploadFile } from "../database/supabase/supabaseQueries";
 import { getCommunityByIdAndParticipant } from "../database/prisma/communityQueries";
-import { convertFileName } from "../utils/file";
+import {
+  AttachmentData,
+  convertFileName,
+  handleImageAttachmentUpload,
+} from "../utils/file";
 import { isUUID, isISOString } from "../utils/validation";
 import { Inbox, Message } from "@prisma/client";
 import {
@@ -79,7 +87,6 @@ const messageValidation = {
     .trim()
     .custom((val: string): boolean => {
       if (!isUUID(val)) {
-        console.log({ val });
         throw new Error("DM id is invalid");
       }
 
@@ -506,7 +513,6 @@ const dm_messages_get = [
     if (!errors.isEmpty()) {
       const obj = createValidationErrObj(errors, `Failed to fetch messages`);
 
-      console.log({ error: obj.error.validationError[0] });
       res.status(422).json(obj);
       return;
     }
@@ -570,4 +576,129 @@ const dm_messages_get = [
   }),
 ];
 
-export { message_post, messages_get, dm_messages_get };
+const DMMessageAttachmentMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  upload.array("attachments", 10)(req, res, function (err) {
+    // Handle file validation
+    if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+      res.status(413).json({
+        message: "Failed to create DM's message",
+        error: {
+          validationError: [
+            {
+              field: "attachments",
+              msg: "Individual file in attachments must not exceed 5 MB",
+            },
+          ],
+        },
+      });
+    } else if (err && err.message === "INVALID_MIMETYPE") {
+      res.status(422).json({
+        message: "Failed to create DM's message",
+        error: {
+          validationError: [
+            {
+              field: "attachments",
+              msg: "Message's attachments can only be in jpeg, png, or gif format",
+            },
+          ],
+        },
+      });
+    } else if (err) {
+      next(err);
+    } else {
+      next();
+    }
+  });
+};
+
+const DMMessagePOSTAuthentication = createAuthenticationMiddleware({
+  message: "Failed to create DM's message",
+  errMessage: "You are not authenticated",
+});
+
+const dm_message_post = [
+  DMMessagePOSTAuthentication,
+  DMMessageAttachmentMiddleware,
+  messageValidation.content,
+  messageValidation.directMessageIdParam,
+  messageValidation.attachments,
+  asyncHandler(async (req: Request, res: Response) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      const obj = createValidationErrObj(
+        errors,
+        "Failed to create DM's message",
+      );
+      res.status(422).json(obj);
+      return;
+    }
+
+    const user = req.user as Express.User;
+    const DMId: string = req.params.directmessageid;
+    const content: string = req.body.content;
+
+    const inbox = await getDirectMessageInboxById(DMId);
+
+    if (inbox === null) {
+      res.status(404).json({
+        message: "Failed to create DM's message",
+        error: {
+          message: "Can't find DM's inbox",
+        },
+      });
+
+      return;
+    }
+
+    // Check authorisation
+    const isAuthorised: boolean = await hasDMAccess({
+      directMessageId: inbox.directMessageId as string,
+      userId: user.id as string,
+    });
+
+    if (!isAuthorised) {
+      res.status(403).json({
+        message: `Failed to create DM's message`,
+        error: {
+          message: "You are not authorised to create messages to this DM",
+        },
+      });
+
+      return;
+    }
+
+    const attachmentsData: AttachmentData[] = [];
+
+    if (req.files && Array.isArray(req.files)) {
+      const files: Express.Multer.File[] = req.files;
+
+      for (const file of files) {
+        const attachment: AttachmentData = await handleImageAttachmentUpload({
+          file,
+          folder: inbox.id,
+          bucketName: "attachment",
+        });
+        attachmentsData.push(attachment);
+      }
+    }
+
+    const message = await createDMMessage({
+      authorId: user.id,
+      inboxId: inbox.id,
+      content,
+      attachmentsData: attachmentsData,
+    });
+
+    res.json({
+      message: "Successfully created DM's message",
+      messageData: message,
+    });
+  }),
+];
+
+export { message_post, messages_get, dm_messages_get, dm_message_post };

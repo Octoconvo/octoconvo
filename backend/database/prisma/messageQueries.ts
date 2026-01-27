@@ -1,3 +1,5 @@
+import { Message, PrismaPromise } from "@prisma/client";
+import { AttachmentData } from "../../utils/file";
 import prisma from "./client";
 
 const createMessage = async ({
@@ -135,4 +137,48 @@ const getMessages = async ({
   return messages;
 };
 
-export { createMessage, deleteAllMessageByContent, getMessages };
+interface CreateDMMessageArgs {
+  authorId: string;
+  inboxId: string;
+  content: string;
+  attachmentsData: AttachmentData[];
+}
+
+const createDMMessage = ({
+  authorId,
+  inboxId,
+  content,
+  attachmentsData,
+}: CreateDMMessageArgs): PrismaPromise<Message> => {
+  return prisma.message.create({
+    data: {
+      authorId,
+      inboxId,
+      content,
+      ...(attachmentsData.length
+        ? {
+            attachments: {
+              create: attachmentsData,
+            },
+          }
+        : {}),
+    },
+
+    include: {
+      author: {
+        select: {
+          username: true,
+          displayName: true,
+          avatar: true,
+        },
+      },
+      attachments: true,
+    },
+  });
+};
+export {
+  createMessage,
+  deleteAllMessageByContent,
+  getMessages,
+  createDMMessage,
+};
